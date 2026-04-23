@@ -30,6 +30,19 @@ const SAMPLE_IMAGES = [
   'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fantasy%20landscape%20with%20floating%20islands%20and%20crystal%20waterfalls%2C%20epic%20fantasy%20art&image_size=square_hd',
 ];
 
+const PREDEFINED_SQUARES = [
+  { x: 3, y: 5 }, { x: 7, y: 2 }, { x: 12, y: 8 }, { x: 5, y: 14 },
+  { x: 15, y: 3 }, { x: 9, y: 11 }, { x: 2, y: 17 }, { x: 18, y: 6 },
+  { x: 11, y: 15 }, { x: 6, y: 9 }, { x: 14, y: 12 }, { x: 8, y: 4 },
+  { x: 16, y: 18 }, { x: 4, y: 7 }, { x: 13, y: 1 }, { x: 10, y: 19 },
+  { x: 1, y: 10 }, { x: 17, y: 13 }, { x: 12, y: 5 }, { x: 5, y: 16 },
+  { x: 19, y: 8 }, { x: 7, y: 12 }, { x: 14, y: 3 }, { x: 3, y: 18 },
+  { x: 11, y: 7 }, { x: 16, y: 14 }, { x: 6, y: 1 }, { x: 18, y: 10 },
+  { x: 9, y: 17 }, { x: 2, y: 8 }, { x: 15, y: 5 }, { x: 8, y: 13 },
+  { x: 13, y: 16 }, { x: 4, y: 11 }, { x: 17, y: 2 }, { x: 10, y: 6 },
+  { x: 1, y: 14 }, { x: 12, y: 10 }, { x: 7, y: 19 },
+];
+
 export function HeroSection({ className }: HeroSectionProps) {
   const { t, tObject } = useTranslation();
   const [mounted, setMounted] = useState(false);
@@ -47,10 +60,7 @@ export function HeroSection({ className }: HeroSectionProps) {
     }
   };
 
-  const squares = Array.from({ length: 40 }).map(() => ({
-    x: Math.floor(Math.random() * 20),
-    y: Math.floor(Math.random() * 20),
-  }));
+  const squares = PREDEFINED_SQUARES;
 
   return (
     <section
