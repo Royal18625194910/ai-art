@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
 import { AnimatedGradientText } from '@/components/ui/animated-gradient-text';
-import { WarpBackground } from '@/components/ui/warp-background';
+import { MagicRings } from '@/components/ui/magic-rings';
 
 interface HeroSectionProps {
   className?: string;
@@ -20,6 +20,13 @@ const STATS = [
   { value: 2000000, label: 'stats.users', icon: Users, suffix: '+' },
   { value: 50000000, label: 'stats.images', icon: Image, suffix: '+' },
   { value: 50, label: 'stats.models', icon: Brain, suffix: '+' },
+];
+
+const SAMPLE_IMAGES = [
+  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=futuristic%20cyberpunk%20city%20at%20night%20with%20neon%20lights%20and%20flying%20cars%2C%20cinematic%2C%20highly%20detailed&image_size=square_hd',
+  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beautiful%20anime%20girl%20with%20pink%20hair%20and%20cherry%20blossoms%2C%20soft%20lighting%2C%20art%20station&image_size=square_hd',
+  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=surreal%20abstract%20art%20with%20flowing%20colors%20and%20geometric%20patterns%2C%20modern%20art&image_size=square_hd',
+  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fantasy%20landscape%20with%20floating%20islands%20and%20crystal%20waterfalls%2C%20epic%20fantasy%20art&image_size=square_hd',
 ];
 
 const containerVariants = {
@@ -44,26 +51,6 @@ const itemVariants = {
     },
   },
 };
-
-const codeLines = [
-  'import { ColorBends } from "@/components/ui/color-bends";',
-  '',
-  'function App() {',
-  '  return (',
-  '    <ColorBends',
-  '      color="#A855F7"',
-  '      speed={0.2}',
-  '      frequency={1.0}',
-  '      noise={0.25}',
-  '      bandWidth={0.14}',
-  '      rotation={-60}',
-  '      fadeTop={0.1}',
-  '      iterations={1}',
-  '      intensity={1.3}',
-  '    />',
-  '  );',
-  '}',
-];
 
 export function HeroSection({ className }: HeroSectionProps) {
   const { t, tObject } = useTranslation();
@@ -90,11 +77,65 @@ export function HeroSection({ className }: HeroSectionProps) {
         className
       )}
     >
-      <WarpBackground className="absolute inset-0">
-        <div className="absolute inset-0" />
-      </WarpBackground>
+      <div className="absolute inset-0 pointer-events-none">
+        <MagicRings
+          color="#A855F7"
+          colorTwo="#06B6D4"
+          ringCount={6}
+          speed={0.8}
+          attenuation={8}
+          lineThickness={3}
+          baseRadius={0.3}
+          radiusStep={0.12}
+          scaleRate={0.15}
+          opacity={0.6}
+          blur={4}
+          noiseAmount={0.15}
+          rotation={0}
+          ringGap={1.8}
+          fadeIn={0.6}
+          fadeOut={0.4}
+          className="absolute inset-0 w-full h-full"
+        />
+        
+        <motion.div
+          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-500/15 rounded-full blur-3xl"
+          animate={{
+            x: [0, 50, -30, 0],
+            y: [0, -40, 20, 0],
+            scale: [1, 1.1, 0.95, 1],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/15 rounded-full blur-3xl"
+          animate={{
+            x: [0, -40, 30, 0],
+            y: [0, 30, -20, 0],
+            scale: [1, 0.95, 1.05, 1],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 2,
+          }}
+        />
+        
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0)`,
+            backgroundSize: '32px 32px',
+          }}
+        />
+      </div>
 
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/30 to-background" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
 
       <Container className="relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -117,7 +158,7 @@ export function HeroSection({ className }: HeroSectionProps) {
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight mb-6">
                 <span className="block">{t('hero.title')}</span>
                 <AnimatedGradientText
                   from="from-purple-500"
@@ -140,7 +181,7 @@ export function HeroSection({ className }: HeroSectionProps) {
 
             <motion.div
               variants={itemVariants}
-              className="flex items-center gap-2 mb-10 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20"
+              className="flex items-center gap-2 mb-10 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20"
             >
               <Sparkles className="w-4 h-4 text-purple-400" />
               <span className="text-sm text-purple-300">
@@ -200,64 +241,123 @@ export function HeroSection({ className }: HeroSectionProps) {
             transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="relative hidden lg:block"
           >
-            <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-black/30">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
+            <div className="relative">
+              <MagicRings
+                color="#A855F7"
+                colorTwo="#06B6D4"
+                ringCount={5}
+                speed={1.2}
+                attenuation={6}
+                lineThickness={2}
+                baseRadius={0.25}
+                radiusStep={0.15}
+                scaleRate={0.2}
+                opacity={0.8}
+                blur={6}
+                noiseAmount={0.1}
+                rotation={-15}
+                ringGap={2}
+                fadeIn={0.5}
+                fadeOut={0.5}
+                className="w-full aspect-square rounded-full"
+              />
+
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="grid grid-cols-2 gap-3 p-8">
+                  {SAMPLE_IMAGES.map((src, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      transition={{
+                        delay: 0.8 + index * 0.15,
+                        duration: 0.6,
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                      }}
+                      className={cn(
+                        'relative group rounded-2xl overflow-hidden',
+                        index % 2 === 0 ? 'translate-y-4' : ''
+                      )}
+                      style={{
+                        transform: `translate(${index === 1 ? '10px' : index === 2 ? '-10px' : '0'}, ${index % 2 === 0 ? '20px' : '-10px'})`,
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+                      <img
+                        src={src}
+                        alt={`AI generated sample ${index + 1}`}
+                        className="w-28 h-28 md:w-32 md:h-32 object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 border border-white/10 rounded-2xl group-hover:border-purple-500/50 transition-colors pointer-events-none" />
+                    </motion.div>
+                  ))}
                 </div>
-                <div className="flex-1 text-center">
-                  <span className="text-xs text-white/40">ColorBends.tsx</span>
-                </div>
-                <div className="w-16" />
               </div>
 
-              <div className="p-6 font-mono text-sm leading-relaxed overflow-x-auto">
-                {codeLines.map((line, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: 0.8 + index * 0.05 }}
-                    className="flex"
-                  >
-                    <span className="select-none text-white/20 w-8 flex-shrink-0 text-right pr-4">
-                      {index + 1}
-                    </span>
-                    <pre className="flex-1 text-white/70">
-                      {line.split(/(".*?"|'[^']*'|`[^`]*`)/g).map((part, partIndex) => {
-                        if (part.match(/^["'`].*["'`]$/)) {
-                          return <span key={partIndex} className="text-emerald-400">{part}</span>;
-                        }
-                        if (part.match(/\b(import|from|return|function)\b/)) {
-                          return <span key={partIndex} className="text-purple-400">{part}</span>;
-                        }
-                        if (part.match(/\b(ColorBends|App)\b/)) {
-                          return <span key={partIndex} className="text-cyan-400">{part}</span>;
-                        }
-                        if (part.match(/\b(color|speed|frequency|noise|bandWidth|rotation|fadeTop|iterations|intensity)\b/)) {
-                          return <span key={partIndex} className="text-orange-400">{part}</span>;
-                        }
-                        if (part.match(/\b(\d+\.?\d*)\b/)) {
-                          return <span key={partIndex} className="text-yellow-400">{part}</span>;
-                        }
-                        return <span key={partIndex}>{part}</span>;
-                      })}
-                    </pre>
-                  </motion.div>
-                ))}
-              </div>
-
-              <div className="absolute -right-20 top-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
-              <div className="absolute -left-20 bottom-1/4 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl" />
+              <motion.div
+                className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 blur-lg opacity-40"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.4, 0.6, 0.4],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+              <motion.div
+                className="absolute -bottom-6 -left-6 w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 blur-lg opacity-30"
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.3, 0.5, 0.3],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: 1,
+                }}
+              />
             </div>
 
             <motion.div
-              className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-black/20 blur-2xl rounded-full"
+              className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-black/30 blur-2xl rounded-full"
             />
           </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          className="lg:hidden mt-12"
+        >
+          <div className="flex justify-center">
+            <div className="relative w-64 h-64">
+              <MagicRings
+                color="#A855F7"
+                colorTwo="#06B6D4"
+                ringCount={4}
+                speed={1}
+                attenuation={6}
+                lineThickness={2}
+                baseRadius={0.3}
+                radiusStep={0.12}
+                scaleRate={0.15}
+                opacity={0.7}
+                blur={4}
+                noiseAmount={0.1}
+                rotation={0}
+                ringGap={1.5}
+                fadeIn={0.6}
+                fadeOut={0.4}
+                className="w-full h-full rounded-full"
+              />
+            </div>
+          </div>
+        </motion.div>
       </Container>
 
       <motion.div

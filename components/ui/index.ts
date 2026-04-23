@@ -19,3 +19,4 @@ export { AnimatedGradientText } from './animated-gradient-text';
 export { AnimatedGridPattern } from './animated-grid-pattern';
 export { BlurFade, BlurFadeText } from './blur-fade';
 export { WarpBackground } from './warp-background';
+export { MagicRings } from './magic-rings';
