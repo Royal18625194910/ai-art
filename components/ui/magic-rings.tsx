@@ -1,7 +1,8 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import React from 'react';
 
 interface MagicRingsProps {
   className?: string;
@@ -9,283 +10,247 @@ interface MagicRingsProps {
   colorTwo?: string;
   ringCount?: number;
   speed?: number;
-  attenuation?: number;
-  lineThickness?: number;
-  baseRadius?: number;
-  radiusStep?: number;
-  scaleRate?: number;
   opacity?: number;
   blur?: number;
-  noiseAmount?: number;
-  rotation?: number;
-  ringGap?: number;
-  fadeIn?: number;
-  fadeOut?: number;
-  followMouse?: boolean;
-  mouseInfluence?: number;
-  hoverScale?: number;
-  parallax?: number;
-  clickBurst?: boolean;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
+
+const sizeMap = {
+  sm: { base: 60, step: 40 },
+  md: { base: 100, step: 60 },
+  lg: { base: 150, step: 80 },
+  xl: { base: 200, step: 100 },
+};
 
 export function MagicRings({
   className,
   color = '#A855F7',
-  colorTwo = '#6366F1',
+  colorTwo = '#06B6D4',
   ringCount = 6,
   speed = 1,
-  attenuation = 10,
-  lineThickness = 2,
-  baseRadius = 0.35,
-  radiusStep = 0.1,
-  scaleRate = 0.1,
-  opacity = 1,
+  opacity = 0.6,
   blur = 0,
-  noiseAmount = 0.1,
-  rotation = 0,
-  ringGap = 1.5,
-  fadeIn = 0.7,
-  fadeOut = 0.5,
-  followMouse = false,
-  mouseInfluence = 0.2,
-  hoverScale = 1.2,
-  parallax = 0.05,
-  clickBurst = false,
+  size = 'md',
 }: MagicRingsProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>(0);
-  const mouseRef = useRef({ x: 0.5, y: 0.5 });
-  const [isHovered, setIsHovered] = useState(false);
-  const [clickBurstTime, setClickBurstTime] = useState(-1);
+  const { base, step } = sizeMap[size];
 
-  const hexToRgb = useCallback((hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-      ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16),
-        }
-      : { r: 168, g: 85, b: 247 };
-  }, []);
-
-  const lerpColor = useCallback(
-    (color1: { r: number; g: number; b: number }, color2: { r: number; g: number; b: number }, t: number) => {
-      return {
-        r: Math.round(color1.r + (color2.r - color1.r) * t),
-        g: Math.round(color1.g + (color2.g - color1.g) * t),
-        b: Math.round(color1.b + (color2.b - color1.b) * t),
-      };
-    },
-    []
-  );
-
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!followMouse || !containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      mouseRef.current = {
-        x: (e.clientX - rect.left) / rect.width,
-        y: (e.clientY - rect.top) / rect.height,
-      };
-    },
-    [followMouse]
-  );
-
-  const handleClick = useCallback(() => {
-    if (clickBurst) {
-      setClickBurstTime(0);
+  const createRings = () => {
+    const rings = [];
+    for (let i = 0; i < ringCount; i++) {
+      const sizePx = base + i * step;
+      const progress = i / (ringCount - 1 || 1);
+      
+      const r1 = parseInt(color.slice(1, 3), 16);
+      const g1 = parseInt(color.slice(3, 5), 16);
+      const b1 = parseInt(color.slice(5, 7), 16);
+      const r2 = parseInt(colorTwo.slice(1, 3), 16);
+      const g2 = parseInt(colorTwo.slice(3, 5), 16);
+      const b2 = parseInt(colorTwo.slice(5, 7), 16);
+      
+      const r = Math.round(r1 + (r2 - r1) * progress);
+      const g = Math.round(g1 + (g2 - g1) * progress);
+      const b = Math.round(b1 + (b2 - b1) * progress);
+      
+      const ringColor = `rgb(${r}, ${g}, ${b})`;
+      
+      rings.push({
+        index: i,
+        size: sizePx,
+        color: ringColor,
+        delay: i * 0.3 / speed,
+        duration: (3 - i * 0.2) / speed,
+        ringOpacity: opacity * (1 - progress * 0.4),
+      });
     }
-  }, [clickBurst]);
+    return rings;
+  };
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const rgb1 = hexToRgb(color);
-    const rgb2 = hexToRgb(colorTwo);
-
-    let startTime = performance.now();
-    let currentBurstTime = clickBurstTime;
-
-    const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      const rect = container.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
-      ctx.scale(dpr, dpr);
-    };
-
-    resize();
-    window.addEventListener('resize', resize);
-
-    const draw = (time: number) => {
-      const elapsed = (time - startTime) / 1000;
-      const rect = container.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-      const centerX = width / 2;
-      const centerY = height / 2;
-
-      let actualCenterX = centerX;
-      let actualCenterY = centerY;
-      if (followMouse) {
-        actualCenterX += (mouseRef.current.x - 0.5) * width * mouseInfluence;
-        actualCenterY += (mouseRef.current.y - 0.5) * height * mouseInfluence;
-      }
-
-      ctx.clearRect(0, 0, width, height);
-
-      const maxRadius = Math.min(width, height) * 0.45;
-      const scale = isHovered ? hoverScale : 1;
-
-      let burstScale = 1;
-      let burstOpacity = 0;
-      if (clickBurstTime >= 0) {
-        const burstElapsed = (time - clickBurstTime) / 1000;
-        if (burstElapsed < 0.5) {
-          burstScale = 1 + burstElapsed * 0.5;
-          burstOpacity = 1 - burstElapsed * 2;
-        }
-      }
-
-      for (let i = 0; i < ringCount; i++) {
-        const ringProgress = i / (ringCount - 1 || 1);
-        const ringColor = lerpColor(rgb1, rgb2, ringProgress);
-
-        const baseRingRadius = maxRadius * (baseRadius + i * radiusStep);
-        const timeExpansion = elapsed * speed * scaleRate * scale * burstScale;
-        const ringRadius = baseRingRadius * (1 + timeExpansion * 0.3);
-
-        const cycleDuration = 2 + i * 0.3;
-        const cyclePos = (elapsed % cycleDuration) / cycleDuration;
-
-        let ringOpacity = 1;
-        if (cyclePos < fadeIn) {
-          ringOpacity = cyclePos / fadeIn;
-        } else if (cyclePos > 1 - fadeOut) {
-          ringOpacity = (1 - cyclePos) / fadeOut;
-        }
-
-        ringOpacity *= opacity;
-        if (burstOpacity > 0) {
-          ringOpacity = Math.min(1, ringOpacity + burstOpacity * 0.5);
-        }
-
-        const parallaxOffset = i * parallax * 20;
-        const drawCenterX = actualCenterX + (isHovered ? parallaxOffset : 0);
-        const drawCenterY = actualCenterY + (isHovered ? parallaxOffset : 0);
-
-        const ringScale = ringRadius / maxRadius;
-        const glowIntensity = Math.exp(-attenuation * (1 - ringScale));
-
-        const segments = 200;
-        const angularCutaway = Math.pow(ringGap, i);
-        const startAngle = (rotation * Math.PI) / 180 + elapsed * speed * (0.5 + i * 0.1);
-        const totalAngle = (2 - angularCutaway) * Math.PI;
-
-        if (totalAngle <= 0) continue;
-
-        ctx.save();
-        ctx.globalAlpha = ringOpacity * glowIntensity;
-
-        if (blur > 0) {
-          ctx.shadowColor = `rgba(${ringColor.r}, ${ringColor.g}, ${ringColor.b}, ${ringOpacity})`;
-          ctx.shadowBlur = blur;
-        }
-
-        ctx.beginPath();
-        for (let j = 0; j <= segments; j++) {
-          const t = j / segments;
-          const angle = startAngle + t * totalAngle;
-
-          let noiseOffset = 0;
-          if (noiseAmount > 0) {
-            const noiseSeed = i * 1000 + t * 100 + elapsed * speed * 0.5;
-            noiseOffset = (Math.sin(noiseSeed) * Math.cos(noiseSeed * 1.3)) * noiseAmount * ringRadius * 0.05;
-          }
-
-          const r = ringRadius + noiseOffset;
-          const x = drawCenterX + Math.cos(angle) * r;
-          const y = drawCenterY + Math.sin(angle) * r;
-
-          if (j === 0) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
-          }
-        }
-
-        ctx.strokeStyle = `rgba(${ringColor.r}, ${ringColor.g}, ${ringColor.b}, ${ringOpacity})`;
-        ctx.lineWidth = lineThickness;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-
-        if (blur > 0 && opacity > 0.5) {
-          ctx.shadowBlur = blur * 2;
-          ctx.globalAlpha = ringOpacity * glowIntensity * 0.3;
-          ctx.strokeStyle = `rgba(${ringColor.r}, ${ringColor.g}, ${ringColor.b}, ${ringOpacity * 0.5})`;
-          ctx.stroke();
-        }
-
-        ctx.restore();
-      }
-
-      animationRef.current = requestAnimationFrame(draw);
-    };
-
-    animationRef.current = requestAnimationFrame(draw);
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationRef.current);
-    };
-  }, [
-    color,
-    colorTwo,
-    ringCount,
-    speed,
-    attenuation,
-    lineThickness,
-    baseRadius,
-    radiusStep,
-    scaleRate,
-    opacity,
-    blur,
-    noiseAmount,
-    rotation,
-    ringGap,
-    fadeIn,
-    fadeOut,
-    followMouse,
-    mouseInfluence,
-    hoverScale,
-    parallax,
-    clickBurstTime,
-    isHovered,
-    hexToRgb,
-    lerpColor,
-  ]);
+  const rings = createRings();
 
   return (
-    <div
-      ref={containerRef}
-      className={cn('relative overflow-hidden', className)}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={handleClick}
-    >
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
+    <div className={cn('relative flex items-center justify-center', className)}>
+      {rings.map((ring) => (
+        <motion.div
+          key={ring.index}
+          className="absolute rounded-full border"
+          style={{
+            width: ring.size,
+            height: ring.size,
+            borderColor: ring.color,
+            borderWidth: Math.max(1, 4 - ring.index * 0.5),
+            opacity: ring.ringOpacity,
+            filter: blur > 0 ? `blur(${blur}px)` : undefined,
+            boxShadow: `0 0 ${10 + ring.index * 5}px ${ring.color}40`,
+          }}
+          animate={{
+            scale: [0.8, 1.1, 0.9, 1],
+            rotate: [0, 180, 360],
+            opacity: [ring.ringOpacity * 0.3, ring.ringOpacity, ring.ringOpacity * 0.6],
+          }}
+          transition={{
+            duration: ring.duration,
+            delay: ring.delay,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+      
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: base * 0.4,
+          height: base * 0.4,
+          background: `radial-gradient(circle, ${color}60 0%, ${colorTwo}30 50%, transparent 100%)`,
+          boxShadow: `0 0 30px ${color}40, inset 0 0 20px ${colorTwo}30`,
+        }}
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.5, 1, 0.7],
+        }}
+        transition={{
+          duration: 2 / speed,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+
+      <motion.div
+        className="absolute rounded-full"
+        style={{
+          width: base * 0.15,
+          height: base * 0.15,
+          background: `linear-gradient(135deg, ${color} 0%, ${colorTwo} 100%)`,
+          boxShadow: `0 0 20px ${color}80`,
+        }}
+        animate={{
+          scale: [1, 1.5, 1],
+          opacity: [0.8, 1, 0.9],
+        }}
+        transition={{
+          duration: 1.5 / speed,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+    </div>
+  );
+}
+
+export function MagicRingsBackground({
+  className,
+  color = '#A855F7',
+  colorTwo = '#06B6D4',
+}: {
+  className?: string;
+  color?: string;
+  colorTwo?: string;
+}) {
+  return (
+    <div className={cn('absolute inset-0 overflow-hidden pointer-events-none', className)}>
+      <motion.div
+        className="absolute"
+        style={{
+          left: '10%',
+          top: '20%',
+        }}
+      >
+        <MagicRings
+          color={color}
+          colorTwo={colorTwo}
+          ringCount={4}
+          speed={0.5}
+          opacity={0.3}
+          blur={2}
+          size="sm"
+        />
+      </motion.div>
+
+      <motion.div
+        className="absolute"
+        style={{
+          right: '5%',
+          top: '30%',
+        }}
+      >
+        <MagicRings
+          color={colorTwo}
+          colorTwo={color}
+          ringCount={5}
+          speed={0.7}
+          opacity={0.25}
+          blur={3}
+          size="md"
+        />
+      </motion.div>
+
+      <motion.div
+        className="absolute"
+        style={{
+          left: '30%',
+          bottom: '10%',
+        }}
+      >
+        <MagicRings
+          color={color}
+          colorTwo={colorTwo}
+          ringCount={3}
+          speed={0.6}
+          opacity={0.2}
+          blur={4}
+          size="sm"
+        />
+      </motion.div>
+
+      <motion.div
+        className="absolute"
+        style={{
+          left: '20%',
+          top: '40%',
+          width: '600px',
+          height: '600px',
+          background: `radial-gradient(circle, ${color}20 0%, transparent 70%)`,
+        }}
+        animate={{
+          x: [0, 50, -30, 0],
+          y: [0, -40, 20, 0],
+          scale: [1, 1.1, 0.95, 1],
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      />
+
+      <motion.div
+        className="absolute"
+        style={{
+          right: '10%',
+          bottom: '20%',
+          width: '500px',
+          height: '500px',
+          background: `radial-gradient(circle, ${colorTwo}15 0%, transparent 70%)`,
+        }}
+        animate={{
+          x: [0, -40, 30, 0],
+          y: [0, 30, -20, 0],
+          scale: [1, 0.95, 1.05, 1],
+        }}
+        transition={{
+          duration: 18,
+          repeat: Infinity,
+          ease: 'easeInOut',
+          delay: 2,
+        }}
+      />
+
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0)`,
+          backgroundSize: '32px 32px',
+        }}
       />
     </div>
   );
