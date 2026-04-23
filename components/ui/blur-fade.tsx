@@ -29,7 +29,7 @@ export function BlurFade({
   blur = '6px',
 }: BlurFadeProps) {
   const ref = useRef(null);
-  const inViewResult = useInView(ref, { once: true, margin: inViewMargin });
+  const inViewResult = useInView(ref, { once: true, margin: inViewMargin as any });
   const isInView = !inView || inViewResult;
   const defaultVariants = {
     hidden: { y: yOffset, opacity: 0, filter: `blur(${blur})` },
@@ -102,7 +102,7 @@ export function BlurFadeText({
           ? { opacity: 1, y: 0, filter: 'blur(0px)' }
           : { opacity: 0, y: yOffset, filter: `blur(${blur})` }
       }
-      transition={{ duration, delay: 'easeOut' }}
+      transition={{ duration, ease: 'easeOut' }}
     >
       {text}
     </motion.h1>

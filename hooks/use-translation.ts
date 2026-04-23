@@ -1,19 +1,19 @@
 import { useCallback, useMemo } from 'react';
 import { useLanguageStore } from '@/stores/use-language-store';
-import { Locale, Translation } from '@/types';
+import { Locale, Translation, TranslationValue } from '@/types';
 import en from '@/locales/en.json';
 import zhCN from '@/locales/zh-CN.json';
 import zhTW from '@/locales/zh-TW.json';
 
 const translations: Record<Locale, Translation> = {
-  'en': en,
-  'zh-CN': zhCN,
-  'zh-TW': zhTW,
+  'en': en as unknown as Translation,
+  'zh-CN': zhCN as unknown as Translation,
+  'zh-TW': zhTW as unknown as Translation,
 };
 
-function getNestedValue(obj: Translation, path: string): string | string[] | undefined {
+function getNestedValue(obj: Translation, path: string): TranslationValue | undefined {
   const keys = path.split('.');
-  let result: Translation | string | string[] | undefined = obj;
+  let result: TranslationValue = obj;
   
   for (const key of keys) {
     if (result && typeof result === 'object' && !Array.isArray(result)) {
@@ -23,7 +23,7 @@ function getNestedValue(obj: Translation, path: string): string | string[] | und
     }
   }
   
-  return typeof result === 'string' || Array.isArray(result) ? result : undefined;
+  return result;
 }
 
 export function useTranslation() {
@@ -42,7 +42,7 @@ export function useTranslation() {
   );
   
   const tArray = useCallback(
-    (key: string): string[] => {
+    (key: string): TranslationValue[] => {
       const value = getNestedValue(translations[locale], key);
       if (Array.isArray(value)) {
         return value;
@@ -55,7 +55,7 @@ export function useTranslation() {
   const tObject = useCallback(
     (key: string): Translation => {
       const keys = key.split('.');
-      let result: Translation | string | string[] | undefined = translations[locale];
+      let result: TranslationValue = translations[locale];
       
       for (const k of keys) {
         if (result && typeof result === 'object' && !Array.isArray(result)) {

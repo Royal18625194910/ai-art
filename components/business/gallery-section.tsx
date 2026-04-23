@@ -99,7 +99,7 @@ export function GallerySection({ className }: GallerySectionProps) {
       scale: 1,
       transition: {
         duration: 0.5,
-        ease: [0.25, 0.46, 0.45, 0.94],
+        ease: [0.25, 0.46, 0.45, 0.94] as any,
       },
     },
   };
