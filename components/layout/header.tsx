@@ -9,7 +9,7 @@ import { useScrollPosition, useScrollDirection } from '@/hooks/use-scroll-animat
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/business/language-switcher';
 import { navItems } from '@/config/site';
-import { SignedIn, SignedOut, UserButton, SignInButton } from '@clerk/nextjs';
+import { useAuth, UserButton, SignInButton } from '@clerk/nextjs';
 
 interface HeaderProps {
   className?: string;
@@ -21,6 +21,7 @@ export function Header({ className }: HeaderProps) {
   const scrollPosition = useScrollPosition();
   const scrollDirection = useScrollDirection();
   const { t } = useTranslation();
+  const { isSignedIn, isLoaded } = useAuth();
 
   useEffect(() => {
     setIsScrolled(scrollPosition > 50);
@@ -92,7 +93,7 @@ export function Header({ className }: HeaderProps) {
 
         <div className="hidden lg:flex items-center gap-3">
           <LanguageSwitcher variant="dropdown" />
-          <SignedOut>
+          {isLoaded && !isSignedIn && (
             <SignInButton mode="redirect">
               <Button variant="gradient" size="sm">
                 <span className="flex items-center gap-1">
@@ -101,8 +102,8 @@ export function Header({ className }: HeaderProps) {
                 </span>
               </Button>
             </SignInButton>
-          </SignedOut>
-          <SignedIn>
+          )}
+          {isLoaded && isSignedIn && (
             <UserButton
               appearance={{
                 elements: {
@@ -111,7 +112,7 @@ export function Header({ className }: HeaderProps) {
                 }
               }}
             />
-          </SignedIn>
+          )}
         </div>
 
         <button
@@ -149,7 +150,7 @@ export function Header({ className }: HeaderProps) {
             </div>
             <div className="px-4 py-4 border-t border-border/50 space-y-3">
               <LanguageSwitcher variant="dropdown" />
-              <SignedOut>
+              {isLoaded && !isSignedIn && (
                 <SignInButton mode="redirect">
                   <Button variant="gradient" className="w-full justify-center">
                     <span className="flex items-center gap-1">
@@ -158,8 +159,8 @@ export function Header({ className }: HeaderProps) {
                     </span>
                   </Button>
                 </SignInButton>
-              </SignedOut>
-              <SignedIn>
+              )}
+              {isLoaded && isSignedIn && (
                 <div className="flex items-center justify-center">
                   <UserButton
                     appearance={{
@@ -169,7 +170,7 @@ export function Header({ className }: HeaderProps) {
                     }}
                   />
                 </div>
-              </SignedIn>
+              )}
             </div>
           </motion.div>
         )}
