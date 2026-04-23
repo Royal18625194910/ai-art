@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Users, Image, Brain, Play } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Sparkles, Users, Image, Brain, Play, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
 import { formatNumber } from '@/lib/utils';
@@ -11,7 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
 import { AnimatedGradientText } from '@/components/ui/animated-gradient-text';
 import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern';
-import { BlurFade } from '@/components/ui/blur-fade';
 
 interface HeroSectionProps {
   className?: string;
@@ -43,6 +42,29 @@ const PREDEFINED_SQUARES = [
   { x: 1, y: 14 }, { x: 12, y: 10 }, { x: 7, y: 19 },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+};
+
 export function HeroSection({ className }: HeroSectionProps) {
   const { t, tObject } = useTranslation();
   const [mounted, setMounted] = useState(false);
@@ -66,7 +88,7 @@ export function HeroSection({ className }: HeroSectionProps) {
     <section
       id="hero"
       className={cn(
-        'relative min-h-screen flex items-center justify-center overflow-hidden pt-20',
+        'relative min-h-screen flex flex-col justify-start overflow-hidden pt-20 pb-16',
         className
       )}
     >
@@ -87,20 +109,25 @@ export function HeroSection({ className }: HeroSectionProps) {
       </div>
 
       <Container className="relative z-10">
-        <div className="flex flex-col items-center text-center max-w-5xl mx-auto">
-          <BlurFade delay={0.1} inView={false}>
+        <motion.div
+          className="flex flex-col items-center text-center max-w-5xl mx-auto"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={itemVariants}>
             <Badge
               variant="gradient"
-              className="mb-8 px-4 py-1.5 text-sm cursor-pointer"
+              className="mb-8 px-4 py-1.5 text-sm cursor-pointer inline-flex"
               onClick={handleCtaClick}
             >
               <Sparkles className="w-3.5 h-3.5 mr-1.5" />
               {t('hero.badge')}
               <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
             </Badge>
-          </BlurFade>
+          </motion.div>
 
-          <BlurFade delay={0.2} inView={false}>
+          <motion.div variants={itemVariants}>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight mb-6">
               <span className="block">{t('hero.title')}</span>
               <AnimatedGradientText
@@ -113,114 +140,116 @@ export function HeroSection({ className }: HeroSectionProps) {
                 {t('hero.titleHighlight')}
               </AnimatedGradientText>
             </h1>
-          </BlurFade>
+          </motion.div>
 
-          <BlurFade delay={0.3} inView={false}>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
-              {t('hero.subtitle')}
-            </p>
-          </BlurFade>
+          <motion.p
+            variants={itemVariants}
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed"
+          >
+            {t('hero.subtitle')}
+          </motion.p>
 
-          <BlurFade delay={0.4} inView={false}>
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-16">
-              <Button
-                variant="gradient"
-                size="lg"
-                className="w-full sm:w-auto text-base px-8 h-14"
-                onClick={handleCtaClick}
-              >
-                <span className="flex items-center gap-2">
-                  {t('hero.ctaPrimary')}
-                  <ArrowRight className="w-5 h-5" />
-                </span>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto text-base px-8 h-14 border-2"
-              >
-                <span className="flex items-center gap-2">
-                  <Play className="w-5 h-5 fill-current" />
-                  {t('hero.ctaSecondary')}
-                </span>
-              </Button>
-            </div>
-          </BlurFade>
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col sm:flex-row items-center gap-4 mb-16"
+          >
+            <Button
+              variant="gradient"
+              size="lg"
+              className="w-full sm:w-auto text-base px-8 h-14"
+              onClick={handleCtaClick}
+            >
+              <span className="flex items-center gap-2">
+                {t('hero.ctaPrimary')}
+                <ArrowRight className="w-5 h-5" />
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto text-base px-8 h-14 border-2"
+            >
+              <span className="flex items-center gap-2">
+                <Play className="w-5 h-5 fill-current" />
+                {t('hero.ctaSecondary')}
+              </span>
+            </Button>
+          </motion.div>
 
-          <BlurFade delay={0.5} inView={false}>
-            <div className="grid grid-cols-3 gap-8 md:gap-16 mb-16">
-              {STATS.map((stat, index) => {
-                const Icon = stat.icon;
-                const label = heroStats[stat.label.split('.')[1]] as string || stat.label;
-                
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <Icon className="w-5 h-5 text-purple-500" />
-                      <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                        {mounted ? formatNumber(stat.value) : '0'}
-                        {stat.suffix}
-                      </span>
-                    </div>
-                    <span className="text-sm text-muted-foreground">
-                      {label}
+          <motion.div
+            variants={itemVariants}
+            className="grid grid-cols-3 gap-8 md:gap-16 mb-16"
+          >
+            {STATS.map((stat, index) => {
+              const Icon = stat.icon;
+              const label = heroStats[stat.label.split('.')[1]] as string || stat.label;
+              
+              return (
+                <div
+                  key={index}
+                  className="flex flex-col items-center"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <Icon className="w-5 h-5 text-purple-500" />
+                    <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                      {mounted ? formatNumber(stat.value) : '0'}
+                      {stat.suffix}
                     </span>
                   </div>
-                );
-              })}
-            </div>
-          </BlurFade>
+                  <span className="text-sm text-muted-foreground">
+                    {label}
+                  </span>
+                </div>
+              );
+            })}
+          </motion.div>
 
-          <BlurFade delay={0.6} inView={false}>
-            <div className="relative w-full max-w-4xl">
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 pointer-events-none" />
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                {SAMPLE_IMAGES.map((src, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      delay: 0.7 + index * 0.1,
-                      duration: 0.5,
-                    }}
-                    className={cn(
-                      'relative group rounded-2xl overflow-hidden',
-                      index % 2 === 0 ? 'translate-y-4' : ''
-                    )}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-                    <img
-                      src={src}
-                      alt={`AI generated sample ${index + 1}`}
-                      className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 border border-white/10 rounded-2xl group-hover:border-white/20 transition-colors pointer-events-none" />
-                  </motion.div>
-                ))}
-              </div>
-
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-black/20 blur-2xl rounded-full" />
+          <motion.div
+            variants={itemVariants}
+            className="relative w-full max-w-4xl mt-4"
+          >
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              {SAMPLE_IMAGES.map((src, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: 1 + index * 0.1,
+                    duration: 0.5,
+                  }}
+                  className={cn(
+                    'relative group rounded-2xl overflow-hidden',
+                    index % 2 === 0 ? 'translate-y-4' : ''
+                  )}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+                  <img
+                    src={src}
+                    alt={`AI generated sample ${index + 1}`}
+                    className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 border border-white/10 rounded-2xl group-hover:border-white/20 transition-colors pointer-events-none" />
+                </motion.div>
+              ))}
             </div>
-          </BlurFade>
-        </div>
+
+            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-black/20 blur-2xl rounded-full" />
+          </motion.div>
+        </motion.div>
       </Container>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          className="flex flex-col items-center gap-2 text-muted-foreground"
-        >
+      <motion.div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        animate={{ y: [0, 8, 0] }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+      >
+        <div className="flex flex-col items-center gap-2 text-muted-foreground">
           <span className="text-xs font-medium">Scroll to explore</span>
           <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-2">
             <motion.div
@@ -233,8 +262,8 @@ export function HeroSection({ className }: HeroSectionProps) {
               className="w-1.5 h-1.5 bg-muted-foreground rounded-full"
             />
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </section>
   );
 }
