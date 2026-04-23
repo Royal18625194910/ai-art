@@ -6,9 +6,6 @@ import { Footer } from '@/components/layout/footer';
 import { HeroSection } from '@/components/business/hero-section';
 import { FeaturesSection } from '@/components/business/features-section';
 import { GallerySection } from '@/components/business/gallery-section';
-import { PricingSection } from '@/components/business/pricing-section';
-import { FAQSection } from '@/components/business/faq-section';
-import { CTASection } from '@/components/business/cta-section';
 import { siteConfig } from '@/config/site';
 
 export default function Home() {
@@ -35,9 +32,6 @@ export default function Home() {
         <HeroSection />
         <FeaturesSection />
         <GallerySection />
-        <PricingSection />
-        <FAQSection />
-        <CTASection />
       </main>
 
       <Footer />
