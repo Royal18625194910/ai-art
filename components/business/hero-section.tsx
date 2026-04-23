@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Users, Image, Brain, ArrowRight } from 'lucide-react';
+import { Sparkles, Users, Image, Palette, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
 import { formatNumber } from '@/lib/utils';
@@ -19,7 +19,7 @@ interface HeroSectionProps {
 const STATS = [
   { value: 2000000, label: 'stats.users', icon: Users, suffix: '+' },
   { value: 50000000, label: 'stats.images', icon: Image, suffix: '+' },
-  { value: 50, label: 'stats.models', icon: Brain, suffix: '+' },
+  { value: 500, label: 'stats.styles', icon: Palette, suffix: '+' },
 ];
 
 const SAMPLE_IMAGES = [

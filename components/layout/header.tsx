@@ -9,6 +9,7 @@ import { useScrollPosition, useScrollDirection } from '@/hooks/use-scroll-animat
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/business/language-switcher';
 import { navItems } from '@/config/site';
+import { SignedIn, SignedOut, UserButton, SignInButton } from '@clerk/nextjs';
 
 interface HeaderProps {
   className?: string;
@@ -91,15 +92,26 @@ export function Header({ className }: HeaderProps) {
 
         <div className="hidden lg:flex items-center gap-3">
           <LanguageSwitcher variant="dropdown" />
-          <Button variant="ghost" size="sm">
-            {t('nav.login')}
-          </Button>
-          <Button variant="gradient" size="sm">
-            <span className="flex items-center gap-1">
-              {t('nav.signup')}
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </Button>
+          <SignedOut>
+            <SignInButton mode="redirect">
+              <Button variant="gradient" size="sm">
+                <span className="flex items-center gap-1">
+                  {t('nav.login')}
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </Button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: 'w-9 h-9',
+                  userButtonPopoverCard: 'shadow-xl border border-border/50',
+                }
+              }}
+            />
+          </SignedIn>
         </div>
 
         <button
@@ -137,17 +149,27 @@ export function Header({ className }: HeaderProps) {
             </div>
             <div className="px-4 py-4 border-t border-border/50 space-y-3">
               <LanguageSwitcher variant="dropdown" />
-              <div className="flex flex-col gap-2">
-                <Button variant="ghost" className="w-full justify-center">
-                  {t('nav.login')}
-                </Button>
-                <Button variant="gradient" className="w-full justify-center">
-                  <span className="flex items-center gap-1">
-                    {t('nav.signup')}
-                    <ArrowRight className="w-4 h-4" />
-                  </span>
-                </Button>
-              </div>
+              <SignedOut>
+                <SignInButton mode="redirect">
+                  <Button variant="gradient" className="w-full justify-center">
+                    <span className="flex items-center gap-1">
+                      {t('nav.login')}
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </Button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <div className="flex items-center justify-center">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: 'w-10 h-10',
+                      }
+                    }}
+                  />
+                </div>
+              </SignedIn>
             </div>
           </motion.div>
         )}

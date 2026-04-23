@@ -22,6 +22,14 @@ export const navItems: NavItem[] = [
     label: 'nav.gallery',
     href: '#gallery',
   },
+  {
+    label: 'nav.pricing',
+    href: '#pricing',
+  },
+  {
+    label: 'nav.faq',
+    href: '#faq',
+  },
 ];
 
 export const footerLinks = {
