@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
 import { AnimatedGradientText } from '@/components/ui/animated-gradient-text';
-import { MagicRings } from '@/components/ui/magic-rings';
+import { MagicRings, MagicRingsBackground } from '@/components/ui/magic-rings';
 
 interface HeroSectionProps {
   className?: string;
@@ -77,63 +77,7 @@ export function HeroSection({ className }: HeroSectionProps) {
         className
       )}
     >
-      <div className="absolute inset-0 pointer-events-none">
-        <MagicRings
-          color="#A855F7"
-          colorTwo="#06B6D4"
-          ringCount={6}
-          speed={0.8}
-          attenuation={8}
-          lineThickness={3}
-          baseRadius={0.3}
-          radiusStep={0.12}
-          scaleRate={0.15}
-          opacity={0.6}
-          blur={4}
-          noiseAmount={0.15}
-          rotation={0}
-          ringGap={1.8}
-          fadeIn={0.6}
-          fadeOut={0.4}
-          className="absolute inset-0 w-full h-full"
-        />
-        
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-500/15 rounded-full blur-3xl"
-          animate={{
-            x: [0, 50, -30, 0],
-            y: [0, -40, 20, 0],
-            scale: [1, 1.1, 0.95, 1],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/15 rounded-full blur-3xl"
-          animate={{
-            x: [0, -40, 30, 0],
-            y: [0, 30, -20, 0],
-            scale: [1, 0.95, 1.05, 1],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 2,
-          }}
-        />
-        
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0)`,
-            backgroundSize: '32px 32px',
-          }}
-        />
-      </div>
+      <MagicRingsBackground color="#A855F7" colorTwo="#06B6D4" />
 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
 
@@ -239,67 +183,57 @@ export function HeroSection({ className }: HeroSectionProps) {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="relative hidden lg:block"
+            className="relative"
           >
-            <div className="relative">
+            <div className="relative flex items-center justify-center aspect-square">
               <MagicRings
                 color="#A855F7"
                 colorTwo="#06B6D4"
-                ringCount={5}
-                speed={1.2}
-                attenuation={6}
-                lineThickness={2}
-                baseRadius={0.25}
-                radiusStep={0.15}
-                scaleRate={0.2}
+                ringCount={6}
+                speed={0.8}
                 opacity={0.8}
-                blur={6}
-                noiseAmount={0.1}
-                rotation={-15}
-                ringGap={2}
-                fadeIn={0.5}
-                fadeOut={0.5}
-                className="w-full aspect-square rounded-full"
+                blur={2}
+                size="xl"
+                className="absolute inset-0"
               />
 
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="grid grid-cols-2 gap-3 p-8">
-                  {SAMPLE_IMAGES.map((src, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      transition={{
-                        delay: 0.8 + index * 0.15,
-                        duration: 0.6,
-                        ease: [0.25, 0.46, 0.45, 0.94],
-                      }}
-                      className={cn(
-                        'relative group rounded-2xl overflow-hidden',
-                        index % 2 === 0 ? 'translate-y-4' : ''
-                      )}
-                      style={{
-                        transform: `translate(${index === 1 ? '10px' : index === 2 ? '-10px' : '0'}, ${index % 2 === 0 ? '20px' : '-10px'})`,
-                      }}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
-                      <img
-                        src={src}
-                        alt={`AI generated sample ${index + 1}`}
-                        className="w-28 h-28 md:w-32 md:h-32 object-cover transition-transform duration-500 group-hover:scale-110"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 border border-white/10 rounded-2xl group-hover:border-purple-500/50 transition-colors pointer-events-none" />
-                    </motion.div>
-                  ))}
-                </div>
+              <div className="relative z-10 grid grid-cols-2 gap-4 p-8">
+                {SAMPLE_IMAGES.map((src, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    transition={{
+                      delay: 0.8 + index * 0.15,
+                      duration: 0.6,
+                      ease: [0.25, 0.46, 0.45, 0.94],
+                    }}
+                    className={cn(
+                      'relative group rounded-2xl overflow-hidden shadow-xl shadow-purple-500/20',
+                      index % 2 === 0 ? 'translate-y-6' : '-translate-y-6'
+                    )}
+                    style={{
+                      transform: `translate(${index === 1 ? '20px' : index === 2 ? '-20px' : '0'}, ${index % 2 === 0 ? '30px' : '-20px'})`,
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+                    <img
+                      src={src}
+                      alt={`AI generated sample ${index + 1}`}
+                      className="w-28 h-28 md:w-36 md:h-36 object-cover transition-transform duration-500 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 border-2 border-purple-500/30 rounded-2xl group-hover:border-purple-500/60 transition-colors pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </motion.div>
+                ))}
               </div>
 
               <motion.div
-                className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 blur-lg opacity-40"
+                className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 blur-lg opacity-50"
                 animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.4, 0.6, 0.4],
+                  scale: [1, 1.3, 1],
+                  opacity: [0.3, 0.6, 0.3],
                 }}
                 transition={{
                   duration: 3,
@@ -308,10 +242,10 @@ export function HeroSection({ className }: HeroSectionProps) {
                 }}
               />
               <motion.div
-                className="absolute -bottom-6 -left-6 w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 blur-lg opacity-30"
+                className="absolute -bottom-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 blur-lg opacity-40"
                 animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.3, 0.5, 0.3],
+                  scale: [1, 1.4, 1],
+                  opacity: [0.2, 0.5, 0.2],
                 }}
                 transition={{
                   duration: 4,
@@ -321,10 +255,6 @@ export function HeroSection({ className }: HeroSectionProps) {
                 }}
               />
             </div>
-
-            <motion.div
-              className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-black/30 blur-2xl rounded-full"
-            />
           </motion.div>
         </div>
 
@@ -332,30 +262,19 @@ export function HeroSection({ className }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.2 }}
-          className="lg:hidden mt-12"
+          className="lg:hidden mt-12 flex justify-center"
         >
-          <div className="flex justify-center">
-            <div className="relative w-64 h-64">
-              <MagicRings
-                color="#A855F7"
-                colorTwo="#06B6D4"
-                ringCount={4}
-                speed={1}
-                attenuation={6}
-                lineThickness={2}
-                baseRadius={0.3}
-                radiusStep={0.12}
-                scaleRate={0.15}
-                opacity={0.7}
-                blur={4}
-                noiseAmount={0.1}
-                rotation={0}
-                ringGap={1.5}
-                fadeIn={0.6}
-                fadeOut={0.4}
-                className="w-full h-full rounded-full"
-              />
-            </div>
+          <div className="relative w-64 h-64">
+            <MagicRings
+              color="#A855F7"
+              colorTwo="#06B6D4"
+              ringCount={5}
+              speed={0.6}
+              opacity={0.7}
+              blur={2}
+              size="lg"
+              className="absolute inset-0"
+            />
           </div>
         </motion.div>
       </Container>
