@@ -18,3 +18,4 @@ export { Container, Section } from './container';
 export { AnimatedGradientText } from './animated-gradient-text';
 export { AnimatedGridPattern } from './animated-grid-pattern';
 export { BlurFade, BlurFadeText } from './blur-fade';
+export { WarpBackground } from './warp-background';

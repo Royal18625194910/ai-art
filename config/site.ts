@@ -22,27 +22,14 @@ export const navItems: NavItem[] = [
     label: 'nav.gallery',
     href: '#gallery',
   },
-  {
-    label: 'nav.pricing',
-    href: '#pricing',
-  },
-  {
-    label: 'nav.faq',
-    href: '#faq',
-  },
 ];
 
 export const footerLinks = {
   product: [
     { label: 'footer.features', href: '#features' },
-    { label: 'footer.pricing', href: '#pricing' },
-    { label: 'footer.docs', href: '#docs' },
+    { label: 'footer.gallery', href: '#gallery' },
   ],
-  company: [
-    { label: 'footer.about', href: '#about' },
-    { label: 'footer.blog', href: '#blog' },
-    { label: 'footer.careers', href: '#careers' },
-  ],
+  company: [],
   legal: [
     { label: 'footer.privacy', href: '#privacy' },
     { label: 'footer.terms', href: '#terms' },
