@@ -7,8 +7,10 @@ export interface LocaleConfig {
   flag: string;
 }
 
+export type TranslationValue = string | number | boolean | Translation | Translation[];
+
 export interface Translation {
-  [key: string]: string | Translation | string[];
+  [key: string]: TranslationValue;
 }
 
 export interface SiteConfig {

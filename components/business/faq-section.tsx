@@ -45,7 +45,7 @@ export function FAQSection({ className }: FAQSectionProps) {
       x: 0,
       transition: {
         duration: 0.5,
-        ease: 'easeOut',
+        ease: 'easeOut' as any,
       },
     },
   };
@@ -167,7 +167,7 @@ export function FAQSection({ className }: FAQSectionProps) {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' as any }}
                     >
                       <div className="px-6 pb-6 pt-0">
                         <motion.div

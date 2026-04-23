@@ -57,7 +57,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
       y: 0,
       transition: {
         duration: 0.5,
-        ease: 'easeOut',
+        ease: 'easeOut' as any,
       },
     },
   };
