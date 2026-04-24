@@ -8,7 +8,18 @@ function getNestedValue(obj: Translation, path: string): TranslationValue | unde
   let result: TranslationValue = obj;
   
   for (const key of keys) {
-    if (result && typeof result === 'object' && !Array.isArray(result)) {
+    if (result === null || result === undefined) {
+      return undefined;
+    }
+    
+    if (Array.isArray(result)) {
+      const index = parseInt(key, 10);
+      if (!isNaN(index) && index >= 0 && index < result.length) {
+        result = result[index];
+      } else {
+        return undefined;
+      }
+    } else if (typeof result === 'object') {
       result = (result as Translation)[key];
     } else {
       return undefined;
@@ -42,10 +53,10 @@ export function useTranslation() {
   );
   
   const tArray = useCallback(
-    (key: string): TranslationValue[] => {
+    (key: string): string[] => {
       const value = getNestedValue(translations[locale], key);
       if (Array.isArray(value)) {
-        return value;
+        return value.filter((item): item is string => typeof item === 'string');
       }
       return [];
     },

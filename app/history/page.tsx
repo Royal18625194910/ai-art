@@ -28,6 +28,12 @@ import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { siteConfig } from '@/config/site';
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
@@ -156,8 +162,6 @@ export default function HistoryPage() {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [showModeDropdown, setShowModeDropdown] = useState(false);
-  const [showDateDropdown, setShowDateDropdown] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -349,83 +353,65 @@ export default function HistoryPage() {
                 )}
               </div>
 
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setShowModeDropdown(!showModeDropdown);
-                    setShowDateDropdown(false);
-                  }}
-                  className="flex items-center gap-2 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all min-w-36 justify-between"
-                >
-                  <span className="text-sm">
-                    {modeOptions.find((o) => o.value === filterMode)?.label}
-                  </span>
-                  <ChevronDown className={cn(
-                    'w-4 h-4 transition-transform',
-                    showModeDropdown && 'rotate-180'
-                  )} />
-                </button>
-                {showModeDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl z-50 overflow-hidden">
-                    {modeOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => {
-                          setFilterMode(option.value);
-                          setShowModeDropdown(false);
-                        }}
-                        className={cn(
-                          'w-full px-4 py-2.5 text-left text-sm transition-colors',
-                          filterMode === option.value
-                            ? 'bg-purple-500/10 text-purple-400'
-                            : 'text-foreground hover:bg-muted/50'
-                        )}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex items-center gap-2 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all min-w-36 justify-between"
+                  >
+                    <span className="text-sm">
+                      {modeOptions.find((o) => o.value === filterMode)?.label}
+                    </span>
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="min-w-36">
+                  {modeOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onClick={() => setFilterMode(option.value)}
+                      className={cn(
+                        'justify-between',
+                        filterMode === option.value && 'text-purple-400'
+                      )}
+                    >
+                      {option.label}
+                      {filterMode === option.value && (
+                        <Check className="w-4 h-4" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setShowDateDropdown(!showDateDropdown);
-                    setShowModeDropdown(false);
-                  }}
-                  className="flex items-center gap-2 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all min-w-40 justify-between"
-                >
-                  <span className="text-sm">
-                    {dateOptions.find((o) => o.value === dateRange)?.label}
-                  </span>
-                  <ChevronDown className={cn(
-                    'w-4 h-4 transition-transform',
-                    showDateDropdown && 'rotate-180'
-                  )} />
-                </button>
-                {showDateDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl z-50 overflow-hidden">
-                    {dateOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => {
-                          setDateRange(option.value);
-                          setShowDateDropdown(false);
-                        }}
-                        className={cn(
-                          'w-full px-4 py-2.5 text-left text-sm transition-colors',
-                          dateRange === option.value
-                            ? 'bg-purple-500/10 text-purple-400'
-                            : 'text-foreground hover:bg-muted/50'
-                        )}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex items-center gap-2 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all min-w-40 justify-between"
+                  >
+                    <span className="text-sm">
+                      {dateOptions.find((o) => o.value === dateRange)?.label}
+                    </span>
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="min-w-40">
+                  {dateOptions.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      onClick={() => setDateRange(option.value)}
+                      className={cn(
+                        'justify-between',
+                        dateRange === option.value && 'text-purple-400'
+                      )}
+                    >
+                      {option.label}
+                      {dateRange === option.value && (
+                        <Check className="w-4 h-4" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {selectedItems.length > 0 && (
