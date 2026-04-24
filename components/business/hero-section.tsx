@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Users, Image, Palette, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/use-translation';
+import { usePageTranslation } from '@/hooks/use-translation';
 import { formatNumber } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,9 +16,9 @@ interface HeroSectionProps {
 }
 
 const STATS = [
-  { value: 2000000, label: 'stats.users', icon: Users, suffix: '+' },
-  { value: 50000000, label: 'stats.images', icon: Image, suffix: '+' },
-  { value: 500, label: 'stats.styles', icon: Palette, suffix: '+' },
+  { value: 2000000, label: 'users', icon: Users, suffix: '+' },
+  { value: 50000000, label: 'images', icon: Image, suffix: '+' },
+  { value: 500, label: 'styles', icon: Palette, suffix: '+' },
 ];
 
 const SAMPLE_IMAGES = [
@@ -66,7 +66,7 @@ const imageVariants = {
 };
 
 export function HeroSection({ className }: HeroSectionProps) {
-  const { t, tObject } = useTranslation();
+  const { t, tObject } = usePageTranslation('landing');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -166,7 +166,7 @@ export function HeroSection({ className }: HeroSectionProps) {
             >
               {STATS.map((stat, index) => {
                 const Icon = stat.icon;
-                const label = heroStats[stat.label.split('.')[1]] as string || stat.label;
+                const label = heroStats[stat.label] as string || stat.label;
                 
                 return (
                   <div

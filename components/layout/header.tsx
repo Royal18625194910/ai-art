@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X, Sparkles, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/use-translation';
+import { useCommonTranslation } from '@/hooks/use-translation';
 import { useScrollPosition, useScrollDirection } from '@/hooks/use-scroll-animation';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/business/language-switcher';
@@ -20,7 +20,7 @@ export function Header({ className }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const scrollPosition = useScrollPosition();
   const scrollDirection = useScrollDirection();
-  const { t } = useTranslation();
+  const { t, nav } = useCommonTranslation();
   const { isSignedIn, isLoaded } = useAuth();
 
   useEffect(() => {
@@ -31,14 +31,16 @@ export function Header({ className }: HeaderProps) {
     e.preventDefault();
     setIsMobileMenuOpen(false);
     
-    const target = href.startsWith('#') ? href.slice(1) : href;
-    const element = document.getElementById(target);
-    
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+    if (href.startsWith('#')) {
+      const target = href.slice(1);
+      const element = document.getElementById(target);
+      
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
     }
   };
 
@@ -86,7 +88,7 @@ export function Header({ className }: HeaderProps) {
                 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               )}
             >
-              {t(item.label)}
+              {t(item.label.replace('nav.', ''))}
             </a>
           ))}
         </nav>
@@ -144,7 +146,7 @@ export function Header({ className }: HeaderProps) {
                   onClick={(e) => handleNavClick(item.href, e)}
                   className="block px-4 py-3 text-sm font-medium rounded-lg hover:bg-muted transition-colors"
                 >
-                  {t(item.label)}
+                  {t(item.label.replace('nav.', ''))}
                 </a>
               ))}
             </div>

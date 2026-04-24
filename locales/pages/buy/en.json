@@ -1,0 +1,147 @@
+{
+  "title": "Buy Credits",
+  "subtitle": "Choose the credit package that's right for you and start creating",
+  "currentBalance": {
+    "label": "Current Balance",
+    "credits": "credits"
+  },
+  "packages": {
+    "title": "Choose Your Plan",
+    "recommended": "Recommended",
+    "bestValue": "Best Value",
+    "savings": "Save {percent}%",
+    "perCredit": "per credit",
+    "starter": {
+      "name": "Starter",
+      "credits": "10",
+      "price": "$3.99",
+      "priceCN": "$3.99",
+      "description": "Perfect for trying out",
+      "perCreditPrice": "$0.40/credit",
+      "perCreditPriceCN": "$0.40/credit",
+      "features": [
+        "10 credits",
+        "Instant delivery",
+        "Valid for 365 days",
+        "All generation modes supported"
+      ]
+    },
+    "standard": {
+      "name": "Standard",
+      "credits": "30",
+      "price": "$9.99",
+      "priceCN": "$9.99",
+      "description": "For serious creators",
+      "perCreditPrice": "$0.33/credit",
+      "perCreditPriceCN": "$0.33/credit",
+      "savingsPercent": "18",
+      "features": [
+        "30 credits",
+        "Instant delivery",
+        "Valid for 365 days",
+        "All generation modes supported",
+        "Priority queue"
+      ]
+    },
+    "premium": {
+      "name": "Premium",
+      "credits": "75",
+      "price": "$19.99",
+      "priceCN": "$19.99",
+      "description": "Best value for money",
+      "perCreditPrice": "$0.27/credit",
+      "perCreditPriceCN": "$0.27/credit",
+      "savingsPercent": "33",
+      "features": [
+        "75 credits",
+        "Instant delivery",
+        "Valid for 365 days",
+        "All generation modes supported",
+        "Priority queue",
+        "API access"
+      ]
+    }
+  },
+  "payment": {
+    "title": "Payment Method",
+    "methods": {
+      "stripe": "Stripe",
+      "paypal": "PayPal",
+      "alipay": "Alipay",
+      "wechat": "WeChat Pay"
+    },
+    "selected": "Selected",
+    "processing": "Processing...",
+    "success": "Payment successful!",
+    "failed": "Payment failed",
+    "retry": "Please try again",
+    "orderSummary": {
+      "title": "Order Summary",
+      "package": "Package",
+      "credits": "Credits",
+      "price": "Price",
+      "total": "Total"
+    },
+    "cta": {
+      "stripe": "Pay with Stripe",
+      "paypal": "Pay with PayPal",
+      "alipay": "Pay with Alipay",
+      "wechat": "Pay with WeChat"
+    }
+  },
+  "creditsInfo": {
+    "title": "About Credits",
+    "whatCanDo": "What can I do with credits?",
+    "whatCanDoList": [
+      "Text to Image: 1 credit/image",
+      "Image to Image: 1 credit/image",
+      "Image Upscale: 1 credit/image",
+      "Batch Generation: N credits/N images"
+    ],
+    "validity": "Validity",
+    "validityDesc": "Credits are valid for 365 days from purchase date",
+    "priority": "Priority Queue",
+    "priorityDesc": "Standard and Premium packages enjoy priority generation queue, 2-5x faster",
+    "refund": "Refund Policy",
+    "refundDesc": "Credits are non-refundable once purchased. Please buy carefully."
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "items": [
+      {
+        "question": "How do I use credits?",
+        "answer": "Each image generation costs 1 credit, whether it's text-to-image or image-to-image mode. For batch generation, you're charged N credits for N images."
+      },
+      {
+        "question": "How long are credits valid?",
+        "answer": "Credits are valid for 365 days from the date of purchase. Unused credits will expire after this period."
+      },
+      {
+        "question": "Can I get a refund?",
+        "answer": "Unfortunately, credits are non-refundable once purchased. Please make sure the package fits your needs before buying."
+      },
+      {
+        "question": "What is Priority Queue?",
+        "answer": "Standard and Premium package users get priority generation queue, which is 2-5x faster than free users. The advantage is more noticeable during peak hours."
+      },
+      {
+        "question": "Can I purchase multiple times?",
+        "answer": "Yes! You can purchase multiple packages, and credits will be accumulated in your account. Credits that expire first will be used first."
+      },
+      {
+        "question": "What payment methods are supported?",
+        "answer": "Currently we support Stripe, PayPal, Alipay, and WeChat Pay. Available payment methods may vary by region."
+      }
+    ]
+  },
+  "success": {
+    "title": "Payment Successful!",
+    "message": "Credits have been added to your account",
+    "creditsAdded": "Added {count} credits",
+    "newBalance": "Current balance: {count} credits",
+    "cta": {
+      "create": "Start Creating Now",
+      "history": "View History"
+    }
+  }
+}

@@ -15,20 +15,20 @@ export const siteConfig: SiteConfig = {
 
 export const navItems: NavItem[] = [
   {
-    label: 'nav.features',
-    href: '#features',
+    label: 'nav.home',
+    href: '/',
   },
   {
-    label: 'nav.gallery',
-    href: '#gallery',
+    label: 'nav.create',
+    href: '/create',
   },
   {
-    label: 'nav.pricing',
-    href: '#pricing',
+    label: 'nav.buy',
+    href: '/buy',
   },
   {
-    label: 'nav.faq',
-    href: '#faq',
+    label: 'nav.history',
+    href: '/history',
   },
 ];
 

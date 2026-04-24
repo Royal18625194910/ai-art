@@ -1,15 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useLanguageStore } from '@/stores/use-language-store';
 import { Locale, Translation, TranslationValue } from '@/types';
-import en from '@/locales/en.json';
-import zhCN from '@/locales/zh-CN.json';
-import zhTW from '@/locales/zh-TW.json';
-
-const translations: Record<Locale, Translation> = {
-  'en': en as unknown as Translation,
-  'zh-CN': zhCN as unknown as Translation,
-  'zh-TW': zhTW as unknown as Translation,
-};
+import { translations } from '@/locales';
 
 function getNestedValue(obj: Translation, path: string): TranslationValue | undefined {
   const keys = path.split('.');
@@ -26,15 +18,23 @@ function getNestedValue(obj: Translation, path: string): TranslationValue | unde
   return result;
 }
 
+function replaceParams(text: string, params: Record<string, string | number> = {}): string {
+  let result = text;
+  for (const [key, value] of Object.entries(params)) {
+    result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), String(value));
+  }
+  return result;
+}
+
 export function useTranslation() {
   const locale = useLanguageStore((state) => state.locale);
   const setLocale = useLanguageStore((state) => state.setLocale);
   
   const t = useCallback(
-    (key: string): string => {
+    (key: string, params: Record<string, string | number> = {}): string => {
       const value = getNestedValue(translations[locale], key);
       if (typeof value === 'string') {
-        return value;
+        return replaceParams(value, params);
       }
       return key;
     },
@@ -70,6 +70,14 @@ export function useTranslation() {
     [locale]
   );
   
+  const common = useMemo(() => {
+    return tObject('common');
+  }, [tObject]);
+  
+  const pages = useMemo(() => {
+    return tObject('pages');
+  }, [tObject]);
+  
   const availableLocales = useMemo(() => Object.keys(translations) as Locale[], []);
   
   return {
@@ -78,6 +86,34 @@ export function useTranslation() {
     t,
     tArray,
     tObject,
+    common,
+    pages,
     availableLocales,
+  };
+}
+
+export function useCommonTranslation() {
+  const { t, tArray, tObject } = useTranslation();
+  
+  return {
+    t: (key: string, params?: Record<string, string | number>) => t(`common.${key}`, params),
+    tArray: (key: string) => tArray(`common.${key}`),
+    tObject: (key: string) => tObject(`common.${key}`),
+    nav: tObject('common.nav'),
+    common: tObject('common.common'),
+    credits: tObject('common.credits'),
+    language: tObject('common.language'),
+    actions: tObject('common.actions'),
+  };
+}
+
+export function usePageTranslation(page: 'landing' | 'create' | 'buy' | 'history') {
+  const { t, tArray, tObject } = useTranslation();
+  
+  return {
+    t: (key: string, params?: Record<string, string | number>) => t(`pages.${page}.${key}`, params),
+    tArray: (key: string) => tArray(`pages.${page}.${key}`),
+    tObject: (key: string) => tObject(`pages.${page}.${key}`),
+    pageTranslations: tObject(`pages.${page}`),
   };
 }

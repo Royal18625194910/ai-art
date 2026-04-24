@@ -1,0 +1,125 @@
+{
+  "title": "Generation History",
+  "subtitle": "View and manage all your AI artwork",
+  "stats": {
+    "total": "Total Works",
+    "textToImage": "Text to Image",
+    "imageToImage": "Image to Image",
+    "creditsUsed": "Credits Used"
+  },
+  "filters": {
+    "title": "Filter",
+    "all": "All",
+    "textToImage": "Text to Image",
+    "imageToImage": "Image to Image",
+    "dateRange": {
+      "label": "Date Range",
+      "today": "Today",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "thisMonth": "This Month",
+      "allTime": "All Time"
+    },
+    "search": {
+      "placeholder": "Search prompts...",
+      "noResults": "No matching results found"
+    },
+    "sort": {
+      "label": "Sort",
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "creditsHigh": "High Credits First",
+      "creditsLow": "Low Credits First"
+    }
+  },
+  "gallery": {
+    "empty": "No history yet",
+    "emptyDesc": "Start creating, your artwork will appear here",
+    "createNow": "Create Now",
+    "loading": "Loading...",
+    "loadMore": "Load More",
+    "noMore": "No more items"
+  },
+  "card": {
+    "viewDetails": "View Details",
+    "download": "Download",
+    "regenerate": "Regenerate",
+    "copyPrompt": "Copy Prompt",
+    "delete": "Delete",
+    "share": "Share",
+    "promptCopied": "Prompt copied",
+    "date": "Generated at",
+    "mode": "Mode",
+    "creditsUsed": "Credits Used",
+    "size": "Size",
+    "styleStrength": "Style Strength",
+    "similarity": "Similarity"
+  },
+  "detail": {
+    "title": "Work Details",
+    "close": "Close",
+    "imagePreview": "Image Preview",
+    "prompt": "Prompt",
+    "negativePrompt": "Negative Prompt",
+    "noNegativePrompt": "None",
+    "parameters": {
+      "title": "Generation Parameters",
+      "mode": "Mode",
+      "size": "Size",
+      "styleStrength": "Style Strength",
+      "similarity": "Similarity",
+      "quantity": "Quantity",
+      "creditsUsed": "Credits Used"
+    },
+    "referenceImages": {
+      "title": "Reference Images",
+      "noImages": "No reference images"
+    },
+    "actions": {
+      "download": "Download Original",
+      "regenerate": "Regenerate",
+      "copyPrompt": "Copy Prompt",
+      "copyAllParams": "Copy All Params",
+      "delete": "Delete Work"
+    }
+  },
+  "delete": {
+    "confirm": "Confirm Delete",
+    "message": "Are you sure you want to delete this work? This action cannot be undone.",
+    "deleteAll": {
+      "confirm": "Confirm Delete All",
+      "message": "Are you sure you want to delete all history? This action cannot be undone."
+    },
+    "success": "Deleted successfully",
+    "failed": "Delete failed"
+  },
+  "batch": {
+    "title": "Batch Actions",
+    "selected": "{count} selected",
+    "downloadSelected": "Download Selected",
+    "deleteSelected": "Delete Selected",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All"
+  },
+  "modes": {
+    "textToImage": "Text to Image",
+    "imageToImage": "Image to Image"
+  },
+  "tips": {
+    "title": "Tips",
+    "items": [
+      "Click on an image to view full details and parameters",
+      "You can copy prompts to regenerate similar works",
+      "History keeps all generation parameters for reference",
+      "Deleted works cannot be recovered, please be careful"
+    ]
+  },
+  "errors": {
+    "loadFailed": "Failed to load history",
+    "loadFailedDesc": "Please check your network connection and try again",
+    "deleteFailed": "Delete failed",
+    "deleteFailedDesc": "Please try again later",
+    "downloadFailed": "Download failed",
+    "downloadFailedDesc": "Please try again later"
+  }
+}
