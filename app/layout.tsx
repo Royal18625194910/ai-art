@@ -69,11 +69,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="zh-CN" suppressHydrationWarning>
         <head>
-          <meta name="theme-color" content="#7c3aed" />
-          <meta name="color-scheme" content="light" />
+          <meta name="theme-color" content="#0a0a0a" />
+          <meta name="color-scheme" content="dark" />
         </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
+          data-theme="dark"
         >
           {children}
         </body>

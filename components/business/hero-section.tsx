@@ -9,7 +9,6 @@ import { formatNumber } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
-import { AnimatedGradientText } from '@/components/ui/animated-gradient-text';
 import { MagicRings, MagicRingsBackground } from '@/components/ui/magic-rings';
 
 interface HeroSectionProps {
@@ -41,12 +40,26 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, filter: 'blur(10px)', y: 30 },
   visible: {
     opacity: 1,
+    filter: 'blur(0px)',
     y: 0,
     transition: {
       duration: 0.8,
+      ease: [0.25, 0.46, 0.45, 0.94] as any,
+    },
+  },
+};
+
+const imageVariants = {
+  hidden: { opacity: 0, scale: 0.8, rotate: -5 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    transition: {
+      duration: 0.6,
       ease: [0.25, 0.46, 0.45, 0.94] as any,
     },
   },
@@ -81,6 +94,9 @@ export function HeroSection({ className }: HeroSectionProps) {
 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
 
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-purple-500/10 rounded-full blur-3xl -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+
       <Container className="relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <motion.div
@@ -92,7 +108,7 @@ export function HeroSection({ className }: HeroSectionProps) {
             <motion.div variants={itemVariants}>
               <Badge
                 variant="secondary"
-                className="mb-8 px-4 py-1.5 text-sm cursor-pointer inline-flex bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/20"
+                className="mb-8 px-4 py-1.5 text-sm cursor-pointer inline-flex bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/20 glass-card"
                 onClick={handleCtaClick}
               >
                 <Sparkles className="w-3.5 h-3.5 mr-1.5" />
@@ -104,15 +120,9 @@ export function HeroSection({ className }: HeroSectionProps) {
             <motion.div variants={itemVariants}>
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight mb-6">
                 <span className="block">{t('hero.title')}</span>
-                <AnimatedGradientText
-                  from="from-purple-500"
-                  via="via-cyan-500"
-                  to="to-purple-500"
-                  duration={3}
-                  className="block mt-2"
-                >
+                <span className="block mt-2 text-gradient-purple-cyan">
                   {t('hero.titleHighlight')}
-                </AnimatedGradientText>
+                </span>
               </h1>
             </motion.div>
 
@@ -125,7 +135,7 @@ export function HeroSection({ className }: HeroSectionProps) {
 
             <motion.div
               variants={itemVariants}
-              className="flex items-center gap-2 mb-10 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20"
+              className="flex items-center gap-2 mb-10 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 glass-card"
             >
               <Sparkles className="w-4 h-4 text-purple-400" />
               <span className="text-sm text-purple-300">
@@ -140,7 +150,7 @@ export function HeroSection({ className }: HeroSectionProps) {
               <Button
                 variant="gradient"
                 size="lg"
-                className="w-full sm:w-auto text-base px-8 h-14 bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500 shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30"
+                className="w-full sm:w-auto text-base px-8 h-14 bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500 shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 btn-gradient"
                 onClick={handleCtaClick}
               >
                 <span className="flex items-center gap-2">
@@ -164,8 +174,8 @@ export function HeroSection({ className }: HeroSectionProps) {
                     className="flex flex-col items-start"
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Icon className="w-5 h-5 text-purple-500" />
-                      <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                      <Icon className="w-5 h-5 text-purple-400" />
+                      <span className="text-2xl font-bold text-gradient-purple-cyan">
                         {mounted ? formatNumber(stat.value) : '0'}
                         {stat.suffix}
                       </span>
@@ -201,15 +211,14 @@ export function HeroSection({ className }: HeroSectionProps) {
                 {SAMPLE_IMAGES.map((src, index) => (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
-                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    variants={imageVariants}
+                    initial="hidden"
+                    animate="visible"
                     transition={{
                       delay: 0.8 + index * 0.15,
-                      duration: 0.6,
-                      ease: [0.25, 0.46, 0.45, 0.94],
                     }}
                     className={cn(
-                      'relative group rounded-2xl overflow-hidden shadow-xl shadow-purple-500/20',
+                      'relative group rounded-2xl overflow-hidden shadow-xl shadow-purple-500/20 glass-card',
                       index % 2 === 0 ? 'translate-y-6' : '-translate-y-6'
                     )}
                     style={{
@@ -298,7 +307,7 @@ export function HeroSection({ className }: HeroSectionProps) {
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
-              className="w-1.5 h-1.5 bg-muted-foreground rounded-full"
+              className="w-1.5 h-1.5 bg-purple-400 rounded-full"
             />
           </div>
         </div>
