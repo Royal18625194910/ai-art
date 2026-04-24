@@ -18,7 +18,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
+import { usePageTranslation, useCommonTranslation, useTranslation } from '@/hooks/use-translation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
@@ -36,7 +36,8 @@ interface FAQItem {
 
 export default function BuyPage() {
   const { t, tObject, tArray } = usePageTranslation('buy');
-  const { t: tCommon, credits } = useCommonTranslation();
+  const { credits, nav } = useCommonTranslation();
+  const { pages } = useTranslation();
   const [mounted, setMounted] = useState(false);
   
   const [selectedPackage, setSelectedPackage] = useState<PackageType>('standard');
@@ -269,7 +270,7 @@ export default function BuyPage() {
                       {t('payment.selected')}
                     </span>
                   ) : (
-                    tCommon('nav.buy')
+                    nav.buy
                   )}
                 </div>
               </motion.div>
@@ -358,7 +359,7 @@ export default function BuyPage() {
 
                 <p className="text-xs text-muted-foreground text-center mt-3 flex items-center justify-center gap-1">
                   <Lock className="w-3 h-3" />
-                  {tCommon('common.securePayment')}
+                  {pages.buy.payment.secureNote}
                 </p>
               </div>
             </div>

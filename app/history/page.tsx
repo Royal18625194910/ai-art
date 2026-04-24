@@ -230,10 +230,10 @@ export default function HistoryPage() {
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    if (minutes < 1) return tCommon('common.justNow');
-    if (minutes < 60) return tCommon('common.minutesAgo', { count: minutes });
-    if (hours < 24) return tCommon('common.hoursAgo', { count: hours });
-    if (days < 7) return tCommon('common.daysAgo', { count: days });
+    if (minutes < 1) return tCommon('time.justNow');
+    if (minutes < 60) return tCommon('time.minutesAgo', { count: minutes });
+    if (hours < 24) return tCommon('time.hoursAgo', { count: hours });
+    if (days < 7) return tCommon('time.daysAgo', { count: days });
     
     return date.toLocaleDateString();
   };
@@ -463,7 +463,7 @@ export default function HistoryPage() {
                 {searchQuery ? t('filters.search.noResults') : t('gallery.empty')}
               </h3>
               <p className="text-muted-foreground mb-6 max-w-md">
-                {searchQuery ? tCommon('common.tryAgain') : t('gallery.emptyDesc')}
+                {searchQuery ? tCommon('actions.retry') : t('empty.desc')}
               </p>
               <Button variant="primary" onClick={() => (window.location.href = '/create')}>
                 <Plus className="w-5 h-5 mr-2" />

@@ -4,7 +4,7 @@ import { Globe, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
 import { localeConfigs } from '@/stores/use-language-store';
-import { Locale } from '@/types';
+import { Locale } from '@/locales';
 import {
   DropdownMenu,
   DropdownMenuContent,

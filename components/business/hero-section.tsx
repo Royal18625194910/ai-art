@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Users, Image, Palette, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { usePageTranslation } from '@/hooks/use-translation';
+import { useLandingTranslation } from '@/hooks/use-translation';
 import { formatNumber } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -66,14 +66,13 @@ const imageVariants = {
 };
 
 export function HeroSection({ className }: HeroSectionProps) {
-  const { t, tObject } = usePageTranslation('landing');
+  const { landing } = useLandingTranslation();
+  const hero = landing.hero;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const heroStats = tObject('hero.stats');
 
   const handleCtaClick = () => {
     const element = document.getElementById('features');
@@ -112,16 +111,16 @@ export function HeroSection({ className }: HeroSectionProps) {
                 onClick={handleCtaClick}
               >
                 <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                {t('hero.badge')}
+                {hero.badge}
                 <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
               </Badge>
             </motion.div>
 
             <motion.div variants={itemVariants}>
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight mb-6">
-                <span className="block">{t('hero.title')}</span>
+                <span className="block">{hero.title}</span>
                 <span className="block mt-2 text-gradient-purple">
-                  {t('hero.titleHighlight')}
+                  {hero.titleHighlight}
                 </span>
               </h1>
             </motion.div>
@@ -130,7 +129,7 @@ export function HeroSection({ className }: HeroSectionProps) {
               variants={itemVariants}
               className="text-lg md:text-xl text-muted-foreground max-w-lg mb-6 leading-relaxed"
             >
-              {t('hero.subtitle')}
+              {hero.subtitle}
             </motion.p>
 
             <motion.div
@@ -139,7 +138,7 @@ export function HeroSection({ className }: HeroSectionProps) {
             >
               <Sparkles className="w-4 h-4 text-purple-400" />
               <span className="text-sm text-purple-300">
-                {t('hero.creditsInfo')}
+                {hero.creditsInfo}
               </span>
             </motion.div>
 
@@ -154,7 +153,7 @@ export function HeroSection({ className }: HeroSectionProps) {
                 onClick={handleCtaClick}
               >
                 <span className="flex items-center gap-2">
-                  {t('hero.ctaPrimary')}
+                  {hero.ctaPrimary}
                   <ArrowRight className="w-5 h-5" />
                 </span>
               </Button>
@@ -166,8 +165,8 @@ export function HeroSection({ className }: HeroSectionProps) {
             >
               {STATS.map((stat, index) => {
                 const Icon = stat.icon;
-                const label = heroStats[stat.label] as string || stat.label;
-                
+                const label = hero.stats[stat.label as keyof typeof hero.stats];
+
                 return (
                   <div
                     key={index}

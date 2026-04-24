@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Stars } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { usePageTranslation, useTranslation } from '@/hooks/use-translation';
+import { useLandingTranslation } from '@/hooks/use-translation';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container, Section } from '@/components/ui/container';
 import { Button } from '@/components/ui/button';
@@ -13,8 +13,8 @@ interface CTASectionProps {
 }
 
 export function CTASection({ className }: CTASectionProps) {
-  const { t } = usePageTranslation('landing');
-  const { t: tCommon } = useTranslation();
+  const { landing } = useLandingTranslation();
+  const cta = landing.cta;
   const { ref: sectionRef, isVisible } = useScrollAnimation({
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px',
@@ -55,23 +55,23 @@ export function CTASection({ className }: CTASectionProps) {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm text-white/90 text-sm font-medium mb-8">
               <Sparkles className="w-4 h-4 text-yellow-400" />
-              <span>{t('cta.badge')}</span>
+              <span>{cta.badge}</span>
             </div>
 
             <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              <span className="block">{t('cta.title')}</span>
-              {t('cta.titleHighlight') && (
+              <span className="block">{cta.title}</span>
+              {cta.titleHighlight && (
                 <span className="block mt-2 bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
                   <span className="inline-flex items-center gap-2">
                     <Stars className="w-8 h-8 md:w-12 md:h-12 text-yellow-400" />
-                    {t('cta.titleHighlight')}
+                    {cta.titleHighlight}
                   </span>
                 </span>
               )}
             </h2>
 
             <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-              {t('cta.subtitle')}
+              {cta.subtitle}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -82,7 +82,7 @@ export function CTASection({ className }: CTASectionProps) {
                 onClick={handleCtaClick}
               >
                 <span className="flex items-center gap-2">
-                  {t('cta.ctaPrimary')}
+                  {cta.ctaPrimary}
                   <ArrowRight className="w-5 h-5" />
                 </span>
               </Button>
@@ -91,7 +91,7 @@ export function CTASection({ className }: CTASectionProps) {
                 size="lg"
                 className="w-full sm:w-auto text-base px-10 h-14 border-2 border-white/20 text-white hover:bg-white/10 hover:border-white/30"
               >
-                {t('cta.ctaSecondary')}
+                {cta.ctaSecondary}
               </Button>
             </div>
 
@@ -100,7 +100,7 @@ export function CTASection({ className }: CTASectionProps) {
                 <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
                   <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 </div>
-                <span>{t('cta.freeTrial')}</span>
+                <span>{cta.freeTrial}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
@@ -108,7 +108,7 @@ export function CTASection({ className }: CTASectionProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <span>{t('cta.noCreditCard')}</span>
+                <span>{cta.noCreditCard}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center">
@@ -116,7 +116,7 @@ export function CTASection({ className }: CTASectionProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
-                <span>{t('cta.cancelAnytime')}</span>
+                <span>{cta.cancelAnytime}</span>
               </div>
             </div>
           </motion.div>

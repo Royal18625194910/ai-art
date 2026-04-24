@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Star, Sparkles, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/use-translation';
+import { useLandingTranslation } from '@/hooks/use-translation';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container, Section } from '@/components/ui/container';
 import { Badge } from '@/components/ui/badge';
@@ -15,15 +15,13 @@ interface PricingSectionProps {
 }
 
 export function PricingSection({ className }: PricingSectionProps) {
-  const { t, tObject } = useTranslation();
+  const { landing } = useLandingTranslation();
+  const pricing = landing.pricing;
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const { ref: sectionRef, isVisible } = useScrollAnimation({
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px',
   });
-
-  const pricingData = tObject('pricing.plans');
-  const plans = Array.isArray(pricingData) ? pricingData : [];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -65,7 +63,7 @@ export function PricingSection({ className }: PricingSectionProps) {
               variant="secondary"
               className="mb-6 px-4 py-1.5 text-sm"
             >
-              {t('pricing.badge')}
+              {pricing.badge}
             </Badge>
           </motion.div>
 
@@ -75,7 +73,7 @@ export function PricingSection({ className }: PricingSectionProps) {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
           >
-            {t('pricing.title')}
+            {pricing.title}
           </motion.h2>
 
           <motion.p
@@ -84,7 +82,7 @@ export function PricingSection({ className }: PricingSectionProps) {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            {t('pricing.subtitle')}
+            {pricing.subtitle}
           </motion.p>
 
           <motion.div
@@ -102,7 +100,7 @@ export function PricingSection({ className }: PricingSectionProps) {
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              Monthly
+              {pricing.monthlyLabel}
             </button>
             <button
               onClick={() => setBillingCycle('yearly')}
@@ -113,9 +111,9 @@ export function PricingSection({ className }: PricingSectionProps) {
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              Yearly
+              {pricing.yearlyLabel}
               <span className="absolute -top-2 -right-2 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full">
-                -20%
+                {pricing.yearlyDiscount}
               </span>
             </button>
           </motion.div>
@@ -128,28 +126,8 @@ export function PricingSection({ className }: PricingSectionProps) {
           className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto"
         >
           <AnimatePresence mode="wait">
-            {plans.map((plan, index) => {
-              if (typeof plan !== 'object' || plan === null) return null;
-              
-              const {
-                name,
-                price,
-                period,
-                description,
-                features,
-                cta,
-                isPopular,
-              } = plan as {
-                name: string;
-                price: string;
-                period: string;
-                description: string;
-                features: string[];
-                cta: string;
-                isPopular?: boolean;
-              };
-
-              const featuresArray = Array.isArray(features) ? features : [];
+            {pricing.plans.map((plan, index) => {
+              const isPopular = plan.isPopular ?? false;
 
               return (
                 <motion.div
@@ -187,34 +165,34 @@ export function PricingSection({ className }: PricingSectionProps) {
                     <div className="relative p-8">
                       <div className="mb-6">
                         <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                          {name}
+                          {plan.name}
                           {isPopular && (
                             <Sparkles className="w-5 h-5 text-purple-500" />
                           )}
                         </h3>
                         <p className="text-muted-foreground text-sm">
-                          {description}
+                          {plan.description}
                         </p>
                       </div>
 
                       <div className="mb-8">
                         <div className="flex items-baseline gap-1">
                           <span className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                            {price}
+                            {plan.price}
                           </span>
                           <span className="text-muted-foreground text-lg">
-                            {period}
+                            {plan.period}
                           </span>
                         </div>
-                        {billingCycle === 'yearly' && price !== 'Custom' && (
+                        {billingCycle === 'yearly' && plan.price !== 'Custom' && (
                           <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                            Save 20% with yearly billing
+                            {pricing.yearlyDiscount}
                           </p>
                         )}
                       </div>
 
                       <div className="space-y-3 mb-8">
-                        {featuresArray.map((feature, idx) => (
+                        {plan.features.map((feature, idx) => (
                           <div key={idx} className="flex items-start gap-3">
                             <div className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-green-500/10 dark:bg-green-500/20 flex items-center justify-center">
                               <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
@@ -234,7 +212,7 @@ export function PricingSection({ className }: PricingSectionProps) {
                         )}
                       >
                         <span className="flex items-center justify-center gap-2">
-                          {cta}
+                          {plan.cta}
                           <ArrowRight className="w-4 h-4" />
                         </span>
                       </Button>
@@ -253,7 +231,7 @@ export function PricingSection({ className }: PricingSectionProps) {
           className="text-center mt-12"
         >
           <p className="text-sm text-muted-foreground">
-            All plans include a 14-day free trial. No credit card required.
+            {pricing.footerNote}
           </p>
         </motion.div>
       </Container>

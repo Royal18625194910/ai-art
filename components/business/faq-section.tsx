@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/use-translation';
+import { useLandingTranslation } from '@/hooks/use-translation';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container, Section } from '@/components/ui/container';
 import { Badge } from '@/components/ui/badge';
@@ -14,15 +14,13 @@ interface FAQSectionProps {
 }
 
 export function FAQSection({ className }: FAQSectionProps) {
-  const { t, tObject } = useTranslation();
+  const { landing } = useLandingTranslation();
+  const faq = landing.faq;
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const { ref: sectionRef, isVisible } = useScrollAnimation({
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px',
   });
-
-  const faqData = tObject('faq.items');
-  const faqs = Array.isArray(faqData) ? faqData : [];
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -68,7 +66,7 @@ export function FAQSection({ className }: FAQSectionProps) {
               className="mb-6 px-4 py-1.5 text-sm"
             >
               <HelpCircle className="w-3.5 h-3.5 mr-1.5" />
-              {t('faq.badge')}
+              {faq.badge}
             </Badge>
           </motion.div>
 
@@ -78,7 +76,7 @@ export function FAQSection({ className }: FAQSectionProps) {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
           >
-            {t('faq.title')}
+            {faq.title}
           </motion.h2>
 
           <motion.p
@@ -87,7 +85,7 @@ export function FAQSection({ className }: FAQSectionProps) {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
           >
-            {t('faq.subtitle')}
+            {faq.subtitle}
           </motion.p>
         </div>
 
@@ -97,10 +95,7 @@ export function FAQSection({ className }: FAQSectionProps) {
           animate={isVisible ? 'visible' : 'hidden'}
           className="max-w-3xl mx-auto space-y-4"
         >
-          {faqs.map((faq, index) => {
-            if (typeof faq !== 'object' || faq === null) return null;
-            
-            const { question, answer } = faq as { question: string; answer: string };
+          {faq.items.map((item, index) => {
             const isOpen = openIndex === index;
 
             return (
@@ -124,7 +119,7 @@ export function FAQSection({ className }: FAQSectionProps) {
                     'transition-colors duration-300',
                     isOpen && 'text-purple-600 dark:text-purple-400'
                   )}>
-                    {question}
+                    {item.question}
                   </span>
                   <div
                     className={cn(
@@ -176,7 +171,7 @@ export function FAQSection({ className }: FAQSectionProps) {
                           transition={{ delay: 0.1, duration: 0.3 }}
                         >
                           <p className="text-muted-foreground leading-relaxed">
-                            {answer}
+                            {item.answer}
                           </p>
                         </motion.div>
                       </div>
@@ -198,12 +193,12 @@ export function FAQSection({ className }: FAQSectionProps) {
             'border border-purple-200/50 dark:border-purple-800/30'
           )}
         >
-          <h3 className="text-xl font-bold mb-2">Still have questions?</h3>
+          <h3 className="text-xl font-bold mb-2">{faq.contactTitle}</h3>
           <p className="text-muted-foreground mb-4">
-            Can't find what you're looking for? Reach out to our team.
+            {faq.contactDescription}
           </p>
           <button className="inline-flex items-center gap-2 text-purple-600 dark:text-purple-400 font-medium hover:underline">
-            Contact support
+            {faq.contactCta}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>

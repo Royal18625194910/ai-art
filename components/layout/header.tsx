@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Menu, X, Sparkles, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/use-translation';
+import { useCommonTranslation } from '@/hooks/use-translation';
 import { useScrollPosition, useScrollDirection } from '@/hooks/use-scroll-animation';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/business/language-switcher';
@@ -21,7 +21,7 @@ export function Header({ className }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const scrollPosition = useScrollPosition();
   const scrollDirection = useScrollDirection();
-  const { t } = useTranslation();
+  const { nav } = useCommonTranslation();
   const { isSignedIn, isLoaded } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -58,14 +58,9 @@ export function Header({ className }: HeaderProps) {
   };
 
   const getNavLabel = (label: string) => {
-    const fullKey = `common.${label}`;
-    const translated = t(fullKey);
-    
-    if (translated === fullKey) {
-      const parts = label.split('.');
-      return parts[parts.length - 1] || label;
-    }
-    return translated;
+    // label is like 'nav.home', 'nav.create', etc.
+    const key = label.replace('nav.', '') as keyof typeof nav;
+    return nav[key] || label;
   };
 
   const isHidden = scrollDirection === 'down' && scrollPosition > 300;
@@ -122,7 +117,7 @@ export function Header({ className }: HeaderProps) {
             <SignInButton mode="redirect">
               <Button variant="gradient" size="sm">
                 <span className="flex items-center gap-1">
-                  {getNavLabel('nav.login')}
+                  {nav.login}
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </Button>
@@ -184,7 +179,7 @@ export function Header({ className }: HeaderProps) {
                 <SignInButton mode="redirect">
                   <Button variant="gradient" className="w-full justify-center">
                     <span className="flex items-center gap-1">
-                      {getNavLabel('nav.login')}
+                      {nav.login}
                       <ArrowRight className="w-4 h-4" />
                     </span>
                   </Button>

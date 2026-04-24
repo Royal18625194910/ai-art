@@ -1,17 +1,4 @@
-export type Locale = 'en' | 'zh-CN' | 'zh-TW';
-
-export interface LocaleConfig {
-  code: Locale;
-  name: string;
-  nativeName: string;
-  flag: string;
-}
-
-export type TranslationValue = string | number | boolean | Translation | Translation[];
-
-export interface Translation {
-  [key: string]: TranslationValue;
-}
+import type { ReactNode } from 'react';
 
 export interface SiteConfig {
   name: string;
@@ -33,18 +20,5 @@ export interface NavItem {
   external?: boolean;
 }
 
-export interface FeatureItem {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-}
-
-export interface PricingPlan {
-  name: string;
-  price: string;
-  period: string;
-  description: string;
-  features: string[];
-  isPopular?: boolean;
-  cta: string;
-}
+// Re-export from locales for backward compatibility
+export type { Locale, LocaleConfig } from '@/locales';

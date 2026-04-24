@@ -25,10 +25,18 @@ export interface CreditsTranslations {
   insufficient: string;
 }
 
+export interface TimeTranslations {
+  justNow: string;
+  minutesAgo: string;
+  hoursAgo: string;
+  daysAgo: string;
+}
+
 export interface CommonTranslations {
   nav: NavTranslations;
   actions: ActionsTranslations;
   credits: CreditsTranslations;
+  time: TimeTranslations;
 }
 
 // Landing Page
@@ -103,6 +111,38 @@ export interface LandingTranslations {
 }
 
 // Buy Page
+export interface BuyPackage {
+  name: string;
+  credits: string;
+  price: string;
+  priceCN: string;
+  description: string;
+  perCreditPrice: string;
+  features: string[];
+  isPopular: boolean;
+  savingsPercent: string;
+}
+
+export interface BuyPackages {
+  starter: BuyPackage;
+  standard: BuyPackage;
+  premium: BuyPackage;
+}
+
+export interface BuyFAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface BuyPayment {
+  title: string;
+  description: string;
+  submit: string;
+  processing: string;
+  secureNote: string;
+  selected: string;
+}
+
 export interface BuyTranslations {
   title: string;
   subtitle: string;
@@ -111,6 +151,16 @@ export interface BuyTranslations {
   payWith: string;
   success: string;
   error: string;
+  packages: BuyPackages;
+  faq: {
+    title: string;
+    items: BuyFAQItem[];
+  };
+  payment: BuyPayment;
+  // Backward compatibility keys
+  bestValue: string;
+  recommended: string;
+  savings: string;
 }
 
 // Create Page
@@ -134,6 +184,7 @@ export interface HistoryTranslations {
   download: string;
   delete: string;
   empty: string;
+  emptyDesc: string;
 }
 
 // 页面翻译总览
@@ -144,8 +195,69 @@ export interface PageTranslations {
   history: HistoryTranslations;
 }
 
+// FAQ Section
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface LandingFAQTranslations {
+  badge: string;
+  title: string;
+  subtitle: string;
+  items: FAQItem[];
+  contactTitle: string;
+  contactDescription: string;
+  contactCta: string;
+}
+
+// Pricing Section
+export interface PricingPlan {
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  features: string[];
+  cta: string;
+  isPopular?: boolean;
+}
+
+export interface LandingPricingTranslations {
+  badge: string;
+  title: string;
+  subtitle: string;
+  plans: PricingPlan[];
+  monthlyLabel: string;
+  yearlyLabel: string;
+  yearlyDiscount: string;
+  footerNote: string;
+  freeTrial: string;
+  noCreditCard: string;
+  cancelAnytime: string;
+}
+
+// Landing Page
+export interface LandingTranslations {
+  hero: LandingHeroTranslations;
+  features: LandingFeaturesTranslations;
+  gallery: LandingGalleryTranslations;
+  cta: LandingCtaTranslations;
+  faq: LandingFAQTranslations;
+  pricing: LandingPricingTranslations;
+  footer: {
+    copyright: string;
+  };
+}
+
 // 语言类型
 export type Locale = 'zh' | 'en' | 'zh-TW';
+
+export interface LocaleConfig {
+  code: Locale;
+  name: string;
+  nativeName: string;
+  flag: string;
+}
 
 // 完整翻译
 export interface Translations {

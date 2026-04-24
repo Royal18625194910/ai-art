@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Maximize2, Heart, Eye, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { usePageTranslation } from '@/hooks/use-translation';
+import { useLandingTranslation } from '@/hooks/use-translation';
+import type { LandingGalleryCategories } from '@/locales';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container, Section } from '@/components/ui/container';
 import { Badge } from '@/components/ui/badge';
@@ -65,11 +66,12 @@ const GALLERY_IMAGES = [
   },
 ];
 
-const CATEGORIES = ['all', 'scifi', 'anime', 'fantasy', 'abstract', 'portrait'];
+const CATEGORIES: Array<keyof LandingGalleryCategories> = ['all', 'scifi', 'anime', 'fantasy', 'abstract', 'portrait'];
 
 export function GallerySection({ className }: GallerySectionProps) {
-  const { t, tObject } = usePageTranslation('landing');
-  const [activeCategory, setActiveCategory] = useState('all');
+  const { landing } = useLandingTranslation();
+  const gallery = landing.gallery;
+  const [activeCategory, setActiveCategory] = useState<keyof LandingGalleryCategories>('all');
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const { ref: sectionRef, isVisible } = useScrollAnimation({
     threshold: 0.1,
@@ -126,7 +128,7 @@ export function GallerySection({ className }: GallerySectionProps) {
               className="mb-6 px-4 py-1.5 text-sm glass-card border-purple-500/20"
             >
               <Sparkles className="w-3.5 h-3.5 mr-1.5 inline-block" />
-              {t('gallery.badge')}
+              {gallery.badge}
             </Badge>
           </motion.div>
 
@@ -136,7 +138,7 @@ export function GallerySection({ className }: GallerySectionProps) {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
           >
-            <span className="text-gradient-purple">{t('gallery.title')}</span>
+            <span className="text-gradient-purple">{gallery.title}</span>
           </motion.h2>
 
           <motion.p
@@ -145,7 +147,7 @@ export function GallerySection({ className }: GallerySectionProps) {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            {t('gallery.subtitle')}
+            {gallery.subtitle}
           </motion.p>
 
           <motion.div
@@ -165,7 +167,7 @@ export function GallerySection({ className }: GallerySectionProps) {
                     : 'bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground glass-card'
                 )}
               >
-                {t(`gallery.categories.${category}`)}
+                {gallery.categories[category]}
               </button>
             ))}
           </motion.div>
@@ -283,7 +285,7 @@ export function GallerySection({ className }: GallerySectionProps) {
             size="lg"
           >
             <span className="flex items-center gap-2">
-              {t('gallery.cta')}
+              {gallery.cta}
               <ArrowRight className="w-5 h-5" />
             </span>
           </Button>

@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { usePageTranslation } from '@/hooks/use-translation';
+import { useLandingTranslation } from '@/hooks/use-translation';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container, Section } from '@/components/ui/container';
 import { Badge } from '@/components/ui/badge';
@@ -54,14 +54,12 @@ const itemVariants = {
 };
 
 export function FeaturesSection({ className }: FeaturesSectionProps) {
-  const { t, tObject } = usePageTranslation('landing');
+  const { landing } = useLandingTranslation();
+  const features = landing.features;
   const { ref: sectionRef, isVisible } = useScrollAnimation({
     threshold: 0.1,
     rootMargin: '0px 0px -100px 0px',
   });
-
-  const featuresData = tObject('features.items');
-  const features = Array.isArray(featuresData) ? featuresData : [];
 
   return (
     <Section
@@ -84,7 +82,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
               className="mb-6 px-4 py-1.5 text-sm glass-card border-purple-500/20 text-purple-400"
             >
               <Sparkles className="w-3.5 h-3.5 mr-1.5 inline-block" />
-              {t('features.badge')}
+              {features.badge}
             </Badge>
           </motion.div>
 
@@ -94,7 +92,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
           >
-            <span className="text-gradient-purple">{t('features.title')}</span>
+            <span className="text-gradient-purple">{features.title}</span>
           </motion.h2>
 
           <motion.p
@@ -103,7 +101,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
           >
-            {t('features.subtitle')}
+            {features.subtitle}
           </motion.p>
         </div>
 
@@ -113,10 +111,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
           animate={isVisible ? 'visible' : 'hidden'}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
         >
-          {features.map((feature, index) => {
-            if (typeof feature !== 'object' || feature === null) return null;
-            
-            const { title, description } = feature as { title: string; description: string };
+          {features.items.map((feature, index) => {
             const Icon = FEATURE_ICONS[index % FEATURE_ICONS.length];
 
             return (
@@ -151,7 +146,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
                   </CardHeader>
                   <CardContent>
                     <CardTitle className="mb-3 text-lg flex items-center gap-2 group">
-                      {title}
+                      {feature.title}
                       <ArrowRight
                         className={cn(
                           'w-4 h-4 opacity-0 -translate-x-2',
@@ -161,7 +156,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
                       />
                     </CardTitle>
                     <CardDescription className="text-sm leading-relaxed">
-                      {description}
+                      {feature.description}
                     </CardDescription>
                   </CardContent>
                 </Card>
@@ -187,15 +182,15 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-400 text-sm font-medium mb-6 border border-purple-500/20">
               <Sparkles className="w-4 h-4" />
-              <span>{t('features.cta.badge')}</span>
+              <span>{features.cta.badge}</span>
             </div>
             <h3 className="text-2xl md:text-3xl font-bold mb-4">
               <span className="text-gradient-purple">
-                {t('features.cta.title')}
+                {features.cta.title}
               </span>
             </h3>
             <p className="text-muted-foreground max-w-xl mx-auto mb-8">
-              {t('features.cta.description')}
+              {features.cta.description}
             </p>
           </div>
         </motion.div>

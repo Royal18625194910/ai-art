@@ -1,4 +1,4 @@
-import type { CommonTranslations } from '../../types';
+import type { CommonTranslations } from './types';
 
 export const common: CommonTranslations = {
   nav: {
@@ -23,5 +23,11 @@ export const common: CommonTranslations = {
     label: 'Credits',
     balance: 'Balance',
     insufficient: 'Insufficient credits',
+  },
+  time: {
+    justNow: 'Just now',
+    minutesAgo: '{count} minutes ago',
+    hoursAgo: '{count} hours ago',
+    daysAgo: '{count} days ago',
   },
 };

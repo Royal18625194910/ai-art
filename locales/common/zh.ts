@@ -1,4 +1,4 @@
-import type { CommonTranslations } from '../../types';
+import type { CommonTranslations } from './types';
 
 export const common: CommonTranslations = {
   nav: {
@@ -23,5 +23,11 @@ export const common: CommonTranslations = {
     label: '积分',
     balance: '余额',
     insufficient: '积分不足',
+  },
+  time: {
+    justNow: '刚刚',
+    minutesAgo: '{count}分钟前',
+    hoursAgo: '{count}小时前',
+    daysAgo: '{count}天前',
   },
 };

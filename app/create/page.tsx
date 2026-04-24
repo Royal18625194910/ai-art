@@ -20,7 +20,7 @@ import {
   Check
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
+import { usePageTranslation, useCommonTranslation, useTranslation } from '@/hooks/use-translation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
@@ -45,7 +45,8 @@ interface UploadedImage {
 
 export default function CreatePage() {
   const { t, tObject, tArray } = usePageTranslation('create');
-  const { t: tCommon, credits } = useCommonTranslation();
+  const { credits } = useCommonTranslation();
+  const { common } = useTranslation();
   const [mounted, setMounted] = useState(false);
   
   const [mode, setMode] = useState<GenerationMode>('text-to-image');

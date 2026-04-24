@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Locale, LocaleConfig } from '@/types';
+import { type Locale, type LocaleConfig } from '@/locales';
 
 interface LanguageState {
   locale: Locale;
@@ -8,14 +8,14 @@ interface LanguageState {
 }
 
 export const localeConfigs: Record<Locale, LocaleConfig> = {
-  'en': {
+  en: {
     code: 'en',
     name: 'English',
     nativeName: 'English',
     flag: '🇺🇸',
   },
-  'zh-CN': {
-    code: 'zh-CN',
+  zh: {
+    code: 'zh',
     name: 'Simplified Chinese',
     nativeName: '简体中文',
     flag: '🇨🇳',
@@ -31,7 +31,7 @@ export const localeConfigs: Record<Locale, LocaleConfig> = {
 export const useLanguageStore = create<LanguageState>()(
   persist(
     (set) => ({
-      locale: 'zh-CN',
+      locale: 'zh',
       setLocale: (locale) => set({ locale }),
     }),
     {
