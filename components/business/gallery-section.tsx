@@ -92,13 +92,14 @@ export function GallerySection({ className }: GallerySectionProps) {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    hidden: { opacity: 0, y: 40, filter: 'blur(10px)', scale: 0.95 },
     visible: {
       opacity: 1,
       y: 0,
+      filter: 'blur(0px)',
       scale: 1,
       transition: {
-        duration: 0.5,
+        duration: 0.6,
         ease: [0.25, 0.46, 0.45, 0.94] as any,
       },
     },
@@ -108,37 +109,40 @@ export function GallerySection({ className }: GallerySectionProps) {
     <Section
       id="gallery"
       variant="default"
-      className={cn('py-24 md:py-32 overflow-hidden', className)}
+      className={cn('py-24 md:py-32 overflow-hidden relative', className)}
     >
-      <Container>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+
+      <Container className="relative z-10">
         <div ref={sectionRef} className="text-center mb-12 md:mb-16">
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
           >
             <Badge
               variant="gradient"
-              className="mb-6 px-4 py-1.5 text-sm"
+              className="mb-6 px-4 py-1.5 text-sm glass-card border-purple-500/20"
             >
-              <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+              <Sparkles className="w-3.5 h-3.5 mr-1.5 inline-block" />
               {t('gallery.badge')}
             </Badge>
           </motion.div>
 
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            animate={isVisible ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
           >
-            {t('gallery.title')}
+            <span className="text-gradient-purple-cyan">{t('gallery.title')}</span>
           </motion.h2>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
             {t('gallery.subtitle')}
@@ -147,7 +151,7 @@ export function GallerySection({ className }: GallerySectionProps) {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-wrap justify-center gap-2"
           >
             {CATEGORIES.map((category) => (
@@ -155,10 +159,10 @@ export function GallerySection({ className }: GallerySectionProps) {
                 key={category}
                 onClick={() => setActiveCategory(category)}
                 className={cn(
-                  'px-4 py-2 text-sm font-medium rounded-xl transition-all',
+                  'px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300',
                   activeCategory === category
-                    ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-md'
-                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                    ? 'glass-card border-purple-500/30 text-purple-400 shadow-glow'
+                    : 'bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground glass-card'
                 )}
               >
                 {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -184,7 +188,7 @@ export function GallerySection({ className }: GallerySectionProps) {
                 onMouseEnter={() => setHoveredId(image.id)}
                 onMouseLeave={() => setHoveredId(null)}
               >
-                <div className="relative overflow-hidden rounded-2xl aspect-square">
+                <div className="relative overflow-hidden rounded-2xl aspect-square glass-card">
                   <motion.div
                     initial={false}
                     animate={{
@@ -258,7 +262,7 @@ export function GallerySection({ className }: GallerySectionProps) {
                     className={cn(
                       'absolute inset-0 border-2 rounded-2xl transition-all duration-300',
                       hoveredId === image.id
-                        ? 'border-purple-500/50'
+                        ? 'border-purple-500/50 shadow-glow'
                         : 'border-white/10'
                     )}
                   />
@@ -269,12 +273,16 @@ export function GallerySection({ className }: GallerySectionProps) {
         </AnimatePresence>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+          animate={isVisible ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+          transition={{ duration: 0.6, delay: 0.5 }}
           className="text-center mt-12"
         >
-          <Button variant="gradient" size="lg">
+          <Button
+            variant="gradient"
+            size="lg"
+            className="btn-gradient shadow-glow hover:shadow-glow-lg"
+          >
             <span className="flex items-center gap-2">
               {t('gallery.cta')}
               <ArrowRight className="w-5 h-5" />

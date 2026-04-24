@@ -30,6 +30,29 @@ const FEATURE_ICONS = [
   Code2,
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 40, filter: 'blur(10px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: {
+      duration: 0.6,
+      ease: [0.25, 0.46, 0.45, 0.94] as any,
+    },
+  },
+};
+
 export function FeaturesSection({ className }: FeaturesSectionProps) {
   const { t, tObject } = useTranslation();
   const { ref: sectionRef, isVisible } = useScrollAnimation({
@@ -40,62 +63,44 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
   const featuresData = tObject('features.items');
   const features = Array.isArray(featuresData) ? featuresData : [];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: 'easeOut' as any,
-      },
-    },
-  };
-
   return (
     <Section
       id="features"
       variant="alternate"
-      className={cn('py-24 md:py-32', className)}
+      className={cn('py-24 md:py-32 relative overflow-hidden', className)}
     >
-      <Container>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+
+      <Container className="relative z-10">
         <div ref={sectionRef} className="text-center mb-16 md:mb-20">
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
           >
             <Badge
               variant="secondary"
-              className="mb-6 px-4 py-1.5 text-sm"
+              className="mb-6 px-4 py-1.5 text-sm glass-card border-purple-500/20 text-purple-400"
             >
+              <Sparkles className="w-3.5 h-3.5 mr-1.5 inline-block" />
               {t('features.badge')}
             </Badge>
           </motion.div>
 
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            animate={isVisible ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
           >
-            {t('features.title')}
+            <span className="text-gradient-purple-cyan">{t('features.title')}</span>
           </motion.h2>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
           >
             {t('features.subtitle')}
@@ -119,26 +124,27 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
                 <Card
                   className={cn(
                     'group h-full border-2 border-transparent',
-                    'bg-background/50 backdrop-blur-sm',
-                    'hover:border-purple-200 dark:hover:border-purple-800/50',
-                    'hover:shadow-lg hover:shadow-purple-500/10',
-                    'transition-all duration-300 cursor-pointer'
+                    'glass-card',
+                    'hover:border-purple-500/30',
+                    'hover:shadow-xl hover:shadow-purple-500/10',
+                    'transition-all duration-500 cursor-pointer card-hover'
                   )}
                 >
                   <CardHeader className="pb-4">
                     <div
                       className={cn(
-                        'w-12 h-12 rounded-xl flex items-center justify-center',
-                        'bg-gradient-to-br from-purple-500/10 to-cyan-500/10',
-                        'group-hover:from-purple-500/20 group-hover:to-cyan-500/20',
-                        'transition-all duration-300'
+                        'w-14 h-14 rounded-2xl flex items-center justify-center',
+                        'bg-gradient-to-br from-purple-500/20 to-cyan-500/20',
+                        'group-hover:from-purple-500/30 group-hover:to-cyan-500/30',
+                        'transition-all duration-500',
+                        'shadow-lg shadow-purple-500/10'
                       )}
                     >
                       <Icon
                         className={cn(
-                          'w-6 h-6',
-                          'text-purple-600 dark:text-purple-400',
-                          'group-hover:scale-110 transition-transform duration-300'
+                          'w-7 h-7',
+                          'text-purple-400',
+                          'group-hover:scale-110 group-hover:text-purple-300 transition-all duration-500'
                         )}
                       />
                     </div>
@@ -150,7 +156,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
                         className={cn(
                           'w-4 h-4 opacity-0 -translate-x-2',
                           'group-hover:opacity-100 group-hover:translate-x-0',
-                          'transition-all duration-300 text-purple-500'
+                          'transition-all duration-300 text-purple-400'
                         )}
                       />
                     </CardTitle>
@@ -164,33 +170,35 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
           })}
         </motion.div>
 
-        <div className="relative mt-20 md:mt-24">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="relative mt-20 md:mt-24"
+        >
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-purple-500/10 rounded-3xl blur-2xl" />
           <div
             className={cn(
-              'relative rounded-3xl border border-border/50',
-              'bg-gradient-to-br from-purple-500/5 via-background to-cyan-500/5',
-              'p-8 md:p-12 text-center'
+              'relative rounded-3xl',
+              'glass-card border-purple-500/20',
+              'p-8 md:p-12 text-center',
+              'shadow-glow'
             )}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" />
-                <span>Try it now</span>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-400 text-sm font-medium mb-6 border border-purple-500/20">
+              <Sparkles className="w-4 h-4" />
+              <span>Try it now</span>
+            </div>
+            <h3 className="text-2xl md:text-3xl font-bold mb-4">
+              <span className="text-gradient-purple-cyan">
                 Ready to transform your ideas into art?
-              </h3>
-              <p className="text-muted-foreground max-w-xl mx-auto mb-8">
-                Join millions of creators who are already using AI Art to bring their imagination to life.
-              </p>
-            </motion.div>
+              </span>
+            </h3>
+            <p className="text-muted-foreground max-w-xl mx-auto mb-8">
+              Join millions of creators who are already using AI Art to bring their imagination to life.
+            </p>
           </div>
-        </div>
+        </motion.div>
       </Container>
     </Section>
   );
