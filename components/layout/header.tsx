@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Menu, X, Sparkles, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useCommonTranslation } from '@/hooks/use-translation';
+import { useTranslation } from '@/hooks/use-translation';
 import { useScrollPosition, useScrollDirection } from '@/hooks/use-scroll-animation';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/business/language-switcher';
@@ -20,18 +21,19 @@ export function Header({ className }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const scrollPosition = useScrollPosition();
   const scrollDirection = useScrollDirection();
-  const { t, nav } = useCommonTranslation();
+  const { t } = useTranslation();
   const { isSignedIn, isLoaded } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     setIsScrolled(scrollPosition > 50);
   }, [scrollPosition]);
 
   const handleNavClick = (href: string, e: React.MouseEvent) => {
-    e.preventDefault();
     setIsMobileMenuOpen(false);
     
     if (href.startsWith('#')) {
+      e.preventDefault();
       const target = href.slice(1);
       const element = document.getElementById(target);
       
@@ -41,7 +43,21 @@ export function Header({ className }: HeaderProps) {
           block: 'start',
         });
       }
+    } else if (href !== '#') {
+      e.preventDefault();
+      router.push(href);
     }
+  };
+
+  const getNavLabel = (label: string) => {
+    const fullKey = `common.${label}`;
+    const translated = t(fullKey);
+    
+    if (translated === fullKey) {
+      const parts = label.split('.');
+      return parts[parts.length - 1] || label;
+    }
+    return translated;
   };
 
   const isHidden = scrollDirection === 'down' && scrollPosition > 300;
@@ -59,12 +75,9 @@ export function Header({ className }: HeaderProps) {
     >
       <div className="flex items-center justify-between h-16 md:h-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <a
-          href="#"
+          href="/"
+          onClick={(e) => handleNavClick('/', e)}
           className="flex items-center gap-2 group"
-          onClick={(e) => {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
         >
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-lg blur-md opacity-50 group-hover:opacity-75 transition-opacity" />
@@ -88,7 +101,7 @@ export function Header({ className }: HeaderProps) {
                 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               )}
             >
-              {t(item.label.replace('nav.', ''))}
+              {getNavLabel(item.label)}
             </a>
           ))}
         </nav>
@@ -99,7 +112,7 @@ export function Header({ className }: HeaderProps) {
             <SignInButton mode="redirect">
               <Button variant="gradient" size="sm">
                 <span className="flex items-center gap-1">
-                  {t('nav.login')}
+                  {getNavLabel('nav.login')}
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </Button>
@@ -146,7 +159,7 @@ export function Header({ className }: HeaderProps) {
                   onClick={(e) => handleNavClick(item.href, e)}
                   className="block px-4 py-3 text-sm font-medium rounded-lg hover:bg-muted transition-colors"
                 >
-                  {t(item.label.replace('nav.', ''))}
+                  {getNavLabel(item.label)}
                 </a>
               ))}
             </div>
@@ -156,7 +169,7 @@ export function Header({ className }: HeaderProps) {
                 <SignInButton mode="redirect">
                   <Button variant="gradient" className="w-full justify-center">
                     <span className="flex items-center gap-1">
-                      {t('nav.login')}
+                      {getNavLabel('nav.login')}
                       <ArrowRight className="w-4 h-4" />
                     </span>
                   </Button>
