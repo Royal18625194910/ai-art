@@ -36,7 +36,7 @@ const translations: Record<Locale, Translation> = {
       landing: landingZhCN,
       create: createZhCN,
       buy: buyZhCN,
-      history: historyZhTW,
+      history: historyZhCN,
     },
   } as unknown as Translation,
   'zh-TW': {
