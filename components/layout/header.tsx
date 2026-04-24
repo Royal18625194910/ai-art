@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Menu, X, Sparkles, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -24,6 +24,14 @@ export function Header({ className }: HeaderProps) {
   const { t } = useTranslation();
   const { isSignedIn, isLoaded } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isActiveNav = (href: string) => {
+    if (href === '/') {
+      return pathname === '/';
+    }
+    return pathname === href || pathname.startsWith(href + '/');
+  };
 
   useEffect(() => {
     setIsScrolled(scrollPosition > 50);
@@ -98,7 +106,9 @@ export function Header({ className }: HeaderProps) {
               onClick={(e) => handleNavClick(item.href, e)}
               className={cn(
                 'px-4 py-2 text-sm font-medium rounded-lg transition-all',
-                'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                isActiveNav(item.href)
+                  ? 'text-purple-400 bg-purple-500/10'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               )}
             >
               {getNavLabel(item.label)}
@@ -157,7 +167,12 @@ export function Header({ className }: HeaderProps) {
                   key={item.label}
                   href={item.href}
                   onClick={(e) => handleNavClick(item.href, e)}
-                  className="block px-4 py-3 text-sm font-medium rounded-lg hover:bg-muted transition-colors"
+                  className={cn(
+                    'block px-4 py-3 text-sm font-medium rounded-lg transition-colors',
+                    isActiveNav(item.href)
+                      ? 'text-purple-400 bg-purple-500/10'
+                      : 'hover:bg-muted'
+                  )}
                 >
                   {getNavLabel(item.label)}
                 </a>

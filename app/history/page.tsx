@@ -226,10 +226,10 @@ export default function HistoryPage() {
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    if (minutes < 1) return tCommon('common.loading');
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
+    if (minutes < 1) return tCommon('common.justNow');
+    if (minutes < 60) return tCommon('common.minutesAgo', { count: minutes });
+    if (hours < 24) return tCommon('common.hoursAgo', { count: hours });
+    if (days < 7) return tCommon('common.daysAgo', { count: days });
     
     return date.toLocaleDateString();
   };
@@ -366,7 +366,7 @@ export default function HistoryPage() {
                   )} />
                 </button>
                 {showModeDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl z-10 overflow-hidden">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl z-50 overflow-hidden">
                     {modeOptions.map((option) => (
                       <button
                         key={option.value}
@@ -405,7 +405,7 @@ export default function HistoryPage() {
                   )} />
                 </button>
                 {showDateDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl z-10 overflow-hidden">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl z-50 overflow-hidden">
                     {dateOptions.map((option) => (
                       <button
                         key={option.value}
@@ -711,7 +711,7 @@ export default function HistoryPage() {
                           {t('detail.parameters.creditsUsed')}
                         </p>
                         <p className="text-sm font-medium text-foreground">
-                          {selectedItem.creditsUsed} {tCommon('nav.buy')}
+                          {selectedItem.creditsUsed} {tCommon('credits.label')}
                         </p>
                       </div>
                       <div className="bg-background/50 rounded-lg p-3 border border-border/50">

@@ -4,6 +4,7 @@
     "title": "用AI创造",
     "titleHighlight": "惊艳艺术",
     "subtitle": "借助人工智能的力量，将你的想法转化为令人惊叹的艺术作品。无需任何艺术技能。",
+    "creditsInfo": "积分制：1积分 = 1张图片",
     "ctaPrimary": "立即创作",
     "ctaSecondary": "浏览作品",
     "stats": {
@@ -47,7 +48,15 @@
     "badge": "社区画廊",
     "title": "灵感创作",
     "subtitle": "看看我们的社区用AI Art创造了什么",
-    "cta": "探索更多"
+    "cta": "探索更多",
+    "categories": {
+      "all": "全部",
+      "scifi": "科幻",
+      "anime": "动漫",
+      "fantasy": "奇幻",
+      "abstract": "抽象",
+      "portrait": "肖像"
+    }
   },
   "pricing": {
     "badge": "简单定价",
@@ -142,10 +151,15 @@
     ]
   },
   "cta": {
+    "badge": "几秒钟即可开始",
     "title": "准备好创作了吗？",
+    "titleHighlight": "今天",
     "subtitle": "加入数百万创作者，今天就开始生成令人惊叹的艺术作品",
     "ctaPrimary": "免费开始创作",
-    "ctaSecondary": "了解更多"
+    "ctaSecondary": "了解更多",
+    "freeTrial": "免费试用",
+    "noCreditCard": "无需信用卡",
+    "cancelAnytime": "随时取消"
   },
   "footer": {
     "description": "借助人工智能的力量，将你的想法转化为令人惊叹的艺术作品。",

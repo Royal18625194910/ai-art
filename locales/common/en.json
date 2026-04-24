@@ -13,6 +13,11 @@
   },
   "common": {
     "loading": "Loading...",
+    "securePayment": "Secure payment",
+    "justNow": "just now",
+    "minutesAgo": "{count}m ago",
+    "hoursAgo": "{count}h ago",
+    "daysAgo": "{count}d ago",
     "error": "Error",
     "confirm": "Confirm",
     "cancel": "Cancel",

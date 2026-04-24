@@ -9,6 +9,7 @@
     "title": "Text to Image",
     "placeholder": "Describe the image you want to generate...",
     "tips": "Tip: The more detailed your description, the better the result. You can include style, lighting, atmosphere, and other elements.",
+    "examplesLabel": "💡 Prompt examples (click to use):",
     "examples": [
       "A cute cat, watercolor style, soft lighting",
       "Cyberpunk city at night with neon lights",

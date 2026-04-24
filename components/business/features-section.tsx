@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/use-translation';
+import { usePageTranslation } from '@/hooks/use-translation';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container, Section } from '@/components/ui/container';
 import { Badge } from '@/components/ui/badge';
@@ -54,7 +54,7 @@ const itemVariants = {
 };
 
 export function FeaturesSection({ className }: FeaturesSectionProps) {
-  const { t, tObject } = useTranslation();
+  const { t, tObject } = usePageTranslation('landing');
   const { ref: sectionRef, isVisible } = useScrollAnimation({
     threshold: 0.1,
     rootMargin: '0px 0px -100px 0px',

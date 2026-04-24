@@ -68,7 +68,7 @@ const GALLERY_IMAGES = [
 const CATEGORIES = ['all', 'scifi', 'anime', 'fantasy', 'abstract', 'portrait'];
 
 export function GallerySection({ className }: GallerySectionProps) {
-  const { t } = usePageTranslation('landing');
+  const { t, tObject } = usePageTranslation('landing');
   const [activeCategory, setActiveCategory] = useState('all');
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const { ref: sectionRef, isVisible } = useScrollAnimation({
@@ -165,7 +165,7 @@ export function GallerySection({ className }: GallerySectionProps) {
                     : 'bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground glass-card'
                 )}
               >
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+                {t(`gallery.categories.${category}`)}
               </button>
             ))}
           </motion.div>

@@ -139,7 +139,7 @@ export function HeroSection({ className }: HeroSectionProps) {
             >
               <Sparkles className="w-4 h-4 text-purple-400" />
               <span className="text-sm text-purple-300">
-                积分制：1积分 = 1张图片
+                {t('hero.creditsInfo')}
               </span>
             </motion.div>
 
@@ -154,7 +154,7 @@ export function HeroSection({ className }: HeroSectionProps) {
                 onClick={handleCtaClick}
               >
                 <span className="flex items-center gap-2">
-                  开始创作
+                  {t('hero.ctaPrimary')}
                   <ArrowRight className="w-5 h-5" />
                 </span>
               </Button>
