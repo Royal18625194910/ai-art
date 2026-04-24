@@ -13,6 +13,11 @@ export const siteConfig: SiteConfig = {
   },
 };
 
+// 联系邮箱
+export const contactInfo = {
+  supportEmail: '2326182533@qq.com',
+};
+
 export const navItems: NavItem[] = [
   {
     label: 'nav.home',

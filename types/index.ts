@@ -20,5 +20,18 @@ export interface NavItem {
   external?: boolean;
 }
 
+export interface CreditPackage {
+  id: string;
+  name: string;
+  credits: number;
+  price: number;
+  priceFormatted: string;
+  perCreditPrice: string;
+  description: string;
+  features: string[];
+  isPopular: boolean;
+  savingsPercent: number;
+}
+
 // Re-export from locales for backward compatibility
 export type { Locale, LocaleConfig } from '@/locales';

@@ -111,38 +111,6 @@ export interface LandingTranslations {
 }
 
 // Buy Page
-export interface BuyPackage {
-  name: string;
-  credits: string;
-  price: string;
-  priceCN: string;
-  description: string;
-  perCreditPrice: string;
-  features: string[];
-  isPopular: boolean;
-  savingsPercent: string;
-}
-
-export interface BuyPackages {
-  starter: BuyPackage;
-  standard: BuyPackage;
-  premium: BuyPackage;
-}
-
-export interface BuyFAQItem {
-  question: string;
-  answer: string;
-}
-
-export interface BuyPayment {
-  title: string;
-  description: string;
-  submit: string;
-  processing: string;
-  secureNote: string;
-  selected: string;
-}
-
 export interface BuyTranslations {
   title: string;
   subtitle: string;
@@ -151,13 +119,7 @@ export interface BuyTranslations {
   payWith: string;
   success: string;
   error: string;
-  packages: BuyPackages;
-  faq: {
-    title: string;
-    items: BuyFAQItem[];
-  };
-  payment: BuyPayment;
-  // Backward compatibility keys
+  // packages, faq, payment 相关配置已移至 config/pricing.ts
   bestValue: string;
   recommended: string;
   savings: string;
