@@ -90,12 +90,12 @@ export function HeroSection({ className }: HeroSectionProps) {
         className
       )}
     >
-      <MagicRingsBackground color="#A855F7" colorTwo="#06B6D4" />
+      <MagicRingsBackground color="#8B5CF6" colorTwo="#A78BFA" />
 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background" />
 
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-purple-500/10 rounded-full blur-3xl -translate-y-1/2" />
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-400/5 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
 
       <Container className="relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -120,7 +120,7 @@ export function HeroSection({ className }: HeroSectionProps) {
             <motion.div variants={itemVariants}>
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight mb-6">
                 <span className="block">{t('hero.title')}</span>
-                <span className="block mt-2 text-gradient-purple-cyan">
+                <span className="block mt-2 text-gradient-purple">
                   {t('hero.titleHighlight')}
                 </span>
               </h1>
@@ -135,7 +135,7 @@ export function HeroSection({ className }: HeroSectionProps) {
 
             <motion.div
               variants={itemVariants}
-              className="flex items-center gap-2 mb-10 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 glass-card"
+              className="flex items-center gap-2 mb-10 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 glass-card"
             >
               <Sparkles className="w-4 h-4 text-purple-400" />
               <span className="text-sm text-purple-300">
@@ -148,9 +148,9 @@ export function HeroSection({ className }: HeroSectionProps) {
               className="flex flex-col sm:flex-row items-center gap-4 mb-12"
             >
               <Button
-                variant="gradient"
+                variant="primary"
                 size="lg"
-                className="w-full sm:w-auto text-base px-8 h-14 bg-gradient-to-r from-purple-500 via-cyan-500 to-purple-500 shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 btn-gradient"
+                className="w-full sm:w-auto text-base px-8"
                 onClick={handleCtaClick}
               >
                 <span className="flex items-center gap-2">
@@ -175,7 +175,7 @@ export function HeroSection({ className }: HeroSectionProps) {
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <Icon className="w-5 h-5 text-purple-400" />
-                      <span className="text-2xl font-bold text-gradient-purple-cyan">
+                      <span className="text-2xl font-bold text-gradient-purple">
                         {mounted ? formatNumber(stat.value) : '0'}
                         {stat.suffix}
                       </span>
@@ -197,8 +197,8 @@ export function HeroSection({ className }: HeroSectionProps) {
           >
             <div className="relative flex items-center justify-center aspect-square">
               <MagicRings
-                color="#A855F7"
-                colorTwo="#06B6D4"
+                color="#8B5CF6"
+                colorTwo="#A78BFA"
                 ringCount={6}
                 speed={0.8}
                 opacity={0.8}
@@ -225,7 +225,7 @@ export function HeroSection({ className }: HeroSectionProps) {
                       transform: `translate(${index === 1 ? '20px' : index === 2 ? '-20px' : '0'}, ${index % 2 === 0 ? '30px' : '-20px'})`,
                     }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+                    <div className="absolute inset-0 bg-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
                     <img
                       src={src}
                       alt={`AI generated sample ${index + 1}`}
@@ -239,7 +239,7 @@ export function HeroSection({ className }: HeroSectionProps) {
               </div>
 
               <motion.div
-                className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 blur-lg opacity-50"
+                className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-400 blur-lg opacity-50"
                 animate={{
                   scale: [1, 1.3, 1],
                   opacity: [0.3, 0.6, 0.3],
@@ -251,7 +251,7 @@ export function HeroSection({ className }: HeroSectionProps) {
                 }}
               />
               <motion.div
-                className="absolute -bottom-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 blur-lg opacity-40"
+                className="absolute -bottom-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-500 blur-lg opacity-40"
                 animate={{
                   scale: [1, 1.4, 1],
                   opacity: [0.2, 0.5, 0.2],
@@ -275,8 +275,8 @@ export function HeroSection({ className }: HeroSectionProps) {
         >
           <div className="relative w-64 h-64">
             <MagicRings
-              color="#A855F7"
-              colorTwo="#06B6D4"
+              color="#8B5CF6"
+              colorTwo="#A78BFA"
               ringCount={5}
               speed={0.6}
               opacity={0.7}

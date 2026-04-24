@@ -111,7 +111,7 @@ export function GallerySection({ className }: GallerySectionProps) {
       variant="default"
       className={cn('py-24 md:py-32 overflow-hidden relative', className)}
     >
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-purple-400/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <Container className="relative z-10">
@@ -136,7 +136,7 @@ export function GallerySection({ className }: GallerySectionProps) {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
           >
-            <span className="text-gradient-purple-cyan">{t('gallery.title')}</span>
+            <span className="text-gradient-purple">{t('gallery.title')}</span>
           </motion.h2>
 
           <motion.p
@@ -279,9 +279,8 @@ export function GallerySection({ className }: GallerySectionProps) {
           className="text-center mt-12"
         >
           <Button
-            variant="gradient"
+            variant="primary"
             size="lg"
-            className="btn-gradient shadow-glow hover:shadow-glow-lg"
           >
             <span className="flex items-center gap-2">
               {t('gallery.cta')}

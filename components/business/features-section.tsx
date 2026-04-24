@@ -70,7 +70,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
       className={cn('py-24 md:py-32 relative overflow-hidden', className)}
     >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-purple-400/5 rounded-full blur-3xl pointer-events-none" />
 
       <Container className="relative z-10">
         <div ref={sectionRef} className="text-center mb-16 md:mb-20">
@@ -94,7 +94,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
           >
-            <span className="text-gradient-purple-cyan">{t('features.title')}</span>
+            <span className="text-gradient-purple">{t('features.title')}</span>
           </motion.h2>
 
           <motion.p
@@ -134,8 +134,8 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
                     <div
                       className={cn(
                         'w-14 h-14 rounded-2xl flex items-center justify-center',
-                        'bg-gradient-to-br from-purple-500/20 to-cyan-500/20',
-                        'group-hover:from-purple-500/30 group-hover:to-cyan-500/30',
+                        'bg-gradient-to-br from-purple-500/20 to-purple-400/20',
+                        'group-hover:from-purple-500/30 group-hover:to-purple-400/30',
                         'transition-all duration-500',
                         'shadow-lg shadow-purple-500/10'
                       )}
@@ -176,7 +176,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="relative mt-20 md:mt-24"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-purple-500/10 rounded-3xl blur-2xl" />
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-purple-400/10 to-purple-500/10 rounded-3xl blur-2xl" />
           <div
             className={cn(
               'relative rounded-3xl',
@@ -190,7 +190,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
               <span>Try it now</span>
             </div>
             <h3 className="text-2xl md:text-3xl font-bold mb-4">
-              <span className="text-gradient-purple-cyan">
+              <span className="text-gradient-purple">
                 Ready to transform your ideas into art?
               </span>
             </h3>

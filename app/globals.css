@@ -137,7 +137,7 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-purple-600 via-cyan-500 to-purple-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-purple-500 to-purple-400 bg-clip-text text-transparent;
   }
 
   .bg-grid-pattern {
@@ -396,18 +396,16 @@
     animation: ripple 1.5s ease-out forwards;
   }
 
-  .bg-gradient-purple-cyan {
-    background: linear-gradient(135deg, #a78bfa 0%, #67e8f9 50%, #a78bfa 100%);
+  .bg-gradient-purple {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #8b5cf6 100%);
   }
 
   .bg-gradient-purple-dark {
     background: linear-gradient(135deg, #1e1b4b 0%, #0f0a1a 50%, #1e1b4b 100%);
   }
 
-  .text-gradient-purple-cyan {
-    background: linear-gradient(135deg, #a78bfa 0%, #67e8f9 50%, #a78bfa 100%);
-    background-size: 200% 200%;
-    animation: gradient-shift 4s ease infinite;
+  .text-gradient-purple {
+    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 50%, #8b5cf6 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -444,7 +442,7 @@
     inset: 0;
     padding: 1px;
     border-radius: inherit;
-    background: linear-gradient(135deg, rgba(167, 139, 250, 0.5), rgba(103, 232, 249, 0.5), rgba(167, 139, 250, 0.5));
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(167, 139, 250, 0.5), rgba(139, 92, 246, 0.5));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -452,8 +450,8 @@
   }
 
   .hero-gradient {
-    background: radial-gradient(ellipse at top, rgba(167, 139, 250, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at bottom, rgba(103, 232, 249, 0.1) 0%, transparent 50%);
+    background: radial-gradient(ellipse at top, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
   }
 
   .card-hover {
@@ -466,13 +464,12 @@
   }
 
   .btn-gradient {
-    background: linear-gradient(135deg, #a78bfa 0%, #67e8f9 50%, #a78bfa 100%);
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite;
+    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
   }
 
   .btn-gradient:hover {
-    box-shadow: 0 0 30px rgba(167, 139, 250, 0.4);
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
     transform: translateY(-1px);
   }
 
