@@ -1,0 +1,125 @@
+{
+  "title": "生成歷史",
+  "subtitle": "查看和管理你所有的AI藝術作品",
+  "stats": {
+    "total": "總作品數",
+    "textToImage": "文生圖",
+    "imageToImage": "圖生圖",
+    "creditsUsed": "消耗積分"
+  },
+  "filters": {
+    "title": "篩選",
+    "all": "全部",
+    "textToImage": "文生圖",
+    "imageToImage": "圖生圖",
+    "dateRange": {
+      "label": "日期範圍",
+      "today": "今天",
+      "last7Days": "最近7天",
+      "last30Days": "最近30天",
+      "thisMonth": "本月",
+      "allTime": "全部時間"
+    },
+    "search": {
+      "placeholder": "搜尋提示詞...",
+      "noResults": "沒有找到匹配的結果"
+    },
+    "sort": {
+      "label": "排序",
+      "newest": "最新優先",
+      "oldest": "最早優先",
+      "creditsHigh": "高積分優先",
+      "creditsLow": "低積分優先"
+    }
+  },
+  "gallery": {
+    "empty": "暫無歷史記錄",
+    "emptyDesc": "開始創作，你的作品將顯示在這裡",
+    "createNow": "立即創作",
+    "loading": "載入中...",
+    "loadMore": "載入更多",
+    "noMore": "沒有更多了"
+  },
+  "card": {
+    "viewDetails": "查看詳情",
+    "download": "下載",
+    "regenerate": "重新生成",
+    "copyPrompt": "複製提示詞",
+    "delete": "刪除",
+    "share": "分享",
+    "promptCopied": "提示詞已複製",
+    "date": "生成時間",
+    "mode": "生成模式",
+    "creditsUsed": "消耗積分",
+    "size": "尺寸",
+    "styleStrength": "風格強度",
+    "similarity": "相似度"
+  },
+  "detail": {
+    "title": "作品詳情",
+    "close": "關閉",
+    "imagePreview": "圖片預覽",
+    "prompt": "提示詞",
+    "negativePrompt": "負向提示",
+    "noNegativePrompt": "無",
+    "parameters": {
+      "title": "生成參數",
+      "mode": "生成模式",
+      "size": "尺寸",
+      "styleStrength": "風格強度",
+      "similarity": "相似度",
+      "quantity": "生成數量",
+      "creditsUsed": "消耗積分"
+    },
+    "referenceImages": {
+      "title": "參考圖片",
+      "noImages": "無參考圖片"
+    },
+    "actions": {
+      "download": "下載原圖",
+      "regenerate": "重新生成",
+      "copyPrompt": "複製提示詞",
+      "copyAllParams": "複製全部參數",
+      "delete": "刪除作品"
+    }
+  },
+  "delete": {
+    "confirm": "確認刪除",
+    "message": "確定要刪除這張作品嗎？此操作無法撤銷。",
+    "deleteAll": {
+      "confirm": "確認刪除全部",
+      "message": "確定要刪除所有歷史記錄嗎？此操作無法撤銷。"
+    },
+    "success": "刪除成功",
+    "failed": "刪除失敗"
+  },
+  "batch": {
+    "title": "批量操作",
+    "selected": "已選擇 {count} 張",
+    "downloadSelected": "下載選中",
+    "deleteSelected": "刪除選中",
+    "selectAll": "全選",
+    "deselectAll": "取消全選"
+  },
+  "modes": {
+    "textToImage": "文生圖",
+    "imageToImage": "圖生圖"
+  },
+  "tips": {
+    "title": "提示",
+    "items": [
+      "點擊圖片可以查看完整詳情和參數",
+      "你可以複製提示詞來重新生成相似的作品",
+      "歷史記錄會保留所有生成參數，方便回溯",
+      "刪除的作品無法恢復，請謹慎操作"
+    ]
+  },
+  "errors": {
+    "loadFailed": "載入歷史記錄失敗",
+    "loadFailedDesc": "請檢查網絡連接後重試",
+    "deleteFailed": "刪除失敗",
+    "deleteFailedDesc": "請稍後重試",
+    "downloadFailed": "下載失敗",
+    "downloadFailedDesc": "請稍後重試"
+  }
+}

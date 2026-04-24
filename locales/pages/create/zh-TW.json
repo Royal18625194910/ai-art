@@ -1,0 +1,125 @@
+{
+  "title": "AI 藝術創作",
+  "subtitle": "將你的想法轉化為驚艷的藝術作品",
+  "mode": {
+    "textToImage": "文生圖",
+    "imageToImage": "圖生圖"
+  },
+  "textToImage": {
+    "title": "文生圖",
+    "placeholder": "請描述你想生成的圖片...",
+    "tips": "提示：描述越詳細，效果越好。你可以包含風格、光線、氛圍等元素。",
+    "examples": [
+      "一隻可愛的貓咪，水彩畫風格，柔和的光線",
+      "賽博龐克風格的城市夜景，霓虹燈光",
+      "神秘的森林，迷霧繚繞，奇幻風格",
+      "未來科技感的宇航員，星際背景"
+    ],
+    "negativePrompt": {
+      "label": "負向提示（可選）",
+      "placeholder": "描述你不想要的內容...",
+      "description": "排除不想要的元素，提高生成質量"
+    }
+  },
+  "imageToImage": {
+    "title": "圖生圖",
+    "uploadTitle": "上傳參考圖片",
+    "uploadDesc": "支持 1-3 張圖片，AI 將融合各圖片特徵",
+    "dragHint": "拖拽圖片到此處，或點擊選擇",
+    "maxFiles": "最多上傳 3 張圖片",
+    "fileFormat": "支持 JPG、PNG、WebP 格式",
+    "fileSize": "單張圖片不超過 10MB",
+    "removeImage": "移除",
+    "replaceImage": "更換",
+    "addMore": "添加更多",
+    "tips": "用例：\"用這張貓的姿態 + 這張畫的風格 + 這張圖的配色\""
+  },
+  "parameters": {
+    "title": "參數設置",
+    "size": {
+      "label": "尺寸",
+      "options": {
+        "512x512": "512×512",
+        "1024x1024": "1024×1024",
+        "1024x1792": "1024×1792（豎版）",
+        "1792x1024": "1792×1024（橫版）"
+      }
+    },
+    "styleStrength": {
+      "label": "風格強度",
+      "options": {
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      },
+      "description": "影響創意程度，高強度會產生更多創意變化"
+    },
+    "similarity": {
+      "label": "相似度",
+      "description": "控制與參考圖片的相似程度"
+    },
+    "quantity": {
+      "label": "生成數量",
+      "description": "一次生成的圖片數量"
+    }
+  },
+  "stylePresets": {
+    "title": "風格預設",
+    "categories": {
+      "realistic": "寫實",
+      "anime": "動漫",
+      "artistic": "藝術",
+      "3d": "3D渲染",
+      "photography": "攝影"
+    },
+    "presets": [
+      { "name": "寫實攝影", "category": "photography" },
+      { "name": "肖像攝影", "category": "photography" },
+      { "name": "風景攝影", "category": "photography" },
+      { "name": "日系動漫", "category": "anime" },
+      { "name": "賽博龐克動漫", "category": "anime" },
+      { "name": "水彩畫", "category": "artistic" },
+      { "name": "油畫", "category": "artistic" },
+      { "name": "像素藝術", "category": "artistic" },
+      { "name": "3D渲染", "category": "3d" },
+      { "name": "概念藝術", "category": "3d" }
+    ]
+  },
+  "actions": {
+    "generate": "生成圖片",
+    "generating": "生成中...",
+    "estimatedTime": "預計需要 10-30 秒",
+    "useCredits": "預計消耗: {count} credit",
+    "currentBalance": "剩餘積分: {count}"
+  },
+  "results": {
+    "title": "生成結果",
+    "noResults": "還沒有生成結果",
+    "generating": "正在生成你的藝術作品...",
+    "success": "生成完成！",
+    "failed": "生成失敗",
+    "download": "下載原圖",
+    "downloadAll": "下載全部",
+    "regenerate": "重新生成",
+    "copyPrompt": "複製提示詞",
+    "delete": "刪除",
+    "viewDetails": "查看詳情",
+    "promptCopied": "提示詞已複製"
+  },
+  "credits": {
+    "insufficient": "積分不足",
+    "insufficientMessage": "你的積分不足以完成此次生成。請先購買積分。",
+    "buyCredits": "購買積分",
+    "cost": "消耗 {count} 積分",
+    "balance": "餘額: {count} 積分"
+  },
+  "tips": {
+    "title": "創作提示",
+    "items": [
+      "描述越詳細，生成效果越好",
+      "可以在提示詞中包含風格、光線、構圖等元素",
+      "使用負向提示排除不想要的內容",
+      "嘗試不同的風格預設獲得多樣化效果"
+    ]
+  }
+}
