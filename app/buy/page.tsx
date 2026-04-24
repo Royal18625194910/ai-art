@@ -35,7 +35,7 @@ interface FAQItem {
 }
 
 export default function BuyPage() {
-  const { t, tObject } = usePageTranslation('buy');
+  const { t, tObject, tArray } = usePageTranslation('buy');
   const { t: tCommon, credits } = useCommonTranslation();
   const [mounted, setMounted] = useState(false);
   
@@ -358,7 +358,7 @@ export default function BuyPage() {
 
                 <p className="text-xs text-muted-foreground text-center mt-3 flex items-center justify-center gap-1">
                   <Lock className="w-3 h-3" />
-                  {tCommon('common.loading')}...
+                  {tCommon('common.securePayment')}
                 </p>
               </div>
             </div>
@@ -402,14 +402,12 @@ export default function BuyPage() {
                 <div>
                   <h4 className="font-semibold text-foreground mb-1">{t('creditsInfo.whatCanDo')}</h4>
                   <ul className="mt-2 space-y-1">
-                    <li className="text-sm text-muted-foreground flex items-center gap-2">
-                      <span className="w-1 h-1 rounded-full bg-purple-400" />
-                      文生图：1 积分/张
-                    </li>
-                    <li className="text-sm text-muted-foreground flex items-center gap-2">
-                      <span className="w-1 h-1 rounded-full bg-purple-400" />
-                      图生图：1 积分/张
-                    </li>
+                    {tArray('creditsInfo.whatCanDoList').map((item, index) => (
+                      <li key={index} className="text-sm text-muted-foreground flex items-center gap-2">
+                        <span className="w-1 h-1 rounded-full bg-purple-400" />
+                        {item}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>

@@ -13,6 +13,11 @@
   },
   "common": {
     "loading": "加载中...",
+    "securePayment": "安全支付",
+    "justNow": "刚刚",
+    "minutesAgo": "{count} 分钟前",
+    "hoursAgo": "{count} 小时前",
+    "daysAgo": "{count} 天前",
     "error": "出错了",
     "confirm": "确认",
     "cancel": "取消",

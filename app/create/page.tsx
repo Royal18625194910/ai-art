@@ -37,7 +37,7 @@ interface UploadedImage {
 }
 
 export default function CreatePage() {
-  const { t, tObject } = usePageTranslation('create');
+  const { t, tObject, tArray } = usePageTranslation('create');
   const { t: tCommon, credits } = useCommonTranslation();
   const [mounted, setMounted] = useState(false);
   
@@ -71,12 +71,7 @@ export default function CreatePage() {
     'high': '高',
   };
 
-  const promptExamples = [
-    "一只可爱的猫咪，水彩画风格，柔和的光线",
-    "赛博朋克风格的城市夜景，霓虹灯光",
-    "神秘的森林，迷雾缭绕，奇幻风格",
-    "未来科技感的宇航员，星际背景",
-  ];
+  const promptExamples = tArray('textToImage.examples');
 
   const handleExampleClick = (example: string) => {
     setPrompt(example);
@@ -237,16 +232,16 @@ export default function CreatePage() {
 
                       <div>
                         <p className="text-sm text-muted-foreground mb-3">
-                          💡 提示词示例（点击使用）：
+                          {t('textToImage.examplesLabel')}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {promptExamples.map((example, index) => (
                             <button
                               key={index}
-                              onClick={() => handleExampleClick(example)}
+                              onClick={() => handleExampleClick(example as string)}
                               className="px-3 py-1.5 text-xs bg-purple-500/10 text-purple-300 rounded-lg hover:bg-purple-500/20 transition-colors border border-purple-500/20"
                             >
-                              {example.slice(0, 20)}...
+                              {(example as string).slice(0, 20)}...
                             </button>
                           ))}
                         </div>
@@ -370,7 +365,7 @@ export default function CreatePage() {
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="absolute top-full left-0 right-0 mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl z-10 overflow-hidden"
+                          className="absolute top-full left-0 right-0 mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl z-50 overflow-hidden"
                         >
                           {Object.entries(sizes).map(([key, value]) => (
                             <button

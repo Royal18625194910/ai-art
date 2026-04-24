@@ -4,6 +4,7 @@
     "title": "Create Stunning Art",
     "titleHighlight": "with AI",
     "subtitle": "Transform your ideas into breathtaking artwork using the power of artificial intelligence. No artistic skills required.",
+    "creditsInfo": "Credit System: 1 credit = 1 image",
     "ctaPrimary": "Start Creating",
     "ctaSecondary": "View Gallery",
     "stats": {
@@ -47,7 +48,15 @@
     "badge": "Community Gallery",
     "title": "Inspiring Creations",
     "subtitle": "See what our community is creating with AI Art",
-    "cta": "Explore More"
+    "cta": "Explore More",
+    "categories": {
+      "all": "All",
+      "scifi": "Sci-Fi",
+      "anime": "Anime",
+      "fantasy": "Fantasy",
+      "abstract": "Abstract",
+      "portrait": "Portrait"
+    }
   },
   "pricing": {
     "badge": "Simple Pricing",
@@ -142,10 +151,15 @@
     ]
   },
   "cta": {
+    "badge": "Get started in seconds",
     "title": "Ready to Create?",
+    "titleHighlight": "Today",
     "subtitle": "Join millions of creators and start generating amazing artwork today",
     "ctaPrimary": "Start Creating Free",
-    "ctaSecondary": "Learn More"
+    "ctaSecondary": "Learn More",
+    "freeTrial": "Free trial available",
+    "noCreditCard": "No credit card required",
+    "cancelAnytime": "Cancel anytime"
   },
   "footer": {
     "description": "Transform your ideas into stunning artwork with the power of artificial intelligence.",

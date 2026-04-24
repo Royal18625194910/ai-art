@@ -4,6 +4,7 @@
     "title": "用AI創造",
     "titleHighlight": "驚艷藝術",
     "subtitle": "借助人工智能的力量，將你的想法轉化為令人驚嘆的藝術作品。無需任何藝術技能。",
+    "creditsInfo": "積分制：1積分 = 1張圖片",
     "ctaPrimary": "立即創作",
     "ctaSecondary": "瀏覽作品",
     "stats": {
@@ -47,7 +48,15 @@
     "badge": "社區畫廊",
     "title": "靈感創作",
     "subtitle": "看看我們的社區用AI Art創造了什麼",
-    "cta": "探索更多"
+    "cta": "探索更多",
+    "categories": {
+      "all": "全部",
+      "scifi": "科幻",
+      "anime": "動漫",
+      "fantasy": "奇幻",
+      "abstract": "抽象",
+      "portrait": "肖像"
+    }
   },
   "pricing": {
     "badge": "簡單定價",
@@ -142,10 +151,15 @@
     ]
   },
   "cta": {
+    "badge": "幾秒鐘即可開始",
     "title": "準備好創作了嗎？",
+    "titleHighlight": "今天",
     "subtitle": "加入數百萬創作者，今天就開始生成令人驚嘆的藝術作品",
     "ctaPrimary": "免費開始創作",
-    "ctaSecondary": "了解更多"
+    "ctaSecondary": "了解更多",
+    "freeTrial": "免費試用",
+    "noCreditCard": "無需信用卡",
+    "cancelAnytime": "隨時取消"
   },
   "footer": {
     "description": "借助人工智能的力量，將你的想法轉化為令人驚嘆的藝術作品。",
