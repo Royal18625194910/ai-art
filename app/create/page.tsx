@@ -16,7 +16,8 @@ import {
   Wand2,
   Layers,
   Sliders,
-  Info
+  Info,
+  Check
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
@@ -25,6 +26,12 @@ import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
 import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { siteConfig } from '@/config/site';
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
@@ -50,7 +57,6 @@ export default function CreatePage() {
   const [quantity, setQuantity] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-  const [showSizeDropdown, setShowSizeDropdown] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
 
   useEffect(() => {
@@ -350,43 +356,33 @@ export default function CreatePage() {
                     <label className="block text-sm text-muted-foreground mb-2">
                       {t('parameters.size.label')}
                     </label>
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowSizeDropdown(!showSizeDropdown)}
-                        className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all"
-                      >
-                        <span className="text-sm">{sizes[selectedSize]}</span>
-                        <ChevronDown className={cn(
-                          'w-4 h-4 transition-transform',
-                          showSizeDropdown && 'rotate-180'
-                        )} />
-                      </button>
-                      {showSizeDropdown && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="absolute top-full left-0 right-0 mt-2 bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-xl z-50 overflow-hidden"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all"
                         >
-                          {Object.entries(sizes).map(([key, value]) => (
-                            <button
-                              key={key}
-                              onClick={() => {
-                                setSelectedSize(key);
-                                setShowSizeDropdown(false);
-                              }}
-                              className={cn(
-                                'w-full px-4 py-2.5 text-left text-sm transition-colors',
-                                selectedSize === key
-                                  ? 'bg-purple-500/10 text-purple-400'
-                                  : 'text-foreground hover:bg-muted/50'
-                              )}
-                            >
-                              {value}
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </div>
+                          <span className="text-sm">{sizes[selectedSize]}</span>
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-full min-w-48">
+                        {Object.entries(sizes).map(([key, value]) => (
+                          <DropdownMenuItem
+                            key={key}
+                            onClick={() => setSelectedSize(key)}
+                            className={cn(
+                              'justify-between',
+                              selectedSize === key && 'text-purple-400'
+                            )}
+                          >
+                            {value}
+                            {selectedSize === key && (
+                              <Check className="w-4 h-4" />
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
                   <div>
