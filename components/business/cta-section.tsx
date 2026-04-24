@@ -60,12 +60,14 @@ export function CTASection({ className }: CTASectionProps) {
 
             <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
               <span className="block">{t('cta.title')}</span>
-              <span className="block mt-2 bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                <span className="inline-flex items-center gap-2">
-                  <Stars className="w-8 h-8 md:w-12 md:h-12 text-yellow-400" />
-                  {t('cta.titleHighlight')}
+              {t('cta.titleHighlight') && (
+                <span className="block mt-2 bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  <span className="inline-flex items-center gap-2">
+                    <Stars className="w-8 h-8 md:w-12 md:h-12 text-yellow-400" />
+                    {t('cta.titleHighlight')}
+                  </span>
                 </span>
-              </span>
+              )}
             </h2>
 
             <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">

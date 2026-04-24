@@ -18,7 +18,7 @@ interface HeroSectionProps {
 const STATS = [
   { value: 2000000, label: 'users', icon: Users, suffix: '+' },
   { value: 50000000, label: 'images', icon: Image, suffix: '+' },
-  { value: 500, label: 'styles', icon: Palette, suffix: '+' },
+  { value: 20, label: 'templates', icon: Palette, suffix: '+' },
 ];
 
 const SAMPLE_IMAGES = [
