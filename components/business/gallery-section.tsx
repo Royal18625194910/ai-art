@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Maximize2, Heart, Eye, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/use-translation';
+import { usePageTranslation } from '@/hooks/use-translation';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container, Section } from '@/components/ui/container';
 import { Badge } from '@/components/ui/badge';
@@ -68,7 +68,7 @@ const GALLERY_IMAGES = [
 const CATEGORIES = ['all', 'scifi', 'anime', 'fantasy', 'abstract', 'portrait'];
 
 export function GallerySection({ className }: GallerySectionProps) {
-  const { t } = useTranslation();
+  const { t } = usePageTranslation('landing');
   const [activeCategory, setActiveCategory] = useState('all');
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const { ref: sectionRef, isVisible } = useScrollAnimation({

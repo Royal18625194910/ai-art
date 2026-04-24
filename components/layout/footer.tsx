@@ -8,7 +8,7 @@ import {
   Code2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslation } from '@/hooks/use-translation';
+import { usePageTranslation } from '@/hooks/use-translation';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container } from '@/components/ui/container';
 import { LanguageSwitcher } from '@/components/business/language-switcher';
@@ -19,7 +19,7 @@ interface FooterProps {
 }
 
 export function Footer({ className }: FooterProps) {
-  const { t, tObject } = useTranslation();
+  const { t, tObject } = usePageTranslation('landing');
   const { ref: footerRef, isVisible } = useScrollAnimation({
     threshold: 0.1,
     rootMargin: '0px 0px 0px 0px',
