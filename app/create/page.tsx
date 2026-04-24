@@ -50,7 +50,6 @@ export default function CreatePage() {
   const [prompt, setPrompt] = useState('');
   const [selectedQuality, setSelectedQuality] = useState('1k');
   const [aspectRatio, setAspectRatio] = useState('1:1');
-  const [similarity, setSimilarity] = useState(60);
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
@@ -398,21 +397,6 @@ export default function CreatePage() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  {mode === 'image-to-image' && (
-                    <div>
-                      <label className="block text-sm text-muted-foreground mb-2">
-                        {t('parameters.similarity.label')}: {similarity}%
-                      </label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={similarity}
-                        onChange={(e) => setSimilarity(Number(e.target.value))}
-                        className="w-full h-2 bg-muted/50 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                      />
-                    </div>
-                  )}
                 </div>
               </motion.div>
 
