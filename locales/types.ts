@@ -167,11 +167,54 @@ export interface BuyTranslations {
 export interface CreateTranslations {
   title: string;
   subtitle: string;
-  modeText: string;
-  modeImage: string;
-  promptPlaceholder: string;
-  generate: string;
-  generating: string;
+  mode: {
+    textToImage: string;
+    imageToImage: string;
+  };
+  textToImage: {
+    title: string;
+    placeholder: string;
+    tips: string;
+    examplesLabel: string;
+    examples: string[];
+  };
+  imageToImage: {
+    uploadTitle: string;
+    uploadDesc: string;
+    dragHint: string;
+    tips: string;
+    maxFiles: string;
+    fileFormat: string;
+  };
+  parameters: {
+    title: string;
+    size: {
+      label: string;
+      options: Record<string, string>;
+    };
+    aspectRatio: {
+      label: string;
+      options: Record<string, string>;
+    };
+  };
+  actions: {
+    generate: string;
+    generating: string;
+    useCredits: string;
+    currentBalance: string;
+  };
+  results: {
+    title: string;
+    success: string;
+  };
+  card: {
+    copyPrompt: string;
+    regenerate: string;
+  };
+  tips: {
+    title: string;
+    items: string[];
+  };
 }
 
 // History Page

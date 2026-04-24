@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Menu, X, Sparkles, ArrowRight } from 'lucide-react';
+import { Menu, X, Sparkles, ArrowRight, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCommonTranslation } from '@/hooks/use-translation';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/business/language-switcher';
 import { navItems } from '@/config/site';
 import { useAuth, UserButton, SignInButton } from '@clerk/nextjs';
+import { useUserCredits } from '@/hooks/use-user-credits';
 
 interface HeaderProps {
   className?: string;
@@ -23,6 +24,7 @@ export function Header({ className }: HeaderProps) {
   const scrollDirection = useScrollDirection();
   const { nav } = useCommonTranslation();
   const { isSignedIn, isLoaded } = useAuth();
+  const { credits, isSignedIn: hasCredits } = useUserCredits();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -112,6 +114,12 @@ export function Header({ className }: HeaderProps) {
         </nav>
 
         <div className="hidden lg:flex items-center gap-3">
+          {isLoaded && isSignedIn && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300">
+              <Coins className="w-4 h-4" />
+              <span className="text-sm font-medium">{credits}</span>
+            </div>
+          )}
           <LanguageSwitcher variant="dropdown" />
           {isLoaded && !isSignedIn && (
             <SignInButton mode="redirect">
@@ -174,6 +182,12 @@ export function Header({ className }: HeaderProps) {
               ))}
             </div>
             <div className="px-4 py-4 border-t border-border/50 space-y-3">
+              {isLoaded && isSignedIn && (
+                <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-300">
+                  <Coins className="w-4 h-4" />
+                  <span className="text-sm font-medium">{credits} 积分</span>
+                </div>
+              )}
               <LanguageSwitcher variant="dropdown" />
               {isLoaded && !isSignedIn && (
                 <SignInButton mode="redirect">

@@ -1,58 +1,42 @@
-// 按语言组织的翻译导出
+// 按页面组织的翻译导出
 import type { Locale, Translations, CommonTranslations, PageTranslations } from './types';
 
 // Common translations
-import { common as commonZh } from './common/zh';
-import { common as commonZhTw } from './common/zh-tw';
-import { common as commonEn } from './common/en';
+import { common as commonTranslations } from './common';
 
-// Landing page translations
-import { landing as landingZh } from './pages/landing/zh';
-import { landing as landingZhTw } from './pages/landing/zh-tw';
-import { landing as landingEn } from './pages/landing/en';
+// Page translations
+import { landing } from './pages/landing';
+import { buy } from './pages/buy';
+import { create } from './pages/create';
+import { history } from './pages/history';
 
-// Buy page translations
-import { buy as buyZh } from './pages/buy/zh';
-import { buy as buyZhTw } from './pages/buy/zh-tw';
-import { buy as buyEn } from './pages/buy/en';
-
-// Create page translations
-import { create as createZh } from './pages/create/zh';
-import { create as createZhTw } from './pages/create/zh-tw';
-import { create as createEn } from './pages/create/en';
-
-// History page translations
-import { history as historyZh } from './pages/history/zh';
-import { history as historyZhTw } from './pages/history/zh-tw';
-import { history as historyEn } from './pages/history/en';
-
-// 完整的翻译对象
+// 完整的翻译对象 - 按语言组织
 export const translations: Record<Locale, Translations> = {
   zh: {
-    common: commonZh,
+    common: commonTranslations.zh,
     pages: {
-      landing: landingZh,
-      buy: buyZh,
-      create: createZh,
-      history: historyZh,
+      landing: landing.zh,
+      buy: buy.zh,
+      create: create.zh,
+      history: history.zh,
     },
   },
   'zh-TW': {
-    common: commonZhTw,
+    common: commonTranslations['zh-TW'],
     pages: {
-      landing: landingZhTw,
-      buy: buyZhTw,
-      create: createZhTw,
-      history: historyZhTw,
+      landing: landing['zh-TW'],
+      buy: buy['zh-TW'],
+      create: create['zh-TW'],
+      history: history['zh-TW'],
     },
   },
   en: {
-    common: commonEn,
+    common: commonTranslations.en,
     pages: {
-      landing: landingEn,
-      buy: buyEn,
-      create: createEn,
-      history: historyEn,
+      landing: landing.en,
+      buy: buy.en,
+      create: create.en,
+      history: history.en,
     },
   },
 };
@@ -89,4 +73,6 @@ export function getHistory(locale: Locale) {
 
 // 导出所有类型
 export * from './types';
-export type { CommonTranslations } from './types';
+
+// 导出页面翻译对象
+export { landing, buy, create, history };

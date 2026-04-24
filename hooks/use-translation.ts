@@ -14,12 +14,14 @@ import {
 export function useTranslation() {
   const locale = useLanguageStore((state) => state.locale);
   const setLocale = useLanguageStore((state) => state.setLocale);
+  const safeLocale = (locale === 'zh' || locale === 'en' || locale === 'zh-TW') ? locale : 'zh';
+  const currentTranslations = translations[safeLocale];
 
   const t = useCallback(
     <K extends keyof CommonTranslations>(key: K): CommonTranslations[K] => {
-      return translations[locale].common[key];
+      return currentTranslations.common[key];
     },
-    [locale]
+    [currentTranslations]
   );
 
   const availableLocales = useMemo(() => Object.keys(localeConfigs) as Locale[], []);
@@ -28,8 +30,8 @@ export function useTranslation() {
     locale,
     setLocale,
     t,
-    common: translations[locale].common,
-    pages: translations[locale].pages,
+    common: currentTranslations.common,
+    pages: currentTranslations.pages,
     availableLocales,
     localeConfigs,
   };
@@ -38,7 +40,8 @@ export function useTranslation() {
 // Landing 页面专用 hook
 export function useLandingTranslation() {
   const locale = useLanguageStore((state) => state.locale);
-  const landing = translations[locale].pages.landing;
+  const safeLocale = (locale === 'zh' || locale === 'en' || locale === 'zh-TW') ? locale : 'zh';
+  const landing = translations[safeLocale].pages.landing;
 
   return {
     t: useCallback(
@@ -54,7 +57,8 @@ export function useLandingTranslation() {
 // Buy 页面专用 hook
 export function useBuyTranslation() {
   const locale = useLanguageStore((state) => state.locale);
-  const buy = translations[locale].pages.buy;
+  const safeLocale = (locale === 'zh' || locale === 'en' || locale === 'zh-TW') ? locale : 'zh';
+  const buy = translations[safeLocale].pages.buy;
 
   return {
     t: useCallback(
@@ -70,7 +74,8 @@ export function useBuyTranslation() {
 // Create 页面专用 hook
 export function useCreateTranslation() {
   const locale = useLanguageStore((state) => state.locale);
-  const create = translations[locale].pages.create;
+  const safeLocale = (locale === 'zh' || locale === 'en' || locale === 'zh-TW') ? locale : 'zh';
+  const create = translations[safeLocale].pages.create;
 
   return {
     t: useCallback(
@@ -86,7 +91,8 @@ export function useCreateTranslation() {
 // History 页面专用 hook
 export function useHistoryTranslation() {
   const locale = useLanguageStore((state) => state.locale);
-  const history = translations[locale].pages.history;
+  const safeLocale = (locale === 'zh' || locale === 'en' || locale === 'zh-TW') ? locale : 'zh';
+  const history = translations[safeLocale].pages.history;
 
   return {
     t: useCallback(
@@ -102,7 +108,8 @@ export function useHistoryTranslation() {
 // 保持向后兼容
 export function usePageTranslation(page: 'landing' | 'buy' | 'create' | 'history') {
   const locale = useLanguageStore((state) => state.locale);
-  const pageData = translations[locale].pages[page];
+  const safeLocale = (locale === 'zh' || locale === 'en' || locale === 'zh-TW') ? locale : 'zh';
+  const pageData = translations[safeLocale].pages[page];
 
   return {
     t: useCallback(
@@ -161,7 +168,8 @@ export function usePageTranslation(page: 'landing' | 'buy' | 'create' | 'history
 
 export function useCommonTranslation() {
   const locale = useLanguageStore((state) => state.locale);
-  const common = translations[locale].common;
+  const safeLocale = (locale === 'zh' || locale === 'en' || locale === 'zh-TW') ? locale : 'zh';
+  const common = translations[safeLocale].common;
 
   // Backward compatible t function
   const t = useCallback(

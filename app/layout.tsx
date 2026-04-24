@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ConvexClientProvider } from "@/components/providers/convex-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -67,18 +68,20 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="zh-CN" suppressHydrationWarning>
-        <head>
-          <meta name="theme-color" content="#0a0a0a" />
-          <meta name="color-scheme" content="dark" />
-        </head>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
-          data-theme="dark"
-        >
-          {children}
-        </body>
-      </html>
+      <ConvexClientProvider>
+        <html lang="zh-CN" suppressHydrationWarning>
+          <head>
+            <meta name="theme-color" content="#0a0a0a" />
+            <meta name="color-scheme" content="dark" />
+          </head>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
+            data-theme="dark"
+          >
+            {children}
+          </body>
+        </html>
+      </ConvexClientProvider>
     </ClerkProvider>
   );
 }

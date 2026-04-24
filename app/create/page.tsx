@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Sparkles, 
-  Image as ImageIcon, 
-  Upload, 
-  X, 
-  ChevronDown, 
-  Download, 
-  RefreshCw, 
+import {
+  Sparkles,
+  Image as ImageIcon,
+  Upload,
+  X,
+  ChevronDown,
+  Download,
+  RefreshCw,
   Copy,
   Trash2,
   Plus,
@@ -20,7 +20,7 @@ import {
   Check
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { usePageTranslation, useCommonTranslation, useTranslation } from '@/hooks/use-translation';
+import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,6 @@ import {
 import { siteConfig } from '@/config/site';
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
-type StyleStrength = 'low' | 'medium' | 'high';
 
 interface UploadedImage {
   id: string;
@@ -45,17 +44,13 @@ interface UploadedImage {
 
 export default function CreatePage() {
   const { t, tObject, tArray } = usePageTranslation('create');
-  const { credits } = useCommonTranslation();
-  const { common } = useTranslation();
   const [mounted, setMounted] = useState(false);
-  
+
   const [mode, setMode] = useState<GenerationMode>('text-to-image');
   const [prompt, setPrompt] = useState('');
-  const [negativePrompt, setNegativePrompt] = useState('');
-  const [selectedSize, setSelectedSize] = useState('1024x1024');
-  const [styleStrength, setStyleStrength] = useState<StyleStrength>('medium');
+  const [selectedQuality, setSelectedQuality] = useState('1k');
+  const [aspectRatio, setAspectRatio] = useState('1:1');
   const [similarity, setSimilarity] = useState(60);
-  const [quantity, setQuantity] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
@@ -65,20 +60,23 @@ export default function CreatePage() {
     document.title = `${t('title')} | ${siteConfig.name}`;
   }, [t]);
 
-  const sizes = tObject('parameters.size.options') as Record<string, string> || {
-    '512x512': '512×512',
-    '1024x1024': '1024×1024',
-    '1024x1792': '1024×1792',
-    '1792x1024': '1792×1024',
+  const qualityOptions = tObject('parameters.size.options') as Record<string, string> || {
+    '1k': '1K (1积分)',
+    '4k': '4K (2积分)',
   };
 
-  const styleOptions = tObject('parameters.styleStrength.options') as Record<string, string> || {
-    'low': '低',
-    'medium': '中',
-    'high': '高',
+  const aspectRatioOptions = tObject('parameters.aspectRatio.options') as Record<string, string> || {
+    '1:1': '1:1 方形',
+    '16:9': '16:9 宽屏',
+    '9:16': '9:16 竖屏',
+    '4:3': '4:3 标准',
+    '3:4': '3:4 竖版',
+    '21:9': '21:9 超宽',
+    '2:3': '2:3 竖版',
   };
 
   const promptExamples = tArray('textToImage.examples');
+  const tipsItems = tArray('tips.items');
 
   const handleExampleClick = (example: string) => {
     setPrompt(example);
@@ -115,17 +113,12 @@ export default function CreatePage() {
     if (uploadedImages.length === 0 && mode === 'image-to-image') return;
 
     setIsGenerating(true);
-    
+
     setTimeout(() => {
-      const mockImages = Array(quantity)
-        .fill(0)
-        .map(
-          (_, i) =>
-            `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
-              prompt.slice(0, 50) || 'art'
-            )}&image_size=square_hd&v=${Date.now() + i}`
-        );
-      setGeneratedImages(mockImages);
+      const mockImage = `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
+        prompt.slice(0, 50) || 'art'
+      )}&image_size=square_hd&v=${Date.now()}`;
+      setGeneratedImages([mockImage]);
       setIsGenerating(false);
     }, 2000);
   };
@@ -134,8 +127,7 @@ export default function CreatePage() {
     navigator.clipboard.writeText(prompt);
   };
 
-  const estimatedCredits = quantity;
-  const currentCredits = 10;
+  const estimatedCredits = selectedQuality === '1k' ? 1 : 2;
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -223,18 +215,6 @@ export default function CreatePage() {
                         <p className="mt-2 text-xs text-muted-foreground">
                           {t('textToImage.tips')}
                         </p>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          {t('textToImage.negativePrompt.label')}
-                        </label>
-                        <textarea
-                          value={negativePrompt}
-                          onChange={(e) => setNegativePrompt(e.target.value)}
-                          placeholder={t('textToImage.negativePrompt.placeholder')}
-                          className="w-full h-20 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 resize-none transition-all"
-                        />
                       </div>
 
                       <div>
@@ -352,7 +332,7 @@ export default function CreatePage() {
                   </h3>
                 </div>
 
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm text-muted-foreground mb-2">
                       {t('parameters.size.label')}
@@ -362,22 +342,22 @@ export default function CreatePage() {
                         <button
                           className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all"
                         >
-                          <span className="text-sm">{sizes[selectedSize]}</span>
+                          <span className="text-sm">{qualityOptions[selectedQuality]}</span>
                           <ChevronDown className="w-4 h-4" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" className="w-full min-w-48">
-                        {Object.entries(sizes).map(([key, value]) => (
+                        {Object.entries(qualityOptions).map(([key, value]) => (
                           <DropdownMenuItem
                             key={key}
-                            onClick={() => setSelectedSize(key)}
+                            onClick={() => setSelectedQuality(key)}
                             className={cn(
                               'justify-between',
-                              selectedSize === key && 'text-purple-400'
+                              selectedQuality === key && 'text-purple-400'
                             )}
                           >
                             {value}
-                            {selectedSize === key && (
+                            {selectedQuality === key && (
                               <Check className="w-4 h-4" />
                             )}
                           </DropdownMenuItem>
@@ -388,26 +368,36 @@ export default function CreatePage() {
 
                   <div>
                     <label className="block text-sm text-muted-foreground mb-2">
-                      {t('parameters.styleStrength.label')}
+                      {t('parameters.aspectRatio.label')}
                     </label>
-                    <div className="flex bg-muted/50 rounded-lg p-1">
-                      {(['low', 'medium', 'high'] as StyleStrength[]).map((level) => (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
                         <button
-                          key={level}
-                          onClick={() => setStyleStrength(level)}
-                          className={cn(
-                            'flex-1 py-2 text-sm font-medium rounded-md transition-all',
-                            styleStrength === level
-                              ? 'bg-purple-500 text-white shadow shadow-purple-500/20'
-                              : 'text-muted-foreground hover:text-foreground'
-                          )}
+                          className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all"
                         >
-                          {styleOptions[level]}
+                          <span className="text-sm">{aspectRatioOptions[aspectRatio]}</span>
+                          <ChevronDown className="w-4 h-4" />
                         </button>
-                      ))}
-                    </div>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-full min-w-48">
+                        {Object.entries(aspectRatioOptions).map(([key, value]) => (
+                          <DropdownMenuItem
+                            key={key}
+                            onClick={() => setAspectRatio(key)}
+                            className={cn(
+                              'justify-between',
+                              aspectRatio === key && 'text-purple-400'
+                            )}
+                          >
+                            {value}
+                            {aspectRatio === key && (
+                              <Check className="w-4 h-4" />
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-
                   {mode === 'image-to-image' && (
                     <div>
                       <label className="block text-sm text-muted-foreground mb-2">
@@ -423,28 +413,6 @@ export default function CreatePage() {
                       />
                     </div>
                   )}
-
-                  <div>
-                    <label className="block text-sm text-muted-foreground mb-2">
-                      {t('parameters.quantity.label')}
-                    </label>
-                    <div className="flex bg-muted/50 rounded-lg p-1">
-                      {[1, 2, 4].map((qty) => (
-                        <button
-                          key={qty}
-                          onClick={() => setQuantity(qty)}
-                          className={cn(
-                            'flex-1 py-2 text-sm font-medium rounded-md transition-all',
-                            quantity === qty
-                              ? 'bg-purple-500 text-white shadow shadow-purple-500/20'
-                              : 'text-muted-foreground hover:text-foreground'
-                          )}
-                        >
-                          {qty}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </motion.div>
 
@@ -454,16 +422,11 @@ export default function CreatePage() {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50"
               >
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                    <Sparkles className="w-4 h-4 text-purple-400" />
-                    <span className="text-sm text-purple-300">
-                      {t('actions.useCredits', { count: estimatedCredits })}
-                    </span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {t('actions.currentBalance', { count: currentCredits })}
-                  </div>
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
+                  <span className="text-sm text-purple-300">
+                    {t('actions.useCredits', { count: estimatedCredits })}
+                  </span>
                 </div>
 
                 <Button
@@ -527,14 +490,14 @@ export default function CreatePage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex justify-center">
                       {generatedImages.map((img, index) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: index * 0.1 }}
-                          className="group relative aspect-square rounded-xl overflow-hidden border border-border/50"
+                          className="group relative max-w-md w-full aspect-square rounded-xl overflow-hidden border border-border/50"
                         >
                           <img
                             src={img}
@@ -574,15 +537,10 @@ export default function CreatePage() {
                   💡 {t('tips.title')}
                 </h3>
                 <ul className="space-y-3">
-                  {[
-                    "描述越详细，生成效果越好",
-                    "可以在提示词中包含风格、光线、构图等元素",
-                    "使用负向提示排除不想要的内容",
-                    "尝试不同的风格预设获得多样化效果",
-                  ].map((tip, index) => (
+                  {tipsItems.map((tip, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <span className="mt-1 w-1.5 h-1.5 rounded-full bg-purple-400 flex-shrink-0" />
-                      <span className="text-sm text-muted-foreground">{tip}</span>
+                      <span className="text-sm text-muted-foreground">{tip as string}</span>
                     </li>
                   ))}
                 </ul>

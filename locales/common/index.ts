@@ -1,0 +1,97 @@
+import type { CommonTranslations } from '../types';
+
+export const common = {
+  zh: {
+    nav: {
+      home: '首页',
+      create: '创作',
+      buy: '购买积分',
+      history: '历史记录',
+      login: '登录',
+      logout: '退出',
+    },
+    actions: {
+      confirm: '确认',
+      cancel: '取消',
+      save: '保存',
+      delete: '删除',
+      download: '下载',
+      share: '分享',
+      retry: '重试',
+      loading: '加载中...',
+    },
+    credits: {
+      label: '积分',
+      balance: '余额',
+      insufficient: '积分不足',
+    },
+    time: {
+      justNow: '刚刚',
+      minutesAgo: '{count}分钟前',
+      hoursAgo: '{count}小时前',
+      daysAgo: '{count}天前',
+    },
+  } as CommonTranslations,
+  en: {
+    nav: {
+      home: 'Home',
+      create: 'Create',
+      buy: 'Buy Credits',
+      history: 'History',
+      login: 'Log In',
+      logout: 'Log Out',
+    },
+    actions: {
+      confirm: 'Confirm',
+      cancel: 'Cancel',
+      save: 'Save',
+      delete: 'Delete',
+      download: 'Download',
+      share: 'Share',
+      retry: 'Retry',
+      loading: 'Loading...',
+    },
+    credits: {
+      label: 'Credits',
+      balance: 'Balance',
+      insufficient: 'Insufficient credits',
+    },
+    time: {
+      justNow: 'Just now',
+      minutesAgo: '{count} minutes ago',
+      hoursAgo: '{count} hours ago',
+      daysAgo: '{count} days ago',
+    },
+  } as CommonTranslations,
+  'zh-TW': {
+    nav: {
+      home: '首頁',
+      create: '創作',
+      buy: '購買積分',
+      history: '歷史記錄',
+      login: '登錄',
+      logout: '登出',
+    },
+    actions: {
+      confirm: '確認',
+      cancel: '取消',
+      save: '保存',
+      delete: '刪除',
+      download: '下載',
+      share: '分享',
+      retry: '重試',
+      loading: '載入中...',
+    },
+    credits: {
+      label: '積分',
+      balance: '餘額',
+      insufficient: '積分不足',
+    },
+    time: {
+      justNow: '剛剛',
+      minutesAgo: '{count}分鐘前',
+      hoursAgo: '{count}小時前',
+      daysAgo: '{count}天前',
+    },
+  } as CommonTranslations,
+};

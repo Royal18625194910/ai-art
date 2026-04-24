@@ -23,6 +23,9 @@ export function LanguageSwitcher({
 }: LanguageSwitcherProps) {
   const { locale, setLocale, availableLocales } = useTranslation();
 
+  // Safe locale fallback
+  const safeLocale = (locale === 'zh' || locale === 'en' || locale === 'zh-TW') ? locale : 'zh';
+
   const handleLanguageChange = (newLocale: Locale) => {
     setLocale(newLocale);
   };
@@ -36,7 +39,7 @@ export function LanguageSwitcher({
             onClick={() => handleLanguageChange(loc)}
             className={cn(
               'px-2 py-1 text-sm rounded-lg transition-all',
-              locale === loc
+              safeLocale === loc
                 ? 'bg-purple-600 text-white shadow-sm'
                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
@@ -61,7 +64,7 @@ export function LanguageSwitcher({
       >
         <Globe className="w-4 h-4 text-foreground" />
         <span className="hidden sm:inline text-foreground">
-          {localeConfigs[locale].nativeName}
+          {localeConfigs[safeLocale].nativeName}
         </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52 bg-popover border-border">
@@ -72,7 +75,7 @@ export function LanguageSwitcher({
             className={cn(
               'flex items-center justify-between cursor-pointer',
               'focus:bg-accent focus:text-accent-foreground',
-              locale === loc && 'bg-accent/50'
+              safeLocale === loc && 'bg-accent/50'
             )}
           >
             <div className="flex items-center gap-3">
@@ -86,7 +89,7 @@ export function LanguageSwitcher({
                 </span>
               </div>
             </div>
-            {locale === loc && (
+            {safeLocale === loc && (
               <Check className="w-4 h-4 text-purple-500" />
             )}
           </DropdownMenuItem>
