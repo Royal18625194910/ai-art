@@ -30,6 +30,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { siteConfig } from '@/config/site';
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
@@ -128,6 +136,9 @@ export default function HistoryPage() {
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 8;
 
   useEffect(() => {
     setMounted(true);
@@ -138,6 +149,11 @@ export default function HistoryPage() {
     }, 800);
     return () => clearTimeout(timer);
   }, [t]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterMode, dateRange]);
 
   const stats = useMemo(() => {
     const total = mockHistoryItems.length;
@@ -174,6 +190,13 @@ export default function HistoryPage() {
       return true;
     });
   }, [searchQuery, filterMode, dateRange]);
+
+  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+
+  const paginatedItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredItems, currentPage]);
 
   const modeOptions = [
     { value: 'all' as FilterMode, label: t('filters.all') },
@@ -408,7 +431,7 @@ export default function HistoryPage() {
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-                {filteredItems.map((item, index) => (
+                {paginatedItems.map((item, index) => (
                   <motion.div
                     key={item.id}
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -474,11 +497,40 @@ export default function HistoryPage() {
                 ))}
               </div>
 
-              <div className="text-center">
-                <Button variant="ghost" className="text-muted-foreground">
-                  {t('gallery.loadMore')}
-                </Button>
-              </div>
+              {totalPages > 1 && (
+                <Pagination className="mt-8">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => {
+                          if (currentPage > 1) setCurrentPage(currentPage - 1);
+                        }}
+                        disabled={currentPage === 1}
+                      />
+                    </PaginationItem>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => {
+                          if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                        }}
+                        disabled={currentPage === totalPages}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
             </motion.div>
           )}
         </Container>
