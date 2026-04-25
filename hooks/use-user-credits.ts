@@ -1,21 +1,39 @@
 'use client';
 
-import { useQuery } from 'convex/react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { api } from '@/convex/_generated/api';
 
 export function useUserCredits() {
-  const { isSignedIn, userId: clerkId } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
+  const [credits, setCredits] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 获取用户数据
-  const user = useQuery(
-    api.users.getUserByClerkId,
-    isSignedIn && clerkId ? { clerkId } : 'skip'
-  );
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) {
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchCredits = async () => {
+      try {
+        const response = await fetch('/api/user/credits');
+        if (response.ok) {
+          const result = await response.json();
+          setCredits(result.data?.credits ?? 0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch credits:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCredits();
+  }, [isLoaded, isSignedIn]);
 
   return {
-    credits: user?.credits ?? 0,
-    isLoading: user === undefined,
+    credits,
+    isLoading,
     isSignedIn,
   };
 }

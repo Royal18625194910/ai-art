@@ -6,6 +6,9 @@ export interface NavTranslations {
   history: string;
   login: string;
   logout: string;
+  features: string;
+  gallery: string;
+  pricing: string;
 }
 
 export interface ActionsTranslations {

@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { ConvexHttpClient } from 'convex/browser';
-import { api } from '@/convex/_generated/api';
-import { createKIEAIClient, KIEAIError, APIErrorCode } from '@/lib/kie-ai-sdk';
-import { MockKIEClient } from '@/lib/mock-kie-client';
+import { getOrCreateUser, api, getConvexClient } from '@/lib/convex-user';
+import { createAceDataClient, AceDataError } from '@/lib/acedata-sdk';
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+const convex = getConvexClient();
 
 // 根据环境选择客户端
-const USE_MOCK = process.env.USE_MOCK_KIE === 'true' || !process.env.KIE_API_KEY;
-const kieClient = USE_MOCK
-  ? new MockKIEClient()
-  : createKIEAIClient({ apiKey: process.env.KIE_API_KEY! });
+const USE_MOCK = process.env.USE_MOCK_ACEDATA === 'true' || !process.env.ACEDATA_API_KEY;
+const aceClient = createAceDataClient({
+  apiKey: process.env.ACEDATA_API_KEY || '',
+  timeout: 300000, // 5分钟超时
+});
 
 function handleError(error: unknown): NextResponse {
   console.error('Generate error:', error);
 
-  if (error instanceof KIEAIError) {
+  if (error instanceof AceDataError) {
     return NextResponse.json(
-      { error: error.message, code: error.code, details: error.details },
-      { status: error.code === APIErrorCode.UNAUTHORIZED ? 401 : 500 }
+      { error: error.message, code: error.statusCode, details: error.details },
+      { status: error.statusCode }
     );
   }
 
@@ -36,10 +35,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized', code: 401 }, { status: 401 });
     }
 
-    // 获取 Convex 用户
-    const user = await convex.query(api.users.getUserByClerkId, { clerkId });
+    // 获取或创建 Convex 用户
+    const user = await getOrCreateUser(clerkId);
+
     if (!user) {
-      return NextResponse.json({ error: 'User not found', code: 404 }, { status: 404 });
+      return NextResponse.json({ error: 'Failed to create user', code: 500 }, { status: 500 });
     }
 
     // 检查积分
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { mode, prompt, aspect_ratio, resolution, input_urls } = body;
+    const { mode, prompt, size, input_urls } = body;
 
     if (!prompt?.trim()) {
       return NextResponse.json({ error: 'Prompt is required', code: 422 }, { status: 422 });
@@ -82,53 +82,58 @@ export async function POST(req: NextRequest) {
       userId: user._id,
       mode,
       prompt: prompt.trim(),
-      aspectRatio: aspect_ratio || '1:1',
-      resolution: resolution || '1K',
+      size: size || '1024x1024',
       referenceImages: input_urls,
       creditsUsed: 1,
     });
 
-    // 创建 KIE AI 任务 (或 Mock)
-    let taskId: string | null = null;
-    try {
-      taskId = mode === 'text-to-image'
-        ? await kieClient.createTextToImageTask({
-            prompt: prompt.trim(),
-            aspect_ratio: aspect_ratio || '1:1',
-            resolution: resolution || '1K',
-          })
-        : await kieClient.createImageToImageTask({
-            prompt: prompt.trim(),
-            input_urls,
-            aspect_ratio: aspect_ratio || '1:1',
-            resolution: resolution || '1K',
-          });
+    let imageUrls: string[] = [];
+    let taskId: string = '';
 
-      // 更新记录，添加 taskId
+    try {
+      if (USE_MOCK) {
+        // Mock 模式：延迟 3 秒后返回示例图片
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        imageUrls = ['https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1024&h=1024&fit=crop'];
+        taskId = `mock-${Date.now()}`;
+      } else {
+        // 调用 AceData API
+        if (mode === 'text-to-image') {
+          const response = await aceClient.createTextToImage({
+            prompt: prompt.trim(),
+            size: size || '1024x1024',
+          });
+          taskId = response.task_id;
+          imageUrls = response.data.map(item => item.url);
+        } else {
+          const response = await aceClient.createImageToImage({
+            prompt: prompt.trim(),
+            image: input_urls[0],
+            size: size || '1024x1024',
+          });
+          taskId = response.task_id;
+          imageUrls = response.data.map(item => item.url);
+        }
+      }
+
+      // 更新 Convex 记录为成功
       await convex.mutation(api.generations.updateGenerationStatus, {
         generationId,
-        status: 'generating',
+        status: 'success',
+        outputImages: imageUrls,
+        outputImage: imageUrls[0] || '',
       });
 
-      // 如果是 Mock 模式，关联 taskId 和 generationId
-      if (USE_MOCK && kieClient instanceof MockKIEClient) {
-        kieClient.setGenerationId(taskId, generationId);
-      }
-
-      // 如果是 Mock 模式，返回提示
-      if (USE_MOCK) {
-        return NextResponse.json({
-          success: true,
-          data: { taskId, generationId, mock: true },
-          message: 'Running in mock mode - images will be simulated',
-        });
-      }
-    } catch (kieError) {
-      // KIE API 失败，标记为失败并退还积分
+      return NextResponse.json({
+        success: true,
+        data: { taskId, generationId, imageUrls, mock: USE_MOCK },
+      });
+    } catch (apiError) {
+      // API 失败，标记为失败并退还积分
       await convex.mutation(api.generations.updateGenerationStatus, {
         generationId,
         status: 'failed',
-        errorMessage: kieError instanceof Error ? kieError.message : 'API connection failed',
+        errorMessage: apiError instanceof Error ? apiError.message : 'API call failed',
       });
 
       // 退还积分
@@ -137,13 +142,8 @@ export async function POST(req: NextRequest) {
         amount: 1,
       });
 
-      return handleError(kieError);
+      return handleError(apiError);
     }
-
-    return NextResponse.json({
-      success: true,
-      data: { taskId, generationId },
-    });
   } catch (error) {
     return handleError(error);
   }

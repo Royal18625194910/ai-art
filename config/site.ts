@@ -18,11 +18,24 @@ export const contactInfo = {
   supportEmail: '2326182533@qq.com',
 };
 
-export const navItems: NavItem[] = [
+// 未登录时显示的导航（landing page 锚点）
+export const landingNavItems: NavItem[] = [
   {
     label: 'nav.home',
     href: '/',
   },
+  {
+    label: 'nav.features',
+    href: '#features',
+  },
+  {
+    label: 'nav.gallery',
+    href: '#gallery',
+  },
+];
+
+// 已登录时显示的功能导航
+export const authNavItems: NavItem[] = [
   {
     label: 'nav.create',
     href: '/create',
@@ -36,6 +49,9 @@ export const navItems: NavItem[] = [
     href: '/history',
   },
 ];
+
+// 默认导出（兼容旧代码）
+export const navItems = authNavItems;
 
 export const footerLinks = {
   product: [

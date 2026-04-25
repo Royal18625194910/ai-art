@@ -9,7 +9,6 @@
  */
 
 import type * as generations from "../generations.js";
-import type * as index from "../index.js";
 import type * as payments from "../payments.js";
 import type * as users from "../users.js";
 
@@ -21,7 +20,6 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   generations: typeof generations;
-  index: typeof index;
   payments: typeof payments;
   users: typeof users;
 }>;

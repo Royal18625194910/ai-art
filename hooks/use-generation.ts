@@ -2,106 +2,69 @@
 
 import { useState, useCallback } from 'react';
 
-export type TaskState = 'waiting' | 'queuing' | 'generating' | 'success' | 'fail';
+export type GenerationState = 'idle' | 'generating' | 'success' | 'failed';
 
 export interface GenerateParams {
   mode: 'text-to-image' | 'image-to-image';
   prompt: string;
-  aspect_ratio?: string;
-  resolution?: string;
+  size?: string;
   input_urls?: string[];
 }
 
 export interface GenerateResult {
   imageUrls: string[];
   taskId: string;
+  generationId: string;
 }
 
 interface UseGenerationOptions {
   onSuccess?: (result: GenerateResult) => void;
   onError?: (error: string) => void;
-  onStatusChange?: (state: TaskState) => void;
 }
 
 export function useGeneration(options: UseGenerationOptions = {}) {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [state, setState] = useState<TaskState | null>(null);
+  const [state, setState] = useState<GenerationState>('idle');
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<GenerateResult | null>(null);
 
   const generate = useCallback(async (params: GenerateParams) => {
     setIsGenerating(true);
-    setState('waiting');
+    setState('generating');
     setProgress(10);
     setError(null);
     setResult(null);
 
     try {
-      // 1. 创建任务
-      const createResponse = await fetch('/api/generate', {
+      // 调用 API（同步等待，最长5分钟）
+      const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
       });
 
-      const createData = await createResponse.json();
+      const data = await response.json();
 
-      if (!createResponse.ok) {
-        throw new Error(createData.error || 'Failed to create task');
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate image');
       }
 
-      const { taskId } = createData.data;
-      setProgress(20);
-      options.onStatusChange?.('waiting');
+      setProgress(100);
+      setState('success');
 
-      // 2. 轮询任务状态
-      const maxAttempts = 300;
-      const interval = 2000;
+      const result: GenerateResult = {
+        imageUrls: data.data.imageUrls,
+        taskId: data.data.taskId,
+        generationId: data.data.generationId,
+      };
 
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        await new Promise(resolve => setTimeout(resolve, interval));
-
-        const statusResponse = await fetch(`/api/generate/status?taskId=${taskId}`);
-        const statusData = await statusResponse.json();
-
-        if (!statusResponse.ok) {
-          throw new Error(statusData.error || 'Failed to get task status');
-        }
-
-        const task = statusData.data;
-        setState(task.state);
-        options.onStatusChange?.(task.state);
-
-        // 更新进度
-        if (task.state === 'waiting') {
-          setProgress(25);
-        } else if (task.state === 'queuing') {
-          setProgress(30);
-        } else if (task.state === 'generating') {
-          setProgress(Math.min(30 + attempt, 90));
-        } else if (task.state === 'success') {
-          setProgress(100);
-
-          // 解析 resultJson
-          const resultData = task.resultJson ? JSON.parse(task.resultJson) : null;
-          const imageUrls = resultData?.resultUrls || [];
-
-          const result = {
-            imageUrls,
-            taskId,
-          };
-          setResult(result);
-          options.onSuccess?.(result);
-          return result;
-        } else if (task.state === 'fail') {
-          throw new Error(task.failMsg || 'Generation failed');
-        }
-      }
-
-      throw new Error('Generation timeout');
+      setResult(result);
+      options.onSuccess?.(result);
+      return result;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setState('failed');
       setError(errorMessage);
       options.onError?.(errorMessage);
       throw err;
@@ -112,7 +75,7 @@ export function useGeneration(options: UseGenerationOptions = {}) {
 
   const reset = useCallback(() => {
     setIsGenerating(false);
-    setState(null);
+    setState('idle');
     setProgress(0);
     setError(null);
     setResult(null);

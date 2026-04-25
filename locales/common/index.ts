@@ -9,6 +9,9 @@ export const common = {
       history: '历史记录',
       login: '登录',
       logout: '退出',
+      features: '功能',
+      gallery: '画廊',
+      pricing: '定价',
     },
     actions: {
       confirm: '确认',
@@ -40,6 +43,9 @@ export const common = {
       history: 'History',
       login: 'Log In',
       logout: 'Log Out',
+      features: 'Features',
+      gallery: 'Gallery',
+      pricing: 'Pricing',
     },
     actions: {
       confirm: 'Confirm',
@@ -71,6 +77,9 @@ export const common = {
       history: '歷史記錄',
       login: '登錄',
       logout: '登出',
+      features: '功能',
+      gallery: '畫廊',
+      pricing: '定價',
     },
     actions: {
       confirm: '確認',

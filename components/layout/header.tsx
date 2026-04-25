@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Menu, X, Sparkles, ArrowRight, Coins, Globe, User } from 'lucide-react';
+import { Menu, X, Sparkles, ArrowRight, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCommonTranslation } from '@/hooks/use-translation';
 import { useScrollPosition, useScrollDirection } from '@/hooks/use-scroll-animation';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/business/language-switcher';
-import { navItems } from '@/config/site';
+import { authNavItems, landingNavItems } from '@/config/site';
 import { useAuth, UserButton, SignInButton } from '@clerk/nextjs';
 import { useUserCredits } from '@/hooks/use-user-credits';
 
@@ -28,9 +28,17 @@ export function Header({ className }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // 根据登录状态选择导航项
+  const navItems = useMemo(() => {
+    return isSignedIn ? authNavItems : landingNavItems;
+  }, [isSignedIn]);
+
   const isActiveNav = (href: string) => {
     if (href === '/') {
       return pathname === '/';
+    }
+    if (href.startsWith('#')) {
+      return pathname === '/' && scrollPosition < 100;
     }
     return pathname === href || pathname.startsWith(href + '/');
   };
@@ -65,6 +73,16 @@ export function Header({ className }: HeaderProps) {
   };
 
   const isHidden = scrollDirection === 'down' && scrollPosition > 300;
+
+  // 未登录用户在非首页时，重定向到首页
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      const protectedRoutes = ['/create', '/buy', '/history'];
+      if (protectedRoutes.some(route => pathname.startsWith(route))) {
+        router.push('/');
+      }
+    }
+  }, [isLoaded, isSignedIn, pathname, router]);
 
   return (
     <header
@@ -150,10 +168,8 @@ export function Header({ className }: HeaderProps) {
 
         {/* Mobile Actions */}
         <div className="flex lg:hidden items-center gap-2">
-          {/* Language Switcher - Mobile */}
           <LanguageSwitcher variant="dropdown" />
 
-          {/* User Button - Mobile */}
           {isLoaded && isSignedIn && (
             <UserButton
               appearance={{
@@ -165,7 +181,6 @@ export function Header({ className }: HeaderProps) {
             />
           )}
 
-          {/* Hamburger Menu */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 rounded-lg hover:bg-muted transition-colors"
