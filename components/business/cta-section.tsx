@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Stars } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -7,6 +8,7 @@ import { useLandingTranslation } from '@/hooks/use-translation';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container, Section } from '@/components/ui/container';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@clerk/nextjs';
 
 interface CTASectionProps {
   className?: string;
@@ -15,13 +17,19 @@ interface CTASectionProps {
 export function CTASection({ className }: CTASectionProps) {
   const { landing } = useLandingTranslation();
   const cta = landing.cta;
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
   const { ref: sectionRef, isVisible } = useScrollAnimation({
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px',
   });
 
   const handleCtaClick = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (isSignedIn) {
+      router.push('/create');
+    } else {
+      router.push('/sign-in');
+    }
   };
 
   return (

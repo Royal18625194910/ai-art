@@ -31,28 +31,39 @@ function CreditInfoItem({ icon, title, description, delay = 0 }: CreditInfoItemP
   );
 }
 
-interface CreditInfoProps {
-  features: string[];
+interface CreditInfoTranslations {
+  neverExpires: string;
+  neverExpiresDesc: string;
+  priority: string;
+  priorityDesc: string;
+  usage: string;
+  support: string;
+  supportDesc: string;
 }
 
-export function CreditInfo({ features }: CreditInfoProps) {
+interface CreditInfoProps {
+  features: string[];
+  creditInfo: CreditInfoTranslations;
+}
+
+export function CreditInfo({ features, creditInfo }: CreditInfoProps) {
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <CreditInfoItem
         icon={<Clock className="w-5 h-5 text-purple-400" />}
-        title="永久有效"
-        description="购买的积分永久有效，不会过期"
+        title={creditInfo.neverExpires}
+        description={creditInfo.neverExpiresDesc}
         delay={0}
       />
       <CreditInfoItem
         icon={<Zap className="w-5 h-5 text-purple-400" />}
-        title="优先处理"
-        description="付费用户享受更快的生成速度"
+        title={creditInfo.priority}
+        description={creditInfo.priorityDesc}
         delay={0.1}
       />
       <CreditInfoItem
         icon={<Star className="w-5 h-5 text-purple-400" />}
-        title="积分用途"
+        title={creditInfo.usage}
         description={
           <ul className="mt-2 space-y-1">
             {features.map((item, index) => (
@@ -67,8 +78,8 @@ export function CreditInfo({ features }: CreditInfoProps) {
       />
       <CreditInfoItem
         icon={<HelpCircle className="w-5 h-5 text-purple-400" />}
-        title="技术支持"
-        description="遇到问题请联系我们"
+        title={creditInfo.support}
+        description={creditInfo.supportDesc}
         delay={0.3}
       />
     </div>

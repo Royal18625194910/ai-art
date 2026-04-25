@@ -4,18 +4,20 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { usePageTranslation } from '@/hooks/use-translation';
+import { useLanguageStore } from '@/stores/use-language-store';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Container } from '@/components/ui/container';
 import { siteConfig } from '@/config/site';
-import { creditPackages, creditRules } from '@/config/pricing';
+import { getCreditPackages, getPricingLabels } from '@/config/pricing';
 
 import { HeaderSection } from './_components/header-section';
 import { PackageCard } from './_components/package-card';
 import { CreditInfo } from './_components/credit-info';
 
 export default function BuyPage() {
-  const { t } = usePageTranslation('buy');
+  const { t, tObject, tArray } = usePageTranslation('buy');
+  const { locale } = useLanguageStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -26,6 +28,20 @@ export default function BuyPage() {
   if (!mounted) {
     return null;
   }
+
+  const packages = getCreditPackages(locale);
+  const labels = getPricingLabels(locale);
+
+  const features = tArray('features') as string[];
+  const creditInfo = tObject('creditInfo') as {
+    neverExpires: string;
+    neverExpiresDesc: string;
+    priority: string;
+    priorityDesc: string;
+    usage: string;
+    support: string;
+    supportDesc: string;
+  };
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -50,11 +66,13 @@ export default function BuyPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="grid md:grid-cols-3 gap-6 mb-12"
           >
-            {creditPackages.map((pkg, index) => (
+            {packages.map((pkg, index) => (
               <PackageCard
                 key={pkg.id}
                 pkg={pkg}
                 index={index}
+                labels={labels}
+                t={t}
               />
             ))}
           </motion.div>
@@ -66,15 +84,15 @@ export default function BuyPage() {
             className="mb-12"
           >
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground">积分说明</h2>
+              <h2 className="text-2xl font-bold text-foreground">{t('creditLabel')}</h2>
               <p className="text-muted-foreground mt-2">
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20">
                   <Sparkles className="w-4 h-4 text-purple-400" />
-                  {creditRules.description}
+                  {t('creditRulesDescription')}
                 </span>
               </p>
             </div>
-            <CreditInfo features={['文生图生成', '图生图生成', '高清图片下载', '无水印']} />
+            <CreditInfo features={features} creditInfo={creditInfo} />
           </motion.div>
         </Container>
       </main>

@@ -5,13 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
   Image as ImageIcon,
-  Upload,
   X,
   ChevronDown,
   Download,
   RefreshCw,
   Copy,
-  Trash2,
   Plus,
   Wand2,
   Layers,
@@ -32,15 +30,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
 import { siteConfig } from '@/config/site';
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
-
-interface UploadedImage {
-  id: string;
-  url: string;
-  name: string;
-}
 
 export default function CreatePage() {
   const { t, tObject, tArray } = usePageTranslation('create');
@@ -51,7 +44,7 @@ export default function CreatePage() {
   const [selectedQuality, setSelectedQuality] = useState('1k');
   const [aspectRatio, setAspectRatio] = useState('1:1');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<UploadedFile[]>([]);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
 
   useEffect(() => {
@@ -81,34 +74,8 @@ export default function CreatePage() {
     setPrompt(example);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && uploadedImages.length < 3) {
-      Array.from(files).forEach((file) => {
-        if (uploadedImages.length < 3) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            setUploadedImages((prev) => [
-              ...prev,
-              {
-                id: Date.now().toString(),
-                url: event.target?.result as string,
-                name: file.name,
-              },
-            ]);
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    }
-  };
-
-  const removeUploadedImage = (id: string) => {
-    setUploadedImages((prev) => prev.filter((img) => img.id !== id));
-  };
-
   const handleGenerate = () => {
-    if (!prompt.trim() && mode === 'text-to-image') return;
+    if (!prompt.trim()) return;
     if (uploadedImages.length === 0 && mode === 'image-to-image') return;
 
     setIsGenerating(true);
@@ -250,44 +217,15 @@ export default function CreatePage() {
                           {t('imageToImage.uploadDesc')}
                         </p>
 
-                        <div className="flex flex-wrap gap-4">
-                          {uploadedImages.map((img) => (
-                            <div
-                              key={img.id}
-                              className="relative group w-32 h-32 rounded-xl overflow-hidden border border-border/50"
-                            >
-                              <img
-                                src={img.url}
-                                alt={img.name}
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                <button
-                                  onClick={() => removeUploadedImage(img.id)}
-                                  className="p-2 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
-                                >
-                                  <Trash2 className="w-4 h-4 text-white" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-
-                          {uploadedImages.length < 3 && (
-                            <label className="w-32 h-32 rounded-xl border-2 border-dashed border-border/50 flex flex-col items-center justify-center cursor-pointer hover:border-purple-500/50 hover:bg-purple-500/5 transition-all">
-                              <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                              <span className="text-xs text-muted-foreground">
-                                {t('imageToImage.dragHint')}
-                              </span>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                onChange={handleImageUpload}
-                                className="hidden"
-                              />
-                            </label>
-                          )}
-                        </div>
+                        <FileUpload
+                          files={uploadedImages}
+                          onFilesChange={setUploadedImages}
+                          maxFiles={3}
+                          accept="image/*"
+                          uploadTitle={t('imageToImage.uploadTitle')}
+                          uploadDesc={t('imageToImage.uploadDesc')}
+                          dragHint={t('imageToImage.dragHint')}
+                        />
 
                         <div className="mt-4 flex items-start gap-2 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
                           <Info className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
@@ -304,7 +242,7 @@ export default function CreatePage() {
 
                       <div>
                         <label className="block text-sm font-medium text-foreground mb-2">
-                          {t('textToImage.title')}（可选）
+                          {t('textToImage.title')}
                         </label>
                         <textarea
                           value={prompt}
@@ -417,7 +355,7 @@ export default function CreatePage() {
                   variant="primary"
                   size="lg"
                   onClick={handleGenerate}
-                  disabled={isGenerating || (mode === 'text-to-image' && !prompt.trim()) || (mode === 'image-to-image' && uploadedImages.length === 0)}
+                  disabled={isGenerating || !prompt.trim() || (mode === 'image-to-image' && uploadedImages.length === 0)}
                   className="w-full sm:w-auto"
                 >
                   {isGenerating ? (

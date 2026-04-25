@@ -110,6 +110,16 @@ export interface LandingTranslations {
   cta: LandingCtaTranslations;
 }
 
+export interface CreditInfoTranslations {
+  neverExpires: string;
+  neverExpiresDesc: string;
+  priority: string;
+  priorityDesc: string;
+  usage: string;
+  support: string;
+  supportDesc: string;
+}
+
 // Buy Page
 export interface BuyTranslations {
   title: string;
@@ -119,10 +129,13 @@ export interface BuyTranslations {
   payWith: string;
   success: string;
   error: string;
-  // packages, faq, payment 相关配置已移至 config/pricing.ts
   bestValue: string;
   recommended: string;
   savings: string;
+  creditLabel: string;
+  creditRulesDescription: string;
+  features: string[];
+  creditInfo: CreditInfoTranslations;
 }
 
 // Create Page

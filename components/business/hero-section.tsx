@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sparkles, Users, Image, Palette, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
 import { MagicRings, MagicRingsBackground } from '@/components/ui/magic-rings';
+import { useAuth } from '@clerk/nextjs';
 
 interface HeroSectionProps {
   className?: string;
@@ -69,15 +71,18 @@ export function HeroSection({ className }: HeroSectionProps) {
   const { landing } = useLandingTranslation();
   const hero = landing.hero;
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const handleCtaClick = () => {
-    const element = document.getElementById('features');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (isSignedIn) {
+      router.push('/create');
+    } else {
+      router.push('/sign-in');
     }
   };
 

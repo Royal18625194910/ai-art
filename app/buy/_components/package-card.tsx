@@ -6,13 +6,22 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CreditPackage } from '@/types';
+import { BuyTranslations } from '@/locales/types';
+
+interface Labels {
+  popularLabel: string;
+  ctaButton: string;
+  creditLabel: string;
+}
 
 interface PackageCardProps {
   pkg: CreditPackage;
   index: number;
+  labels: Labels;
+  t: (key: keyof BuyTranslations, params?: Record<string, string | number>) => string;
 }
 
-export function PackageCard({ pkg, index }: PackageCardProps) {
+export function PackageCard({ pkg, index, labels, t }: PackageCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -32,7 +41,7 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
             className="bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/30 px-4 py-1"
           >
             <Crown className="w-3.5 h-3.5 mr-1" />
-            最受欢迎
+            {labels.popularLabel}
           </Badge>
         </div>
       )}
@@ -41,7 +50,7 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
         <div className="absolute top-4 right-4">
           <Badge variant="secondary" className="bg-green-500/10 text-green-400 border-green-500/20">
             <Zap className="w-3.5 h-3.5 mr-1" />
-            省 {pkg.savingsPercent}%
+            {t('savings', { percent: pkg.savingsPercent })}
           </Badge>
         </div>
       )}
@@ -55,7 +64,7 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
         <div className="flex items-center gap-2 mb-2">
           <Coins className="w-5 h-5 text-purple-400" />
           <span className="text-2xl font-bold text-foreground">{pkg.credits}</span>
-          <span className="text-sm text-muted-foreground">积分</span>
+          <span className="text-sm text-muted-foreground">{labels.creditLabel}</span>
         </div>
         <div className="flex items-baseline gap-2 mb-1">
           <span className="text-4xl font-bold text-foreground">{pkg.priceFormatted}</span>
@@ -76,7 +85,7 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
         variant={pkg.isPopular ? 'primary' : 'secondary'}
         className="w-full cursor-pointer"
       >
-        立即购买
+        {labels.ctaButton}
       </Button>
     </motion.div>
   );

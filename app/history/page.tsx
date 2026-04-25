@@ -39,6 +39,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { siteConfig } from '@/config/site';
+import { mockHistoryItems } from './_data/mock-history';
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
 type FilterMode = 'all' | GenerationMode;
@@ -55,75 +56,6 @@ interface HistoryItem {
   creditsUsed: number;
   createdAt: Date;
 }
-
-const mockHistoryItems: HistoryItem[] = [
-  {
-    id: '1',
-    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20cat%20watercolor%20style%20soft%20lighting&image_size=square_hd&v=1',
-    prompt: '一只可爱的猫咪，水彩画风格，柔和的光线',
-    mode: 'text-to-image',
-    size: '1024x1024',
-    quality: '1K',
-    aspectRatio: '1:1',
-    creditsUsed: 1,
-    createdAt: new Date(Date.now() - 1000 * 60 * 30),
-  },
-  {
-    id: '2',
-    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cyberpunk%20city%20night%20neon%20lights&image_size=square_hd&v=2',
-    prompt: '赛博朋克风格的城市夜景，霓虹灯光',
-    mode: 'text-to-image',
-    size: '1792x1024',
-    quality: '4K',
-    aspectRatio: '16:9',
-    creditsUsed: 2,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
-  },
-  {
-    id: '3',
-    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mystical%20forest%20mist%20fantasy%20style&image_size=square_hd&v=3',
-    prompt: '神秘的森林，迷雾缭绕，奇幻风格',
-    mode: 'text-to-image',
-    size: '1024x1024',
-    quality: '1K',
-    aspectRatio: '1:1',
-    creditsUsed: 1,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5),
-  },
-  {
-    id: '4',
-    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=futuristic%20astronaut%20cosmic%20background&image_size=square_hd&v=4',
-    prompt: '未来科技感的宇航员，星际背景',
-    mode: 'image-to-image',
-    size: '1024x1024',
-    quality: '1K',
-    aspectRatio: '1:1',
-    creditsUsed: 1,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
-  },
-  {
-    id: '5',
-    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beautiful%20anime%20girl%20cherry%20blossoms&image_size=square_hd&v=5',
-    prompt: '美丽的动漫女孩，樱花树下，柔和的光线',
-    mode: 'text-to-image',
-    size: '1024x1792',
-    quality: '4K',
-    aspectRatio: '9:16',
-    creditsUsed: 2,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
-  },
-  {
-    id: '6',
-    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=surreal%20abstract%20art%20flowing%20colors&image_size=square_hd&v=6',
-    prompt: '超现实抽象艺术，流动的色彩和几何图案',
-    mode: 'text-to-image',
-    size: '1024x1024',
-    quality: '1K',
-    aspectRatio: '1:1',
-    creditsUsed: 1,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
-  },
-];
 
 export default function HistoryPage() {
   const { t } = usePageTranslation('history');
