@@ -16,6 +16,7 @@ import {
   Clock,
   Sparkles,
   Check,
+  ChevronDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
@@ -313,13 +314,15 @@ export default function HistoryPage() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button
-                    className="flex items-center gap-2 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all min-w-36 justify-between"
+                  <Button
+                    variant="outline"
+                    className="min-w-36 justify-between"
                   >
                     <span className="text-sm">
                       {modeOptions.find((o) => o.value === filterMode)?.label}
                     </span>
-                  </button>
+                    <ChevronDown className="w-4 h-4 ml-2" />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="min-w-36">
                   {modeOptions.map((option) => (
@@ -342,13 +345,15 @@ export default function HistoryPage() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button
-                    className="flex items-center gap-2 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all min-w-40 justify-between"
+                  <Button
+                    variant="outline"
+                    className="min-w-40 justify-between"
                   >
                     <span className="text-sm">
                       {dateOptions.find((o) => o.value === dateRange)?.label}
                     </span>
-                  </button>
+                    <ChevronDown className="w-4 h-4 ml-2" />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="min-w-40">
                   {dateOptions.map((option) => (
