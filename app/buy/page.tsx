@@ -23,8 +23,6 @@ export default function BuyPage() {
     document.title = `${t('title')} | ${siteConfig.name}`;
   }, [t]);
 
-  const currentCredits = 10;
-
   if (!mounted) {
     return null;
   }
@@ -44,9 +42,6 @@ export default function BuyPage() {
           <HeaderSection
             title={t('title')}
             subtitle={t('subtitle')}
-            balanceLabel="当前余额"
-            creditsLabel="积分"
-            currentCredits={currentCredits}
           />
 
           <motion.div

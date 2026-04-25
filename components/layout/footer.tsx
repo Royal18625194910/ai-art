@@ -6,6 +6,7 @@ import {
   Users,
   MessageSquare,
   Code2,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePageTranslation } from '@/hooks/use-translation';
@@ -13,6 +14,7 @@ import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { Container } from '@/components/ui/container';
 import { LanguageSwitcher } from '@/components/business/language-switcher';
 import { footerLinks } from '@/config/site';
+import { contactInfo } from '@/config/pricing';
 
 interface FooterProps {
   className?: string;
@@ -122,6 +124,16 @@ export function Footer({ className }: FooterProps) {
             <p className="text-sm text-muted-foreground">
               {footerData.copyright as string || t('footer.copyright')}
             </p>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Mail className="w-4 h-4" />
+              <span>技术支持：</span>
+              <a
+                href={`mailto:${contactInfo.supportEmail}`}
+                className="text-purple-400 hover:text-purple-300 transition-colors"
+              >
+                {contactInfo.supportEmail}
+              </a>
+            </div>
           </div>
         </motion.div>
       </Container>

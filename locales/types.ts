@@ -183,11 +183,65 @@ export interface CreateTranslations {
 export interface HistoryTranslations {
   title: string;
   subtitle: string;
-  filterAll: string;
-  filterText: string;
-  filterImage: string;
+  filters: {
+    all: string;
+    textToImage: string;
+    imageToImage: string;
+    search: {
+      placeholder: string;
+      noResults: string;
+    };
+    dateRange: {
+      today: string;
+      last7Days: string;
+      last30Days: string;
+      thisMonth: string;
+      allTime: string;
+    };
+  };
+  stats: {
+    total: string;
+    textToImage: string;
+    imageToImage: string;
+    creditsUsed: string;
+  };
+  card: {
+    copyPrompt: string;
+    download: string;
+    viewDetails: string;
+    delete: string;
+    regenerate: string;
+    date: string;
+  };
+  detail: {
+    prompt: string;
+    negativePrompt: string;
+    parameters: {
+      title: string;
+      mode: string;
+      size: string;
+      quality: string;
+      aspectRatio: string;
+      creditsUsed: string;
+    };
+    referenceImages: {
+      title: string;
+    };
+    actions: {
+      download: string;
+    };
+  };
+  gallery: {
+    loading: string;
+    empty: string;
+    createNow: string;
+    loadMore: string;
+  };
+  delete: {
+    confirm: string;
+    success: string;
+  };
   download: string;
-  delete: string;
   empty: string;
   emptyDesc: string;
 }

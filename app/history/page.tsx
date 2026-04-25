@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, 
-  Filter, 
-  ChevronDown,
+import {
+  Search,
   Image as ImageIcon,
   Layers,
   Download,
@@ -17,9 +15,7 @@ import {
   Plus,
   Clock,
   Sparkles,
-  ArrowRight,
   Check,
-  AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
@@ -27,7 +23,6 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
-import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,15 +39,12 @@ interface HistoryItem {
   id: string;
   imageUrl: string;
   prompt: string;
-  negativePrompt?: string;
   mode: GenerationMode;
   size: string;
-  styleStrength?: string;
-  similarity?: number;
-  quantity: number;
+  quality: string;
+  aspectRatio: string;
   creditsUsed: number;
   createdAt: Date;
-  referenceImages?: string[];
 }
 
 const mockHistoryItems: HistoryItem[] = [
@@ -62,8 +54,8 @@ const mockHistoryItems: HistoryItem[] = [
     prompt: '一只可爱的猫咪，水彩画风格，柔和的光线',
     mode: 'text-to-image',
     size: '1024x1024',
-    styleStrength: 'medium',
-    quantity: 1,
+    quality: '1K',
+    aspectRatio: '1:1',
     creditsUsed: 1,
     createdAt: new Date(Date.now() - 1000 * 60 * 30),
   },
@@ -73,21 +65,20 @@ const mockHistoryItems: HistoryItem[] = [
     prompt: '赛博朋克风格的城市夜景，霓虹灯光',
     mode: 'text-to-image',
     size: '1792x1024',
-    styleStrength: 'high',
-    quantity: 1,
-    creditsUsed: 1,
+    quality: '4K',
+    aspectRatio: '16:9',
+    creditsUsed: 2,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
   },
   {
     id: '3',
     imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=mystical%20forest%20mist%20fantasy%20style&image_size=square_hd&v=3',
     prompt: '神秘的森林，迷雾缭绕，奇幻风格',
-    negativePrompt: 'blurry, low quality',
     mode: 'text-to-image',
     size: '1024x1024',
-    styleStrength: 'medium',
-    quantity: 2,
-    creditsUsed: 2,
+    quality: '1K',
+    aspectRatio: '1:1',
+    creditsUsed: 1,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5),
   },
   {
@@ -96,11 +87,10 @@ const mockHistoryItems: HistoryItem[] = [
     prompt: '未来科技感的宇航员，星际背景',
     mode: 'image-to-image',
     size: '1024x1024',
-    similarity: 70,
-    quantity: 1,
+    quality: '1K',
+    aspectRatio: '1:1',
     creditsUsed: 1,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
-    referenceImages: ['ref1.jpg'],
   },
   {
     id: '5',
@@ -108,9 +98,9 @@ const mockHistoryItems: HistoryItem[] = [
     prompt: '美丽的动漫女孩，樱花树下，柔和的光线',
     mode: 'text-to-image',
     size: '1024x1792',
-    styleStrength: 'low',
-    quantity: 1,
-    creditsUsed: 1,
+    quality: '4K',
+    aspectRatio: '9:16',
+    creditsUsed: 2,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
   },
   {
@@ -119,54 +109,29 @@ const mockHistoryItems: HistoryItem[] = [
     prompt: '超现实抽象艺术，流动的色彩和几何图案',
     mode: 'text-to-image',
     size: '1024x1024',
-    styleStrength: 'high',
-    quantity: 4,
-    creditsUsed: 4,
+    quality: '1K',
+    aspectRatio: '1:1',
+    creditsUsed: 1,
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
-  },
-  {
-    id: '7',
-    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fantasy%20landscape%20floating%20islands%20crystal%20waterfalls&image_size=square_hd&v=7',
-    prompt: '奇幻风景，浮岛和水晶瀑布，史诗奇幻艺术',
-    mode: 'text-to-image',
-    size: '1792x1024',
-    styleStrength: 'medium',
-    quantity: 1,
-    creditsUsed: 1,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14),
-  },
-  {
-    id: '8',
-    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=portrait%20photography%20professional%20lighting&image_size=square_hd&v=8',
-    prompt: '专业肖像摄影，工作室灯光，电影感',
-    negativePrompt: 'cartoon, anime, illustration',
-    mode: 'image-to-image',
-    size: '1024x1024',
-    similarity: 60,
-    quantity: 1,
-    creditsUsed: 1,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
-    referenceImages: ['ref2.jpg', 'ref3.jpg'],
   },
 ];
 
 export default function HistoryPage() {
-  const { t, tObject } = usePageTranslation('history');
+  const { t } = usePageTranslation('history');
   const { t: tCommon } = useCommonTranslation();
   const [mounted, setMounted] = useState(false);
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
   const [dateRange, setDateRange] = useState<DateRange>('allTime');
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
     document.title = `${t('title')} | ${siteConfig.name}`;
-    
+
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 800);
@@ -193,7 +158,7 @@ export default function HistoryPage() {
         const now = new Date();
         const itemDate = item.createdAt;
         const daysDiff = Math.floor((now.getTime() - itemDate.getTime()) / (1000 * 60 * 60 * 24));
-        
+
         if (dateRange === 'today' && daysDiff > 0) return false;
         if (dateRange === 'last7Days' && daysDiff > 7) return false;
         if (dateRange === 'last30Days' && daysDiff > 30) return false;
@@ -234,15 +199,8 @@ export default function HistoryPage() {
     if (minutes < 60) return tCommon('time.minutesAgo', { count: minutes });
     if (hours < 24) return tCommon('time.hoursAgo', { count: hours });
     if (days < 7) return tCommon('time.daysAgo', { count: days });
-    
-    return date.toLocaleDateString();
-  };
 
-  const toggleSelection = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedItems((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    return date.toLocaleDateString();
   };
 
   const handleCopyPrompt = (item: HistoryItem) => {
@@ -361,7 +319,6 @@ export default function HistoryPage() {
                     <span className="text-sm">
                       {modeOptions.find((o) => o.value === filterMode)?.label}
                     </span>
-                    <ChevronDown className="w-4 h-4" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="min-w-36">
@@ -391,7 +348,6 @@ export default function HistoryPage() {
                     <span className="text-sm">
                       {dateOptions.find((o) => o.value === dateRange)?.label}
                     </span>
-                    <ChevronDown className="w-4 h-4" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="min-w-40">
@@ -413,36 +369,6 @@ export default function HistoryPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-
-            {selectedItems.length > 0 && (
-              <div className="mt-4 flex items-center gap-4 p-4 bg-purple-500/10 rounded-xl border border-purple-500/20">
-                <span className="text-sm text-purple-300">
-                  {t('batch.selected', { count: selectedItems.length })}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-purple-300 hover:text-purple-200 hover:bg-purple-500/10"
-                >
-                  <Download className="w-4 h-4 mr-1" />
-                  {t('batch.downloadSelected')}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                >
-                  <Trash2 className="w-4 h-4 mr-1" />
-                  {t('batch.deleteSelected')}
-                </Button>
-                <button
-                  onClick={() => setSelectedItems([])}
-                  className="ml-auto text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {t('batch.deselectAll')}
-                </button>
-              </div>
-            )}
           </motion.div>
 
           {isLoading ? (
@@ -463,7 +389,7 @@ export default function HistoryPage() {
                 {searchQuery ? t('filters.search.noResults') : t('gallery.empty')}
               </h3>
               <p className="text-muted-foreground mb-6 max-w-md">
-                {searchQuery ? tCommon('actions.retry') : t('empty.desc')}
+                {t('emptyDesc')}
               </p>
               <Button variant="primary" onClick={() => (window.location.href = '/create')}>
                 <Plus className="w-5 h-5 mr-2" />
@@ -483,29 +409,9 @@ export default function HistoryPage() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.05 }}
-                    className="group relative aspect-square rounded-xl overflow-hidden border border-border/50 bg-card/30"
+                    className="group relative aspect-square rounded-xl overflow-hidden border border-border/50 bg-card/30 cursor-pointer"
+                    onClick={() => setSelectedItem(item)}
                   >
-                    <button
-                      onClick={(e) => toggleSelection(item.id, e)}
-                      className="absolute top-2 left-2 z-10 w-6 h-6 rounded-md border-2 bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      {selectedItems.includes(item.id) && (
-                        <Check className="w-4 h-4 text-purple-400" />
-                      )}
-                    </button>
-
-                    <Badge
-                      variant="secondary"
-                      className={cn(
-                        'absolute top-2 right-2 z-10 text-xs',
-                        item.mode === 'text-to-image'
-                          ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
-                          : 'bg-pink-500/10 text-pink-400 border-pink-500/20'
-                      )}
-                    >
-                      {item.mode === 'text-to-image' ? 'T2I' : 'I2I'}
-                    </Badge>
-
                     <img
                       src={item.imageUrl}
                       alt={item.prompt}
@@ -559,11 +465,6 @@ export default function HistoryPage() {
                         </div>
                       </div>
                     </div>
-
-                    <button
-                      onClick={() => setSelectedItem(item)}
-                      className="absolute inset-0 z-0"
-                    />
                   </motion.div>
                 ))}
               </div>
@@ -571,7 +472,6 @@ export default function HistoryPage() {
               <div className="text-center">
                 <Button variant="ghost" className="text-muted-foreground">
                   {t('gallery.loadMore')}
-                  <ChevronDown className="w-4 h-4 ml-2" />
                 </Button>
               </div>
             </motion.div>
@@ -632,22 +532,9 @@ export default function HistoryPage() {
                       ) : (
                         <Copy className="w-4 h-4 mr-2" />
                       )}
-                      {copiedId === selectedItem.id ? t('results.promptCopied') : t('card.copyPrompt')}
+                      {copiedId === selectedItem.id ? tCommon('actions.confirm') : t('card.copyPrompt')}
                     </Button>
                   </div>
-
-                  {selectedItem.negativePrompt && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground mb-3">
-                        {t('detail.negativePrompt')}
-                      </h3>
-                      <div className="bg-background/50 rounded-xl p-4 border border-border/50">
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {selectedItem.negativePrompt}
-                        </p>
-                      </div>
-                    </div>
-                  )}
 
                   <div>
                     <h3 className="text-lg font-semibold text-foreground mb-3">
@@ -672,26 +559,22 @@ export default function HistoryPage() {
                           {selectedItem.size}
                         </p>
                       </div>
-                      {selectedItem.styleStrength && (
-                        <div className="bg-background/50 rounded-lg p-3 border border-border/50">
-                          <p className="text-xs text-muted-foreground mb-1">
-                            {t('detail.parameters.styleStrength')}
-                          </p>
-                          <p className="text-sm font-medium text-foreground">
-                            {selectedItem.styleStrength}
-                          </p>
-                        </div>
-                      )}
-                      {selectedItem.similarity !== undefined && (
-                        <div className="bg-background/50 rounded-lg p-3 border border-border/50">
-                          <p className="text-xs text-muted-foreground mb-1">
-                            {t('detail.parameters.similarity')}
-                          </p>
-                          <p className="text-sm font-medium text-foreground">
-                            {selectedItem.similarity}%
-                          </p>
-                        </div>
-                      )}
+                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          {t('detail.parameters.quality')}
+                        </p>
+                        <p className="text-sm font-medium text-foreground">
+                          {selectedItem.quality}
+                        </p>
+                      </div>
+                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
+                        <p className="text-xs text-muted-foreground mb-1">
+                          {t('detail.parameters.aspectRatio')}
+                        </p>
+                        <p className="text-sm font-medium text-foreground">
+                          {selectedItem.aspectRatio}
+                        </p>
+                      </div>
                       <div className="bg-background/50 rounded-lg p-3 border border-border/50">
                         <p className="text-xs text-muted-foreground mb-1">
                           {t('detail.parameters.creditsUsed')}
@@ -710,24 +593,6 @@ export default function HistoryPage() {
                       </div>
                     </div>
                   </div>
-
-                  {selectedItem.referenceImages && selectedItem.referenceImages.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground mb-3">
-                        {t('detail.referenceImages.title')}
-                      </h3>
-                      <div className="flex gap-2">
-                        {selectedItem.referenceImages.map((img, idx) => (
-                          <div
-                            key={idx}
-                            className="w-16 h-16 rounded-lg bg-muted/50 flex items-center justify-center"
-                          >
-                            <ImageIcon className="w-6 h-6 text-muted-foreground" />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
                   <div className="flex flex-wrap gap-3 pt-2">
                     <Button variant="primary" className="flex-1">
