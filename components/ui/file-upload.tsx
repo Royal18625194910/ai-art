@@ -28,6 +28,8 @@ interface FileUploadProps {
   dragHint?: string;
   /** 是否允许多选 */
   multiple?: boolean;
+  /** 是否禁用 */
+  disabled?: boolean;
   /** 自定义类名 */
   className?: string;
   /** 上传区域类名 */
@@ -45,6 +47,7 @@ export function FileUpload({
   uploadDesc = '支持拖拽或点击上传',
   dragHint = '点击或拖拽上传',
   multiple = true,
+  disabled = false,
   className,
   uploadAreaClassName,
   previewClassName,
@@ -53,7 +56,7 @@ export function FileUpload({
 
   const handleFiles = useCallback(
     (fileList: FileList | null) => {
-      if (!fileList) return;
+      if (disabled || !fileList) return;
 
       const remainingSlots = maxFiles - files.length;
       if (remainingSlots <= 0) return;
@@ -89,25 +92,28 @@ export function FileUpload({
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
+    if (disabled) return;
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
-  }, []);
+  }, [disabled]);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
+    if (disabled) return;
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-  }, []);
+  }, [disabled]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
+      if (disabled) return;
       e.preventDefault();
       e.stopPropagation();
       setIsDragging(false);
       handleFiles(e.dataTransfer.files);
     },
-    [handleFiles]
+    [handleFiles, disabled]
   );
 
   const handleInputChange = useCallback(
@@ -146,7 +152,8 @@ export function FileUpload({
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <button
                   onClick={() => removeFile(file.id)}
-                  className="p-2 bg-red-500 rounded-full hover:bg-red-600 transition-colors"
+                  disabled={disabled}
+                  className="p-2 bg-red-500 rounded-full hover:bg-red-600 transition-colors disabled:opacity-50"
                   title="删除"
                 >
                   <Trash2 className="w-4 h-4 text-white" />
@@ -162,7 +169,7 @@ export function FileUpload({
       )}
 
       {/* 拖拽上传区域 */}
-      {canUploadMore && (
+      {canUploadMore && !disabled && (
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -182,6 +189,7 @@ export function FileUpload({
             accept={accept}
             multiple={multiple && maxFiles - files.length > 1}
             onChange={handleInputChange}
+            disabled={disabled}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
 

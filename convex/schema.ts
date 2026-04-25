@@ -21,20 +21,26 @@ export default defineSchema({
   // 生图历史记录
   generations: defineTable({
     userId: v.id("users"),
+    taskId: v.optional(v.string()), // 外部任务 ID (如 KIE AI taskId)
     mode: v.union(v.literal("text-to-image"), v.literal("image-to-image")),
     prompt: v.string(),
     negativePrompt: v.optional(v.string()),
     referenceImages: v.optional(v.array(v.string())),
-    outputImage: v.string(),
-    size: v.string(),
+    outputImages: v.optional(v.array(v.string())), // 生成的图片数组
+    outputImage: v.string(), // 兼容旧数据，单张图片
+    aspectRatio: v.optional(v.string()), // 1:1, 9:16, 16:9, 4:3, 3:4
+    resolution: v.optional(v.string()), // 1K, 2K, 4K
+    size: v.string(), // 兼容旧数据
     quality: v.string(),
     creditsUsed: v.number(),
-    status: v.union(v.literal("pending"), v.literal("success"), v.literal("failed")),
+    status: v.union(v.literal("pending"), v.literal("generating"), v.literal("success"), v.literal("failed")),
     errorMessage: v.optional(v.string()),
     createdAt: v.number(),
+    completedAt: v.optional(v.number()),
   })
     .index("by_user_id", ["userId"])
-    .index("by_user_created", ["userId", "createdAt"]),
+    .index("by_user_created", ["userId", "createdAt"])
+    .index("by_task_id", ["taskId"]), // 用于 webhook 回调查找
 
   // 付费记录
   payments: defineTable({

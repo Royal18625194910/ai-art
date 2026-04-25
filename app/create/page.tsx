@@ -15,7 +15,8 @@ import {
   Layers,
   Sliders,
   Info,
-  Check
+  Check,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
@@ -31,21 +32,59 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
+import { useGeneration, type TaskState } from '@/hooks/use-generation';
+import { useFileUpload } from '@/hooks/use-file-upload';
 import { siteConfig } from '@/config/site';
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
 
+// 映射清晰度到 KIE 的分辨率
+const qualityToResolution: Record<string, string> = {
+  '1k': '1K',
+  '4k': '4K',
+};
+
 export default function CreatePage() {
   const { t, tObject, tArray } = usePageTranslation('create');
+  const { t: tCommon } = useCommonTranslation();
   const [mounted, setMounted] = useState(false);
 
   const [mode, setMode] = useState<GenerationMode>('text-to-image');
   const [prompt, setPrompt] = useState('');
   const [selectedQuality, setSelectedQuality] = useState('1k');
   const [aspectRatio, setAspectRatio] = useState('1:1');
-  const [isGenerating, setIsGenerating] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<UploadedFile[]>([]);
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+
+  const {
+    generate,
+    isGenerating,
+    state,
+    progress,
+    error: generateError,
+    result,
+    reset,
+  } = useGeneration({
+    onSuccess: () => {
+      // 成功回调
+    },
+    onError: (err) => {
+      console.error('Generation error:', err);
+    },
+  });
+
+  const {
+    upload: uploadFile,
+    isUploading,
+    progress: uploadProgress,
+  } = useFileUpload({
+    onSuccess: (uploaded) => {
+      setUploadedImages((prev) => [...prev, uploaded]);
+    },
+    onError: (err) => {
+      console.error('Upload error:', err);
+      alert(tCommon('actions.retry') + ': ' + err);
+    },
+  });
 
   useEffect(() => {
     setMounted(true);
@@ -58,13 +97,13 @@ export default function CreatePage() {
   };
 
   const aspectRatioOptions = tObject('parameters.aspectRatio.options') as Record<string, string> || {
-    '1:1': '1:1 方形',
-    '16:9': '16:9 宽屏',
-    '9:16': '9:16 竖屏',
-    '4:3': '4:3 标准',
-    '3:4': '3:4 竖版',
-    '21:9': '21:9 超宽',
-    '2:3': '2:3 竖版',
+    '1:1': '1:1 头像/商品图',
+    '16:9': '16:9 封面/横版',
+    '9:16': '9:16 短视频/壁纸',
+    '4:3': '4:3 传统照片',
+    '3:4': '3:4 笔记/详情页',
+    '21:9': '21:9 电影/超宽屏',
+    '2:3': '2:3 海报/Pinterest',
   };
 
   const promptExamples = tArray('textToImage.examples');
@@ -74,23 +113,79 @@ export default function CreatePage() {
     setPrompt(example);
   };
 
-  const handleGenerate = () => {
+  const handleModeChange = (newMode: GenerationMode) => {
+    setMode(newMode);
+    reset();
+    setUploadedImages([]);
+  };
+
+  const handleGenerate = async () => {
     if (!prompt.trim()) return;
-    if (uploadedImages.length === 0 && mode === 'image-to-image') return;
+    if (mode === 'image-to-image' && uploadedImages.length === 0) return;
 
-    setIsGenerating(true);
+    try {
+      const params = {
+        mode,
+        prompt: prompt.trim(),
+        aspect_ratio: aspectRatio,
+        resolution: qualityToResolution[selectedQuality] || '1K',
+        ...(mode === 'image-to-image' && {
+          input_urls: uploadedImages.map((img) => img.url),
+        }),
+      };
 
-    setTimeout(() => {
-      const mockImage = `https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
-        prompt.slice(0, 50) || 'art'
-      )}&image_size=square_hd&v=${Date.now()}`;
-      setGeneratedImages([mockImage]);
-      setIsGenerating(false);
-    }, 2000);
+      await generate(params);
+    } catch (err) {
+      // 错误已在 hook 中处理
+    }
   };
 
   const handleCopyPrompt = () => {
     navigator.clipboard.writeText(prompt);
+  };
+
+  const handleDownload = (url: string, index: number) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ai-art-${Date.now()}-${index + 1}.png`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const getStatusText = (state: TaskState | null) => {
+    switch (state) {
+      case 'waiting':
+        return '等待中...';
+      case 'queuing':
+        return '排队中...';
+      case 'generating':
+        return '生成中...';
+      case 'success':
+        return '生成成功';
+      case 'fail':
+        return '生成失败';
+      default:
+        return '';
+    }
+  };
+
+  const getStatusColor = (state: TaskState | null) => {
+    switch (state) {
+      case 'waiting':
+        return 'text-yellow-400';
+      case 'queuing':
+        return 'text-orange-400';
+      case 'generating':
+        return 'text-blue-400';
+      case 'success':
+        return 'text-green-400';
+      case 'fail':
+        return 'text-red-400';
+      default:
+        return '';
+    }
   };
 
   const estimatedCredits = selectedQuality === '1k' ? 1 : 2;
@@ -132,7 +227,7 @@ export default function CreatePage() {
                 <div className="flex items-center gap-2 mb-6">
                   <div className="flex bg-muted/50 rounded-xl p-1">
                     <button
-                      onClick={() => setMode('text-to-image')}
+                      onClick={() => handleModeChange('text-to-image')}
                       className={cn(
                         'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
                         mode === 'text-to-image'
@@ -144,7 +239,7 @@ export default function CreatePage() {
                       {t('mode.textToImage')}
                     </button>
                     <button
-                      onClick={() => setMode('image-to-image')}
+                      onClick={() => handleModeChange('image-to-image')}
                       className={cn(
                         'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
                         mode === 'image-to-image'
@@ -176,7 +271,8 @@ export default function CreatePage() {
                           value={prompt}
                           onChange={(e) => setPrompt(e.target.value)}
                           placeholder={t('textToImage.placeholder')}
-                          className="w-full h-32 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 resize-none transition-all"
+                          disabled={isGenerating}
+                          className="w-full h-32 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 resize-none transition-all disabled:opacity-50"
                         />
                         <p className="mt-2 text-xs text-muted-foreground">
                           {t('textToImage.tips')}
@@ -192,7 +288,8 @@ export default function CreatePage() {
                             <button
                               key={index}
                               onClick={() => handleExampleClick(example as string)}
-                              className="px-3 py-1.5 text-xs bg-purple-500/10 text-purple-300 rounded-lg hover:bg-purple-500/20 transition-colors border border-purple-500/20"
+                              disabled={isGenerating}
+                              className="px-3 py-1.5 text-xs bg-purple-500/10 text-purple-300 rounded-lg hover:bg-purple-500/20 transition-colors border border-purple-500/20 disabled:opacity-50"
                             >
                               {(example as string).slice(0, 20)}...
                             </button>
@@ -225,6 +322,7 @@ export default function CreatePage() {
                           uploadTitle={t('imageToImage.uploadTitle')}
                           uploadDesc={t('imageToImage.uploadDesc')}
                           dragHint={t('imageToImage.dragHint')}
+                          disabled={isGenerating}
                         />
 
                         <div className="mt-4 flex items-start gap-2 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
@@ -248,7 +346,8 @@ export default function CreatePage() {
                           value={prompt}
                           onChange={(e) => setPrompt(e.target.value)}
                           placeholder={t('textToImage.placeholder')}
-                          className="w-full h-24 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 resize-none transition-all"
+                          disabled={isGenerating}
+                          className="w-full h-24 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 resize-none transition-all disabled:opacity-50"
                         />
                       </div>
                     </motion.div>
@@ -277,7 +376,8 @@ export default function CreatePage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all"
+                          disabled={isGenerating}
+                          className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all disabled:opacity-50"
                         >
                           <span className="text-sm">{qualityOptions[selectedQuality]}</span>
                           <ChevronDown className="w-4 h-4" />
@@ -310,7 +410,8 @@ export default function CreatePage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all"
+                          disabled={isGenerating}
+                          className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all disabled:opacity-50"
                         >
                           <span className="text-sm">{aspectRatioOptions[aspectRatio]}</span>
                           <ChevronDown className="w-4 h-4" />
@@ -360,8 +461,8 @@ export default function CreatePage() {
                 >
                   {isGenerating ? (
                     <span className="flex items-center gap-2">
-                      <RefreshCw className="w-5 h-5 animate-spin" />
-                      {t('actions.generating')}
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      {state ? getStatusText(state) : t('actions.generating')}
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
@@ -372,8 +473,52 @@ export default function CreatePage() {
                 </Button>
               </motion.div>
 
+              {/* 生成进度 */}
+              {isGenerating && progress > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50 p-6"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                      <span className="text-sm font-medium text-foreground">
+                        {getStatusText(state)}
+                      </span>
+                    </div>
+                    <span className={cn('text-sm font-medium', getStatusColor(state))}>
+                      {progress}%
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-purple-500 to-cyan-500"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {/* 错误提示 */}
+              {generateError && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-500/10 backdrop-blur-xl rounded-2xl border border-red-500/30 p-6"
+                >
+                  <div className="flex items-center gap-2 text-red-400">
+                    <Info className="w-5 h-5" />
+                    <span className="font-medium">生成失败</span>
+                  </div>
+                  <p className="mt-2 text-sm text-red-300/80">{generateError}</p>
+                </motion.div>
+              )}
+
               <AnimatePresence>
-                {generatedImages.length > 0 && (
+                {result?.imageUrls && result.imageUrls.length > 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -404,6 +549,7 @@ export default function CreatePage() {
                           variant="ghost"
                           size="sm"
                           onClick={handleGenerate}
+                          disabled={isGenerating}
                           className="text-muted-foreground hover:text-foreground"
                         >
                           <RefreshCw className="w-4 h-4 mr-1" />
@@ -412,14 +558,14 @@ export default function CreatePage() {
                       </div>
                     </div>
 
-                    <div className="flex justify-center">
-                      {generatedImages.map((img, index) => (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {result.imageUrls.map((img, index) => (
                         <motion.div
                           key={index}
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: index * 0.1 }}
-                          className="group relative max-w-md w-full aspect-square rounded-xl overflow-hidden border border-border/50"
+                          className="group relative aspect-square rounded-xl overflow-hidden border border-border/50"
                         >
                           <img
                             src={img}
@@ -431,11 +577,11 @@ export default function CreatePage() {
                             <div className="flex items-center justify-between">
                               <span className="text-xs text-white/70">#{index + 1}</span>
                               <div className="flex items-center gap-1">
-                                <button className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm">
+                                <button
+                                  onClick={() => handleDownload(img, index)}
+                                  className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm"
+                                >
                                   <Download className="w-3.5 h-3.5 text-white" />
-                                </button>
-                                <button className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm">
-                                  <Plus className="w-3.5 h-3.5 text-white" />
                                 </button>
                               </div>
                             </div>
