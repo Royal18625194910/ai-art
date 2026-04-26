@@ -1,51 +1,29 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Search,
-  Image as ImageIcon,
-  Layers,
-  Download,
-  RefreshCw,
-  Copy,
-  Trash2,
-  Eye,
-  X,
-  Plus,
-  Clock,
-  Sparkles,
-  Check,
-  ChevronDown,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Clock, Image as ImageIcon, Layers, Sparkles, Plus, Wand2 } from 'lucide-react';
+import { useQuery, useMutation } from 'convex/react';
 import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
+import { Button } from '@/components/ui/button';
+import { StatCard } from '@/components/business/history/stat-card';
+import { FilterBar } from '@/components/business/history/filter-bar';
+import { HistoryGrid } from '@/components/business/history/history-grid';
+import { HistoryDetailModal } from '@/components/business/history/history-detail-modal';
+import { PaginationControls } from '@/components/business/history/pagination-controls';
+import { api } from '@/convex/_generated/api';
 import { siteConfig } from '@/config/site';
-import { mockHistoryItems } from './_data/mock-history';
+import { useRouter } from 'next/navigation';
+import { useUserStore } from '@/stores/user-store';
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
 type FilterMode = 'all' | GenerationMode;
 type DateRange = 'today' | 'last7Days' | 'last30Days' | 'thisMonth' | 'allTime';
 
-interface HistoryItem {
+export interface HistoryItem {
   id: string;
   imageUrl: string;
   prompt: string;
@@ -54,81 +32,87 @@ interface HistoryItem {
   quality: string;
   aspectRatio: string;
   creditsUsed: number;
-  createdAt: Date;
+  createdAt: number | Date;
+  status: string;
+  outputImages?: string[];
+}
+
+const ITEMS_PER_PAGE = 12;
+
+// Debounce hook for search
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
 }
 
 export default function HistoryPage() {
   const { t } = usePageTranslation('history');
   const { t: tCommon } = useCommonTranslation();
-  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+
+  // Get user from Zustand store
+  const convexUserId = useUserStore((state) => state.convexUserId);
+  const isUserSynced = useUserStore((state) => state.isSynced);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
   const [dateRange, setDateRange] = useState<DateRange>('allTime');
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const ITEMS_PER_PAGE = 8;
-
-  useEffect(() => {
-    setMounted(true);
-    document.title = `${t('title')} | ${siteConfig.name}`;
-
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, [t]);
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, filterMode, dateRange]);
-
-  const stats = useMemo(() => {
-    const total = mockHistoryItems.length;
-    const textToImage = mockHistoryItems.filter((item) => item.mode === 'text-to-image').length;
-    const imageToImage = mockHistoryItems.filter((item) => item.mode === 'image-to-image').length;
-    const creditsUsed = mockHistoryItems.reduce((sum, item) => sum + item.creditsUsed, 0);
-    return { total, textToImage, imageToImage, creditsUsed };
-  }, []);
-
-  const filteredItems = useMemo(() => {
-    return mockHistoryItems.filter((item) => {
-      if (searchQuery && !item.prompt.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
-      }
-      if (filterMode !== 'all' && item.mode !== filterMode) {
-        return false;
-      }
-      if (dateRange !== 'allTime') {
-        const now = new Date();
-        const itemDate = item.createdAt;
-        const daysDiff = Math.floor((now.getTime() - itemDate.getTime()) / (1000 * 60 * 60 * 24));
-
-        if (dateRange === 'today' && daysDiff > 0) return false;
-        if (dateRange === 'last7Days' && daysDiff > 7) return false;
-        if (dateRange === 'last30Days' && daysDiff > 30) return false;
-        if (dateRange === 'thisMonth') {
-          const currentMonth = now.getMonth();
-          const currentYear = now.getFullYear();
-          if (itemDate.getMonth() !== currentMonth || itemDate.getFullYear() !== currentYear) {
-            return false;
-          }
+  // Convex queries using Zustand user ID
+  const generationsData = useQuery(
+    api.generations.getUserGenerationsById,
+    convexUserId
+      ? {
+          userId: convexUserId as any,
+          searchQuery: debouncedSearchQuery || undefined,
+          mode: filterMode,
+          dateRange,
+          limit: ITEMS_PER_PAGE,
+          cursor: currentPage > 1 ? String((currentPage - 1) * ITEMS_PER_PAGE) : undefined,
         }
-      }
-      return true;
-    });
-  }, [searchQuery, filterMode, dateRange]);
+      : 'skip'
+  );
 
-  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+  const stats = useQuery(
+    api.generations.getUserGenerationStatsById,
+    convexUserId ? { userId: convexUserId as any } : 'skip'
+  );
 
-  const paginatedItems = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredItems, currentPage]);
+  // Debug logging
+  useEffect(() => {
+    console.log('convexUserId from Zustand:', convexUserId);
+    console.log('isUserSynced:', isUserSynced);
+    console.log('generationsData:', generationsData);
+    console.log('stats:', stats);
+  }, [convexUserId, isUserSynced, generationsData, stats]);
+
+  // Convex mutations
+  const clearMockData = useMutation(api.generations.clearMockGenerations);
+  const deleteGeneration = useMutation(api.generations.deleteGeneration);
+
+  const isLoading = !isUserSynced || generationsData === undefined || stats === undefined;
+
+  const items = useMemo(() => {
+    return (generationsData?.items || []).map((item) => ({
+      ...item,
+      createdAt: item.createdAt,
+    }));
+  }, [generationsData]);
+
+  const totalPages = useMemo(() => {
+    if (!generationsData?.total) return 1;
+    return Math.ceil(generationsData.total / ITEMS_PER_PAGE);
+  }, [generationsData]);
 
   const modeOptions = [
     { value: 'all' as FilterMode, label: t('filters.all') },
@@ -144,7 +128,8 @@ export default function HistoryPage() {
     { value: 'allTime', label: t('filters.dateRange.allTime') },
   ];
 
-  const formatDate = (date: Date) => {
+  const formatDate = useCallback((timestamp: number | Date) => {
+    const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / (1000 * 60));
@@ -157,7 +142,7 @@ export default function HistoryPage() {
     if (days < 7) return tCommon('time.daysAgo', { count: days });
 
     return date.toLocaleDateString();
-  };
+  }, [tCommon]);
 
   const handleCopyPrompt = (item: HistoryItem) => {
     navigator.clipboard.writeText(item.prompt);
@@ -165,23 +150,70 @@ export default function HistoryPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     if (confirm(t('delete.confirm'))) {
-      alert(t('delete.success'));
+      try {
+        await deleteGeneration({ generationId: id as any });
+        if (selectedItem?.id === id) {
+          setSelectedItem(null);
+        }
+      } catch (error) {
+        console.error('Failed to delete:', error);
+        alert('删除失败');
+      }
+    }
+  }, [deleteGeneration, selectedItem, t]);
+
+  // 创建测试数据 - 使用 API 路由
+  const handleCreateMockData = async () => {
+    try {
+      const response = await fetch('/api/seed/generations?count=50');
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Failed to seed data:', error);
+        alert('生成测试数据失败: ' + (error.error || '未知错误'));
+        return;
+      }
+      const result = await response.json();
+      console.log('Created mock data:', result);
+      alert(`成功生成 ${result.data?.created || 0} 条测试数据`);
+    } catch (error) {
+      console.error('Failed to create mock data:', error);
+      alert('生成测试数据失败');
     }
   };
 
-  const StatCard = ({ icon: Icon, label, value, color = 'text-purple-400' }: any) => (
-    <div className="flex items-center gap-3 px-4 py-3 bg-card/30 rounded-xl border border-border/50">
-      <div className={`w-10 h-10 rounded-lg bg-current/10 flex items-center justify-center ${color}`}>
-        <Icon className="w-5 h-5" />
+  // 清除测试数据
+  const handleClearMockData = async () => {
+    try {
+      await clearMockData();
+    } catch (error) {
+      console.error('Failed to clear mock data:', error);
+    }
+  };
+
+  // Reset to page 1 when search/filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchQuery, filterMode, dateRange]);
+
+  // Show loading while waiting for user sync
+  if (!isUserSynced) {
+    return (
+      <div className="relative min-h-screen bg-background">
+        <Header />
+        <main className="relative pt-24 pb-16">
+          <Container className="max-w-7xl mx-auto">
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin mb-4" />
+              <p className="text-muted-foreground">正在同步用户信息...</p>
+            </div>
+          </Container>
+        </main>
+        <Footer />
       </div>
-      <div>
-        <p className="text-2xl font-bold text-foreground">{value}</p>
-        <p className="text-xs text-muted-foreground">{label}</p>
-      </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -194,21 +226,45 @@ export default function HistoryPage() {
 
       <main className="relative pt-24 pb-16">
         <Container className="max-w-7xl mx-auto">
+          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="mb-8"
           >
-            <div className="flex items-center gap-3 mb-2">
-              <Clock className="w-6 h-6 text-purple-400" />
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-                {t('title')}
-              </h1>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Clock className="w-6 h-6 text-purple-400" />
+                <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+                  {t('title')}
+                </h1>
+              </div>
+              {/* 开发工具：创建/清除测试数据 */}
+              <div className="hidden lg:flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCreateMockData}
+                  className="text-muted-foreground hover:text-purple-400"
+                >
+                  <Wand2 className="w-4 h-4 mr-1" />
+                  生成测试数据
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearMockData}
+                  className="text-muted-foreground hover:text-red-400"
+                >
+                  清除测试数据
+                </Button>
+              </div>
             </div>
-            <p className="text-muted-foreground text-lg">{t('subtitle')}</p>
+            <p className="text-muted-foreground text-lg mt-2">{t('subtitle')}</p>
           </motion.div>
 
+          {/* Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -218,125 +274,68 @@ export default function HistoryPage() {
             <StatCard
               icon={ImageIcon}
               label={t('stats.total')}
-              value={mounted ? stats.total : '—'}
+              value={isLoading ? '—' : stats?.total || 0}
               color="text-purple-400"
             />
             <StatCard
               icon={Layers}
               label={t('stats.textToImage')}
-              value={mounted ? stats.textToImage : '—'}
+              value={isLoading ? '—' : stats?.textToImage || 0}
               color="text-cyan-400"
             />
             <StatCard
               icon={ImageIcon}
               label={t('stats.imageToImage')}
-              value={mounted ? stats.imageToImage : '—'}
+              value={isLoading ? '—' : stats?.imageToImage || 0}
               color="text-pink-400"
             />
             <StatCard
               icon={Sparkles}
               label={t('stats.creditsUsed')}
-              value={mounted ? stats.creditsUsed : '—'}
+              value={isLoading ? '—' : stats?.creditsUsed || 0}
               color="text-amber-400"
             />
           </motion.div>
 
+          {/* Filters */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50 p-6 mb-8"
           >
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={t('filters.search.placeholder')}
-                  className="w-full pl-12 pr-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-muted/50 rounded-full transition-colors"
-                  >
-                    <X className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                )}
-              </div>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="min-w-36 justify-between"
-                  >
-                    <span className="text-sm">
-                      {modeOptions.find((o) => o.value === filterMode)?.label}
-                    </span>
-                    <ChevronDown className="w-4 h-4 ml-2" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="min-w-36">
-                  {modeOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onClick={() => setFilterMode(option.value)}
-                      className={cn(
-                        'justify-between',
-                        filterMode === option.value && 'text-purple-400'
-                      )}
-                    >
-                      {option.label}
-                      {filterMode === option.value && (
-                        <Check className="w-4 h-4" />
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="min-w-40 justify-between"
-                  >
-                    <span className="text-sm">
-                      {dateOptions.find((o) => o.value === dateRange)?.label}
-                    </span>
-                    <ChevronDown className="w-4 h-4 ml-2" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="min-w-40">
-                  {dateOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onClick={() => setDateRange(option.value)}
-                      className={cn(
-                        'justify-between',
-                        dateRange === option.value && 'text-purple-400'
-                      )}
-                    >
-                      {option.label}
-                      {dateRange === option.value && (
-                        <Check className="w-4 h-4" />
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <FilterBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              filterMode={filterMode}
+              onFilterModeChange={setFilterMode}
+              dateRange={dateRange}
+              onDateRangeChange={setDateRange}
+              modeOptions={modeOptions}
+              dateOptions={dateOptions}
+            />
           </motion.div>
 
-          {isLoading ? (
+          {/* Search debug info - remove after fixing */}
+          {debouncedSearchQuery && (
+            <div className="mb-4 p-3 bg-purple-500/10 rounded-lg text-sm">
+              <span className="text-muted-foreground">搜索关键词: </span>
+              <span className="text-purple-400 font-medium">{debouncedSearchQuery}</span>
+              <span className="text-muted-foreground ml-4">结果: </span>
+              <span className="text-foreground font-medium">{items.length} 条</span>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {isLoading && (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin mb-4" />
               <p className="text-muted-foreground">{t('gallery.loading')}</p>
             </div>
-          ) : filteredItems.length === 0 ? (
+          )}
+
+          {/* Empty State */}
+          {!isLoading && items.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -346,267 +345,90 @@ export default function HistoryPage() {
                 <ImageIcon className="w-10 h-10 text-muted-foreground/50" />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                {searchQuery ? t('filters.search.noResults') : t('gallery.empty')}
+                {debouncedSearchQuery ? t('filters.search.noResults') : t('gallery.empty')}
               </h3>
               <p className="text-muted-foreground mb-6 max-w-md">
-                {t('emptyDesc')}
+                {debouncedSearchQuery
+                  ? `未找到包含 "${debouncedSearchQuery}" 的结果，请尝试其他关键词`
+                  : t('emptyDesc')
+                }
               </p>
-              <Button variant="primary" onClick={() => (window.location.href = '/create')}>
-                <Plus className="w-5 h-5 mr-2" />
-                {t('gallery.createNow')}
-              </Button>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-                {paginatedItems.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="group relative aspect-square rounded-xl overflow-hidden border border-border/50 bg-card/30 cursor-pointer"
-                    onClick={() => setSelectedItem(item)}
-                  >
-                    <img
-                      src={item.imageUrl}
-                      alt={item.prompt}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                    <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="text-xs text-white/80 mb-2 line-clamp-2">
-                        {item.prompt}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-white/60">
-                          {formatDate(item.createdAt)}
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCopyPrompt(item);
-                            }}
-                            className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm"
-                            title={t('card.copyPrompt')}
-                          >
-                            {copiedId === item.id ? (
-                              <Check className="w-3.5 h-3.5 text-green-400" />
-                            ) : (
-                              <Copy className="w-3.5 h-3.5 text-white" />
-                            )}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
-                            className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm"
-                            title={t('card.download')}
-                          >
-                            <Download className="w-3.5 h-3.5 text-white" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedItem(item);
-                            }}
-                            className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm"
-                            title={t('card.viewDetails')}
-                          >
-                            <Eye className="w-3.5 h-3.5 text-white" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+              <div className="flex items-center gap-3">
+                <Button variant="primary" onClick={() => router.push('/create')}>
+                  <Plus className="w-5 h-5 mr-2" />
+                  {t('gallery.createNow')}
+                </Button>
+                {/* 移动端显示生成测试数据按钮 */}
+                <Button
+                  variant="outline"
+                  onClick={handleCreateMockData}
+                  className="lg:hidden"
+                >
+                  <Wand2 className="w-4 h-4 mr-2" />
+                  生成测试数据
+                </Button>
               </div>
-
-              {totalPages > 1 && (
-                <Pagination className="mt-8">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() => {
-                          if (currentPage > 1) setCurrentPage(currentPage - 1);
-                        }}
-                        disabled={currentPage === 1}
-                      />
-                    </PaginationItem>
-
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          onClick={() => setCurrentPage(page)}
-                          isActive={currentPage === page}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() => {
-                          if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-                        }}
-                        disabled={currentPage === totalPages}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              )}
             </motion.div>
+          )}
+
+          {/* Content */}
+          {!isLoading && items.length > 0 && (
+            <>
+              <HistoryGrid
+                items={items}
+                copiedId={copiedId}
+                onCopyPrompt={handleCopyPrompt}
+                onViewDetails={setSelectedItem}
+                formatDate={formatDate}
+                labels={{
+                  copyPrompt: t('card.copyPrompt'),
+                  download: t('card.download'),
+                  viewDetails: t('card.viewDetails'),
+                  empty: t('gallery.empty'),
+                  emptyDesc: t('emptyDesc'),
+                  createNow: t('gallery.createNow'),
+                  noResults: t('filters.search.noResults'),
+                  searchQuery,
+                }}
+              />
+
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </>
           )}
         </Container>
       </main>
 
-      <AnimatePresence>
-        {selectedItem && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-            onClick={() => setSelectedItem(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-card/95 backdrop-blur-xl rounded-2xl border border-border/50 shadow-2xl"
-            >
-              <button
-                onClick={() => setSelectedItem(null)}
-                className="absolute top-4 right-4 z-10 p-2 bg-muted/50 rounded-full hover:bg-muted transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="grid md:grid-cols-2 gap-0">
-                <div className="relative aspect-square bg-black/50">
-                  <img
-                    src={selectedItem.imageUrl}
-                    alt={selectedItem.prompt}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-
-                <div className="p-6 space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-3">
-                      {t('detail.prompt')}
-                    </h3>
-                    <div className="bg-background/50 rounded-xl p-4 border border-border/50">
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {selectedItem.prompt}
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mt-3 text-muted-foreground"
-                      onClick={() => handleCopyPrompt(selectedItem)}
-                    >
-                      {copiedId === selectedItem.id ? (
-                        <Check className="w-4 h-4 mr-2 text-green-400" />
-                      ) : (
-                        <Copy className="w-4 h-4 mr-2" />
-                      )}
-                      {copiedId === selectedItem.id ? tCommon('actions.confirm') : t('card.copyPrompt')}
-                    </Button>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-3">
-                      {t('detail.parameters.title')}
-                    </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
-                        <p className="text-xs text-muted-foreground mb-1">
-                          {t('detail.parameters.mode')}
-                        </p>
-                        <p className="text-sm font-medium text-foreground">
-                          {selectedItem.mode === 'text-to-image'
-                            ? t('filters.textToImage')
-                            : t('filters.imageToImage')}
-                        </p>
-                      </div>
-                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
-                        <p className="text-xs text-muted-foreground mb-1">
-                          {t('detail.parameters.size')}
-                        </p>
-                        <p className="text-sm font-medium text-foreground">
-                          {selectedItem.size}
-                        </p>
-                      </div>
-                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
-                        <p className="text-xs text-muted-foreground mb-1">
-                          {t('detail.parameters.quality')}
-                        </p>
-                        <p className="text-sm font-medium text-foreground">
-                          {selectedItem.quality}
-                        </p>
-                      </div>
-                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
-                        <p className="text-xs text-muted-foreground mb-1">
-                          {t('detail.parameters.aspectRatio')}
-                        </p>
-                        <p className="text-sm font-medium text-foreground">
-                          {selectedItem.aspectRatio}
-                        </p>
-                      </div>
-                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
-                        <p className="text-xs text-muted-foreground mb-1">
-                          {t('detail.parameters.creditsUsed')}
-                        </p>
-                        <p className="text-sm font-medium text-foreground">
-                          {selectedItem.creditsUsed} {tCommon('credits.label')}
-                        </p>
-                      </div>
-                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
-                        <p className="text-xs text-muted-foreground mb-1">
-                          {t('card.date')}
-                        </p>
-                        <p className="text-sm font-medium text-foreground">
-                          {formatDate(selectedItem.createdAt)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 pt-2">
-                    <Button variant="primary" className="flex-1">
-                      <Download className="w-4 h-4 mr-2" />
-                      {t('detail.actions.download')}
-                    </Button>
-                    <Button variant="secondary" className="flex-1">
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      {t('card.regenerate')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                      onClick={() => handleDelete(selectedItem.id)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      {t('card.delete')}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <HistoryDetailModal
+        item={selectedItem}
+        isOpen={!!selectedItem}
+        onClose={() => setSelectedItem(null)}
+        copiedId={copiedId}
+        onCopyPrompt={handleCopyPrompt}
+        onDelete={handleDelete}
+        formatDate={formatDate}
+        labels={{
+          prompt: t('detail.prompt'),
+          parameters: t('detail.parameters.title'),
+          mode: t('detail.parameters.mode'),
+          size: t('detail.parameters.size'),
+          quality: t('detail.parameters.quality'),
+          aspectRatio: t('detail.parameters.aspectRatio'),
+          creditsUsed: t('detail.parameters.creditsUsed'),
+          date: t('card.date'),
+          download: t('detail.actions.download'),
+          regenerate: t('card.regenerate'),
+          delete: t('card.delete'),
+          copyPrompt: t('card.copyPrompt'),
+          confirmCopy: tCommon('actions.confirm'),
+          textToImage: t('filters.textToImage'),
+          imageToImage: t('filters.imageToImage'),
+          credits: tCommon('credits.label'),
+        }}
+      />
 
       <Footer />
     </div>

@@ -97,7 +97,48 @@ export const addCredits = mutation({
   },
 });
 
-// 扣减积分 (生图时)
+// 同步用户（客户端直接调用）
+// 检查用户是否存在，不存在则创建
+export const syncUser = mutation({
+  args: {
+    clerkId: v.string(),
+    email: v.string(),
+    name: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .unique();
+
+    if (existing) {
+      // 更新用户信息（如果有变化）
+      const updates: Partial<typeof existing> = {};
+      if (args.name && args.name !== existing.name) updates.name = args.name;
+      if (args.imageUrl && args.imageUrl !== existing.imageUrl) updates.imageUrl = args.imageUrl;
+      if (args.email && args.email !== existing.email) updates.email = args.email;
+
+      if (Object.keys(updates).length > 0) {
+        await ctx.db.patch(existing._id, updates);
+      }
+
+      return { userId: existing._id, isNew: false };
+    }
+
+    // 创建新用户
+    const userId = await ctx.db.insert("users", {
+      clerkId: args.clerkId,
+      email: args.email,
+      name: args.name,
+      imageUrl: args.imageUrl,
+      credits: 3, // 新用户送 3 积分
+      createdAt: Date.now(),
+    });
+
+    return { userId, isNew: true };
+  },
+});
 export const deductCredits = mutation({
   args: {
     userId: v.id("users"),

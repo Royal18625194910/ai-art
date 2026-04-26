@@ -2,39 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Sparkles,
-  Image as ImageIcon,
-  X,
-  ChevronDown,
-  Download,
-  RefreshCw,
-  Copy,
-  Plus,
-  Wand2,
-  Layers,
-  Sliders,
-  Info,
-  Check,
-  Loader2,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Wand2, Info } from 'lucide-react';
 import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { Button } from '@/components/ui/button';
 import { Container } from '@/components/ui/container';
-import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { FileUpload, type UploadedFile } from '@/components/ui/file-upload';
-import { useGeneration, type TaskState } from '@/hooks/use-generation';
-import { useFileUpload } from '@/hooks/use-file-upload';
+import { UploadedFile } from '@/components/ui/file-upload';
+import { useGeneration, type GenerationState } from '@/hooks/use-generation';
 import { siteConfig } from '@/config/site';
+import { ModeSelector } from '@/components/business/create/mode-selector';
+import { TextToImageForm } from '@/components/business/create/text-to-image-form';
+import { ImageToImageForm } from '@/components/business/create/image-to-image-form';
+import { ParametersPanel } from '@/components/business/create/parameters-panel';
+import { GenerationProgress } from '@/components/business/create/generation-progress';
+import { ResultsGrid } from '@/components/business/create/results-grid';
+import { TipsPanel } from '@/components/business/create/tips-panel';
+import { GenerateActionBar } from '@/components/business/create/generate-action-bar';
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
 
@@ -72,46 +55,32 @@ export default function CreatePage() {
     },
   });
 
-  const {
-    upload: uploadFile,
-    isUploading,
-    progress: uploadProgress,
-  } = useFileUpload({
-    onSuccess: (uploaded) => {
-      setUploadedImages((prev) => [...prev, uploaded]);
-    },
-    onError: (err) => {
-      console.error('Upload error:', err);
-      alert(tCommon('actions.retry') + ': ' + err);
-    },
-  });
-
   useEffect(() => {
     setMounted(true);
     document.title = `${t('title')} | ${siteConfig.name}`;
   }, [t]);
 
-  const qualityOptions = tObject('parameters.size.options') as Record<string, string> || {
-    '1k': '1K (1积分)',
-    '4k': '4K (2积分)',
-  };
+  const qualityOptions = Object.entries(
+    (tObject('parameters.size.options') as Record<string, string>) || {
+      '1k': '1K (1积分)',
+      '4k': '4K (2积分)',
+    }
+  ).map(([key, value]) => ({ key, label: value }));
 
-  const aspectRatioOptions = tObject('parameters.aspectRatio.options') as Record<string, string> || {
-    '1:1': '1:1 头像/商品图',
-    '16:9': '16:9 封面/横版',
-    '9:16': '9:16 短视频/壁纸',
-    '4:3': '4:3 传统照片',
-    '3:4': '3:4 笔记/详情页',
-    '21:9': '21:9 电影/超宽屏',
-    '2:3': '2:3 海报/Pinterest',
-  };
+  const aspectRatioOptions = Object.entries(
+    (tObject('parameters.aspectRatio.options') as Record<string, string>) || {
+      '1:1': '1:1 头像/商品图',
+      '16:9': '16:9 封面/横版',
+      '9:16': '9:16 短视频/壁纸',
+      '4:3': '4:3 传统照片',
+      '3:4': '3:4 笔记/详情页',
+      '21:9': '21:9 电影/超宽屏',
+      '2:3': '2:3 海报/Pinterest',
+    }
+  ).map(([key, value]) => ({ key, label: value }));
 
-  const promptExamples = tArray('textToImage.examples');
-  const tipsItems = tArray('tips.items');
-
-  const handleExampleClick = (example: string) => {
-    setPrompt(example);
-  };
+  const promptExamples = (tArray('textToImage.examples') as string[]).map((text) => ({ text }));
+  const tipsItems = tArray('tips.items') as string[];
 
   const handleModeChange = (newMode: GenerationMode) => {
     setMode(newMode);
@@ -154,34 +123,30 @@ export default function CreatePage() {
     document.body.removeChild(link);
   };
 
-  const getStatusText = (state: TaskState | null) => {
+  const getStatusText = (state: GenerationState | null) => {
     switch (state) {
-      case 'waiting':
-        return '等待中...';
-      case 'queuing':
-        return '排队中...';
+      case 'idle':
+        return '准备中...';
       case 'generating':
         return '生成中...';
       case 'success':
         return '生成成功';
-      case 'fail':
+      case 'failed':
         return '生成失败';
       default:
         return '';
     }
   };
 
-  const getStatusColor = (state: TaskState | null) => {
+  const getStatusColor = (state: GenerationState | null) => {
     switch (state) {
-      case 'waiting':
+      case 'idle':
         return 'text-yellow-400';
-      case 'queuing':
-        return 'text-orange-400';
       case 'generating':
         return 'text-blue-400';
       case 'success':
         return 'text-green-400';
-      case 'fail':
+      case 'failed':
         return 'text-red-400';
       default:
         return '';
@@ -189,6 +154,10 @@ export default function CreatePage() {
   };
 
   const estimatedCredits = selectedQuality === '1k' ? 1 : 2;
+  const canGenerate =
+    !isGenerating &&
+    prompt.trim() &&
+    (mode === 'text-to-image' || uploadedImages.length > 0);
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -201,6 +170,7 @@ export default function CreatePage() {
 
       <main className="relative pt-24 pb-16">
         <Container className="max-w-7xl mx-auto">
+          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -217,292 +187,92 @@ export default function CreatePage() {
           </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-8">
+            {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
+              {/* Mode Selection & Form */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50 p-6"
               >
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="flex bg-muted/50 rounded-xl p-1">
-                    <button
-                      onClick={() => handleModeChange('text-to-image')}
-                      className={cn(
-                        'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
-                        mode === 'text-to-image'
-                          ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20'
-                          : 'text-muted-foreground hover:text-foreground'
-                      )}
-                    >
-                      <Layers className="w-4 h-4" />
-                      {t('mode.textToImage')}
-                    </button>
-                    <button
-                      onClick={() => handleModeChange('image-to-image')}
-                      className={cn(
-                        'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
-                        mode === 'image-to-image'
-                          ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20'
-                          : 'text-muted-foreground hover:text-foreground'
-                      )}
-                    >
-                      <ImageIcon className="w-4 h-4" />
-                      {t('mode.imageToImage')}
-                    </button>
-                  </div>
-                </div>
+                <ModeSelector
+                  mode={mode}
+                  onModeChange={handleModeChange}
+                  textToImageLabel={t('mode.textToImage')}
+                  imageToImageLabel={t('mode.imageToImage')}
+                />
 
                 <AnimatePresence mode="wait">
                   {mode === 'text-to-image' ? (
-                    <motion.div
-                      key="text-to-image"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ duration: 0.3 }}
-                      className="space-y-4"
-                    >
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          {t('textToImage.title')}
-                        </label>
-                        <textarea
-                          value={prompt}
-                          onChange={(e) => setPrompt(e.target.value)}
-                          placeholder={t('textToImage.placeholder')}
-                          disabled={isGenerating}
-                          className="w-full h-32 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 resize-none transition-all disabled:opacity-50"
-                        />
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          {t('textToImage.tips')}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          {t('textToImage.examplesLabel')}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {promptExamples.map((example, index) => (
-                            <button
-                              key={index}
-                              onClick={() => handleExampleClick(example as string)}
-                              disabled={isGenerating}
-                              className="px-3 py-1.5 text-xs bg-purple-500/10 text-purple-300 rounded-lg hover:bg-purple-500/20 transition-colors border border-purple-500/20 disabled:opacity-50"
-                            >
-                              {(example as string).slice(0, 20)}...
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
+                    <TextToImageForm
+                      prompt={prompt}
+                      onPromptChange={setPrompt}
+                      examples={promptExamples}
+                      onExampleClick={setPrompt}
+                      isGenerating={isGenerating}
+                      title={t('textToImage.title')}
+                      placeholder={t('textToImage.placeholder')}
+                      tips={t('textToImage.tips')}
+                      examplesLabel={t('textToImage.examplesLabel')}
+                    />
                   ) : (
-                    <motion.div
-                      key="image-to-image"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.3 }}
-                      className="space-y-4"
-                    >
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          {t('imageToImage.uploadTitle')}
-                        </label>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          {t('imageToImage.uploadDesc')}
-                        </p>
-
-                        <FileUpload
-                          files={uploadedImages}
-                          onFilesChange={setUploadedImages}
-                          maxFiles={3}
-                          accept="image/*"
-                          uploadTitle={t('imageToImage.uploadTitle')}
-                          uploadDesc={t('imageToImage.uploadDesc')}
-                          dragHint={t('imageToImage.dragHint')}
-                          disabled={isGenerating}
-                        />
-
-                        <div className="mt-4 flex items-start gap-2 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                          <Info className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-sm text-purple-300">
-                              {t('imageToImage.tips')}
-                            </p>
-                            <p className="text-xs text-purple-300/70 mt-1">
-                              {t('imageToImage.maxFiles')} • {t('imageToImage.fileFormat')}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
-                          {t('textToImage.title')}
-                        </label>
-                        <textarea
-                          value={prompt}
-                          onChange={(e) => setPrompt(e.target.value)}
-                          placeholder={t('textToImage.placeholder')}
-                          disabled={isGenerating}
-                          className="w-full h-24 px-4 py-3 bg-background/50 border border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 resize-none transition-all disabled:opacity-50"
-                        />
-                      </div>
-                    </motion.div>
+                    <ImageToImageForm
+                      prompt={prompt}
+                      onPromptChange={setPrompt}
+                      uploadedImages={uploadedImages}
+                      onImagesChange={setUploadedImages}
+                      isGenerating={isGenerating}
+                      uploadTitle={t('imageToImage.uploadTitle')}
+                      uploadDesc={t('imageToImage.uploadDesc')}
+                      dragHint={t('imageToImage.dragHint')}
+                      tips={t('imageToImage.tips')}
+                      maxFilesLabel={t('imageToImage.maxFiles')}
+                      fileFormatLabel={t('imageToImage.fileFormat')}
+                      promptTitle={t('textToImage.title')}
+                      promptPlaceholder={t('textToImage.placeholder')}
+                    />
                   )}
                 </AnimatePresence>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50 p-6"
-              >
-                <div className="flex items-center gap-2 mb-6">
-                  <Sliders className="w-5 h-5 text-purple-400" />
-                  <h3 className="text-lg font-semibold text-foreground">
-                    {t('parameters.title')}
-                  </h3>
-                </div>
+              {/* Parameters */}
+              <ParametersPanel
+                selectedQuality={selectedQuality}
+                onQualityChange={setSelectedQuality}
+                aspectRatio={aspectRatio}
+                onAspectRatioChange={setAspectRatio}
+                qualityOptions={qualityOptions}
+                aspectRatioOptions={aspectRatioOptions}
+                isGenerating={isGenerating}
+                title={t('parameters.title')}
+                sizeLabel={t('parameters.size.label')}
+                aspectRatioLabel={t('parameters.aspectRatio.label')}
+              />
 
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm text-muted-foreground mb-2">
-                      {t('parameters.size.label')}
-                    </label>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button
-                          disabled={isGenerating}
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all disabled:opacity-50"
-                        >
-                          <span className="text-sm">{qualityOptions[selectedQuality]}</span>
-                          <ChevronDown className="w-4 h-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-full min-w-48">
-                        {Object.entries(qualityOptions).map(([key, value]) => (
-                          <DropdownMenuItem
-                            key={key}
-                            onClick={() => setSelectedQuality(key)}
-                            className={cn(
-                              'justify-between',
-                              selectedQuality === key && 'text-purple-400'
-                            )}
-                          >
-                            {value}
-                            {selectedQuality === key && (
-                              <Check className="w-4 h-4" />
-                            )}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+              {/* Generate Action */}
+              <GenerateActionBar
+                estimatedCredits={estimatedCredits}
+                isGenerating={isGenerating}
+                canGenerate={!!canGenerate}
+                onGenerate={handleGenerate}
+                state={state}
+                getStatusText={getStatusText}
+                useCreditsLabel={t('actions.useCredits')}
+                generatingLabel={t('actions.generating')}
+                generateLabel={t('actions.generate')}
+              />
 
-                  <div>
-                    <label className="block text-sm text-muted-foreground mb-2">
-                      {t('parameters.aspectRatio.label')}
-                    </label>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <button
-                          disabled={isGenerating}
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-background/50 border border-border/50 rounded-xl text-foreground hover:border-purple-500/50 transition-all disabled:opacity-50"
-                        >
-                          <span className="text-sm">{aspectRatioOptions[aspectRatio]}</span>
-                          <ChevronDown className="w-4 h-4" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-full min-w-48">
-                        {Object.entries(aspectRatioOptions).map(([key, value]) => (
-                          <DropdownMenuItem
-                            key={key}
-                            onClick={() => setAspectRatio(key)}
-                            className={cn(
-                              'justify-between',
-                              aspectRatio === key && 'text-purple-400'
-                            )}
-                          >
-                            {value}
-                            {aspectRatio === key && (
-                              <Check className="w-4 h-4" />
-                            )}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </motion.div>
+              {/* Progress */}
+              <GenerationProgress
+                isGenerating={isGenerating}
+                progress={progress}
+                state={state}
+                getStatusText={getStatusText}
+                getStatusColor={getStatusColor}
+              />
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50"
-              >
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
-                  <span className="text-sm text-purple-300">
-                    {t('actions.useCredits', { count: estimatedCredits })}
-                  </span>
-                </div>
-
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={handleGenerate}
-                  disabled={isGenerating || !prompt.trim() || (mode === 'image-to-image' && uploadedImages.length === 0)}
-                  className="w-full sm:w-auto"
-                >
-                  {isGenerating ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      {state ? getStatusText(state) : t('actions.generating')}
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5" />
-                      {t('actions.generate')}
-                    </span>
-                  )}
-                </Button>
-              </motion.div>
-
-              {/* 生成进度 */}
-              {isGenerating && progress > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50 p-6"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
-                      <span className="text-sm font-medium text-foreground">
-                        {getStatusText(state)}
-                      </span>
-                    </div>
-                    <span className={cn('text-sm font-medium', getStatusColor(state))}>
-                      {progress}%
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-purple-500 to-cyan-500"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progress}%` }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </div>
-                </motion.div>
-              )}
-
-              {/* 错误提示 */}
+              {/* Error */}
               {generateError && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -517,102 +287,23 @@ export default function CreatePage() {
                 </motion.div>
               )}
 
-              <AnimatePresence>
-                {result?.imageUrls && result.imageUrls.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50 p-6"
-                  >
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-2">
-                        <ImageIcon className="w-5 h-5 text-purple-400" />
-                        <h3 className="text-lg font-semibold text-foreground">
-                          {t('results.title')}
-                        </h3>
-                        <Badge variant="secondary" className="bg-green-500/10 text-green-400 border-green-500/20">
-                          {t('results.success')}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleCopyPrompt}
-                          className="text-muted-foreground hover:text-foreground"
-                        >
-                          <Copy className="w-4 h-4 mr-1" />
-                          {t('card.copyPrompt')}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleGenerate}
-                          disabled={isGenerating}
-                          className="text-muted-foreground hover:text-foreground"
-                        >
-                          <RefreshCw className="w-4 h-4 mr-1" />
-                          {t('card.regenerate')}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {result.imageUrls.map((img, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="group relative aspect-square rounded-xl overflow-hidden border border-border/50"
-                        >
-                          <img
-                            src={img}
-                            alt={`Generated ${index + 1}`}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                          <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-white/70">#{index + 1}</span>
-                              <div className="flex items-center gap-1">
-                                <button
-                                  onClick={() => handleDownload(img, index)}
-                                  className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm"
-                                >
-                                  <Download className="w-3.5 h-3.5 text-white" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* Results */}
+              <ResultsGrid
+                imageUrls={result?.imageUrls || []}
+                isGenerating={isGenerating}
+                onDownload={handleDownload}
+                onRegenerate={handleGenerate}
+                onCopyPrompt={handleCopyPrompt}
+                title={t('results.title')}
+                successLabel={t('results.success')}
+                copyLabel={t('card.copyPrompt')}
+                regenerateLabel={t('card.regenerate')}
+              />
             </div>
 
+            {/* Sidebar */}
             <div className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="bg-card/50 backdrop-blur-xl rounded-2xl border border-border/50 p-6 sticky top-24"
-              >
-                <h3 className="text-lg font-semibold text-foreground mb-4">
-                  💡 {t('tips.title')}
-                </h3>
-                <ul className="space-y-3">
-                  {tipsItems.map((tip, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="mt-1 w-1.5 h-1.5 rounded-full bg-purple-400 flex-shrink-0" />
-                      <span className="text-sm text-muted-foreground">{tip as string}</span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
+              <TipsPanel tips={tipsItems} title={`💡 ${t('tips.title')}`} />
             </div>
           </div>
         </Container>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Menu, X, Sparkles, ArrowRight, Coins } from 'lucide-react';
+import { Menu, X, Sparkles, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCommonTranslation } from '@/hooks/use-translation';
@@ -12,6 +12,7 @@ import { LanguageSwitcher } from '@/components/business/language-switcher';
 import { authNavItems, landingNavItems } from '@/config/site';
 import { useAuth, UserButton, SignInButton } from '@clerk/nextjs';
 import { useUserCredits } from '@/hooks/use-user-credits';
+import { AnimatedLoginButton } from '@/components/ui/animated-login-button';
 
 interface HeaderProps {
   className?: string;
@@ -38,7 +39,10 @@ export function Header({ className }: HeaderProps) {
       return pathname === '/';
     }
     if (href.startsWith('#')) {
-      return pathname === '/' && scrollPosition < 100;
+      // 只有在首页时才考虑 hash 导航的激活状态
+      // 简单处理：pathname === '/' 时，hash 链接不显示为激活
+      // 只有当滚动到对应 section 时才激活（可选实现 scroll spy）
+      return false; // 暂不显示 hash 链接为激活状态
     }
     return pathname === href || pathname.startsWith(href + '/');
   };
@@ -146,12 +150,9 @@ export function Header({ className }: HeaderProps) {
           <LanguageSwitcher variant="dropdown" />
           {isLoaded && !isSignedIn && (
             <SignInButton mode="redirect">
-              <Button variant="gradient" size="sm">
-                <span className="flex items-center gap-1">
-                  {nav.login}
-                  <ArrowRight className="w-4 h-4" />
-                </span>
-              </Button>
+              <AnimatedLoginButton>
+                {nav.login}
+              </AnimatedLoginButton>
             </SignInButton>
           )}
           {isLoaded && isSignedIn && (
@@ -236,12 +237,9 @@ export function Header({ className }: HeaderProps) {
               )}
               {isLoaded && !isSignedIn && (
                 <SignInButton mode="redirect">
-                  <Button variant="gradient" className="w-full justify-center">
-                    <span className="flex items-center gap-1">
-                      {nav.login}
-                      <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </Button>
+                  <AnimatedLoginButton className="w-full">
+                    {nav.login}
+                  </AnimatedLoginButton>
                 </SignInButton>
               )}
             </div>
