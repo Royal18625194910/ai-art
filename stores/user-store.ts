@@ -13,11 +13,12 @@ interface UserState {
   isLoading: boolean;
 
   // Actions
-  setUser: (user: Partial<Omit<UserState, 'setUser' | 'clearUser' | 'updateCredits'>>) => void;
+  setUser: (user: Partial<Omit<UserState, 'setUser' | 'clearUser' | 'updateCredits' | 'refreshUser'>>) => void;
   updateCredits: (credits: number) => void;
   clearUser: () => void;
   setLoading: (loading: boolean) => void;
   setSynced: (synced: boolean) => void;
+  refreshUser: () => Promise<void>;
 }
 
 export const useUserStore = create<UserState>()(
@@ -57,6 +58,13 @@ export const useUserStore = create<UserState>()(
 
       // Set synced state
       setSynced: (synced) => set({ isSynced: synced }),
+
+      // Refresh user data (placeholder - should be implemented with actual API call)
+      refreshUser: async () => {
+        // 触发页面重新加载用户数据
+        // 实际实现应该在 hooks/use-sync-user.ts 中
+        console.log('[UserStore] Refresh user requested');
+      },
     }),
     {
       name: 'user-storage',

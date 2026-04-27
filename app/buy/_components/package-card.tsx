@@ -1,12 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Crown, Zap, Coins } from 'lucide-react';
+import { Check, Crown, Zap, Coins, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CreditPackage } from '@/types';
 import { BuyTranslations } from '@/locales/types';
+import { getCreemProductId, isValidPackageId, PackageId } from '@/config/pricing';
+import { useUserStore } from '@/stores/user-store';
 
 interface Labels {
   popularLabel: string;
@@ -22,6 +25,57 @@ interface PackageCardProps {
 }
 
 export function PackageCard({ pkg, index, labels, t }: PackageCardProps) {
+  const userEmail = useUserStore((state) => state.email);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 验证并获取产品 ID
+  if (!isValidPackageId(pkg.id)) {
+    console.error(`Invalid package ID: ${pkg.id}`);
+    return null;
+  }
+
+  const productId = getCreemProductId(pkg.id as PackageId);
+
+  if (!productId) {
+    console.error(`Product ID not configured for package: ${pkg.id}`);
+    return null;
+  }
+
+  const handlePurchase = async () => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetch('/api/creem/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId,
+          metadata: {
+            packageId: pkg.id,
+            credits: String(pkg.credits),
+          },
+          customerEmail: userEmail,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.checkout_url) {
+        window.location.href = result.checkout_url;
+      } else {
+        console.error('Failed to create checkout:', result);
+        alert('创建支付失败，请重试');
+      }
+    } catch (error) {
+      console.error('Purchase error:', error);
+      alert('支付出错，请重试');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -84,8 +138,17 @@ export function PackageCard({ pkg, index, labels, t }: PackageCardProps) {
       <Button
         variant={pkg.isPopular ? 'primary' : 'secondary'}
         className="w-full cursor-pointer"
+        onClick={handlePurchase}
+        disabled={isLoading}
       >
-        {labels.ctaButton}
+        {isLoading ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            处理中...
+          </>
+        ) : (
+          labels.ctaButton
+        )}
       </Button>
     </motion.div>
   );

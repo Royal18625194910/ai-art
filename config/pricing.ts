@@ -83,12 +83,44 @@ export const pricingI18n = {
   },
 };
 
-// 基础数据（不含文案）
-const basePackages = [
-  { id: 'starter', credits: 20, price: 6.99, isPopular: false, savingsPercent: 0 },
-  { id: 'standard', credits: 60, price: 12.99, isPopular: true, savingsPercent: 35 },
-  { id: 'premium', credits: 200, price: 39.99, isPopular: false, savingsPercent: 46 },
-];
+// 套餐基础数据（包含 Creem 产品 ID）
+export const basePackages = [
+  {
+    id: 'starter',
+    creemProductId: process.env.NEXT_PUBLIC_CREEM_PRODUCT_STARTER || '',
+    credits: 20,
+    price: 6.99,
+    isPopular: false,
+    savingsPercent: 0,
+  },
+  {
+    id: 'standard',
+    creemProductId: process.env.NEXT_PUBLIC_CREEM_PRODUCT_STANDARD || '',
+    credits: 60,
+    price: 12.99,
+    isPopular: true,
+    savingsPercent: 35,
+  },
+  {
+    id: 'premium',
+    creemProductId: process.env.NEXT_PUBLIC_CREEM_PRODUCT_PREMIUM || '',
+    credits: 200,
+    price: 39.99,
+    isPopular: false,
+    savingsPercent: 46,
+  },
+] as const;
+
+// 套餐 ID 类型
+export type PackageId = typeof basePackages[number]['id'];
+
+// 有效的套餐 ID 列表
+const validPackageIds: PackageId[] = ['starter', 'standard', 'premium'];
+
+// 验证套餐 ID 是否有效
+export function isValidPackageId(id: string): id is PackageId {
+  return validPackageIds.includes(id as PackageId);
+}
 
 // 获取指定语言的套餐配置
 export function getCreditPackages(locale: Locale = 'zh'): CreditPackage[] {
@@ -105,6 +137,18 @@ export function getCreditPackages(locale: Locale = 'zh'): CreditPackage[] {
       features: packageI18n.features,
     };
   });
+}
+
+// 根据套餐 ID 获取 Creem 产品 ID
+export function getCreemProductId(packageId: PackageId): string {
+  const pkg = basePackages.find((p) => p.id === packageId);
+  return pkg?.creemProductId || '';
+}
+
+// 根据套餐 ID 获取积分数量
+export function getPackageCredits(packageId: PackageId): number {
+  const pkg = basePackages.find((p) => p.id === packageId);
+  return pkg?.credits || 0;
 }
 
 // 获取指定语言的文案

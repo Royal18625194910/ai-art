@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { usePageTranslation } from '@/hooks/use-translation';
@@ -8,7 +9,6 @@ import { useLanguageStore } from '@/stores/use-language-store';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Container } from '@/components/ui/container';
-import { siteConfig } from '@/config/site';
 import { getCreditPackages, getPricingLabels } from '@/config/pricing';
 
 import { HeaderSection } from './_components/header-section';
@@ -18,16 +18,16 @@ import { CreditInfo } from './_components/credit-info';
 export default function BuyPage() {
   const { t, tObject, tArray } = usePageTranslation('buy');
   const { locale } = useLanguageStore();
-  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
+  // 清除 URL 中的 Creem 回调参数
   useEffect(() => {
-    setMounted(true);
-    document.title = `${t('title')} | ${siteConfig.name}`;
-  }, [t]);
-
-  if (!mounted) {
-    return null;
-  }
+    const hasCallbackParams = searchParams.has('checkout_id') || searchParams.has('status');
+    if (hasCallbackParams) {
+      router.replace('/buy', { scroll: false });
+    }
+  }, [searchParams, router]);
 
   const packages = getCreditPackages(locale);
   const labels = getPricingLabels(locale);
@@ -55,10 +55,7 @@ export default function BuyPage() {
 
       <main className="relative pt-24 pb-16">
         <Container className="max-w-6xl mx-auto">
-          <HeaderSection
-            title={t('title')}
-            subtitle={t('subtitle')}
-          />
+          <HeaderSection title={t('title')} subtitle={t('subtitle')} />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -67,13 +64,7 @@ export default function BuyPage() {
             className="grid md:grid-cols-3 gap-6 mb-12"
           >
             {packages.map((pkg, index) => (
-              <PackageCard
-                key={pkg.id}
-                pkg={pkg}
-                index={index}
-                labels={labels}
-                t={t}
-              />
+              <PackageCard key={pkg.id} pkg={pkg} index={index} labels={labels} t={t} />
             ))}
           </motion.div>
 

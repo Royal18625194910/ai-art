@@ -14,6 +14,7 @@ export const buy = {
     savings: '省{percent}%',
     creditLabel: '积分',
     creditRulesDescription: '1 积分 = 1 张图片',
+    purchaseError: '购买失败，请重试',
     features: ['文生图生成', '图生图生成', '高清图片下载', '无水印'],
     creditInfo: {
       neverExpires: '永久有效',
@@ -38,6 +39,7 @@ export const buy = {
     savings: 'Save {percent}%',
     creditLabel: 'credits',
     creditRulesDescription: '1 credit = 1 image',
+    purchaseError: 'Purchase failed, please try again',
     features: ['Text to Image', 'Image to Image', 'HD Download', 'No Watermark'],
     creditInfo: {
       neverExpires: 'Never Expires',
@@ -62,6 +64,7 @@ export const buy = {
     savings: '省{percent}%',
     creditLabel: '積分',
     creditRulesDescription: '1 積分 = 1 張圖片',
+    purchaseError: '購買失敗，請重試',
     features: ['文生圖生成', '圖生圖生成', '高清圖片下載', '無水印'],
     creditInfo: {
       neverExpires: '永久有效',

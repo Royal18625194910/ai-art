@@ -137,6 +137,7 @@ export interface BuyTranslations {
   savings: string;
   creditLabel: string;
   creditRulesDescription: string;
+  purchaseError: string;
   features: string[];
   creditInfo: CreditInfoTranslations;
 }
