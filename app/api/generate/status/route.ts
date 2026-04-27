@@ -36,7 +36,6 @@ export async function GET(req: NextRequest) {
         generationId: generation._id,
         status: generation.status,
         outputImages: generation.outputImages,
-        outputImage: generation.outputImage,
         errorMessage: generation.errorMessage,
         createdAt: generation.createdAt,
         completedAt: generation.completedAt,

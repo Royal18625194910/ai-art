@@ -12,7 +12,7 @@ const aceClient = createAceDataClient({
 });
 
 function handleError(error: unknown): NextResponse {
-  console.error('Generate error:', error);
+  console.error('Edit error:', error);
 
   if (error instanceof AceDataError) {
     return NextResponse.json(
@@ -57,45 +57,63 @@ export async function POST(req: NextRequest) {
       }
 
       const body = await req.json();
-      const { mode, prompt, size, input_urls } = body;
+      const { prompt, size, images } = body;
 
       if (!prompt?.trim()) {
         return NextResponse.json({ error: 'Prompt is required', code: 422 }, { status: 422 });
       }
 
-      if (mode === 'image-to-image' && (!input_urls || input_urls.length === 0)) {
+      if (!images || !Array.isArray(images) || images.length === 0) {
         return NextResponse.json(
-          { error: 'Input images are required for image-to-image mode', code: 422 },
+          { error: 'Images are required for editing', code: 422 },
           { status: 422 }
         );
       }
 
-      let imageUrls: string[] = [];
+      // 先将 base64 图片上传到 Convex Storage 获取 URL
+      const imageUrls: string[] = [];
+      for (const base64Image of images) {
+        // 检查是否是 base64 格式
+        if (base64Image.startsWith('data:')) {
+          const [header, base64Data] = base64Image.split(',');
+          const mimeMatch = header.match(/data:(.*?);base64/);
+          const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+
+          const result = await convex.action(api.file.storeFile, {
+            base64Data,
+            mimeType,
+          });
+
+          if (!result.url) {
+            return NextResponse.json(
+              { error: 'Failed to upload image', code: 500 },
+              { status: 500 }
+            );
+          }
+          imageUrls.push(result.url);
+        } else {
+          // 已经是 URL，直接使用
+          imageUrls.push(base64Image);
+        }
+      }
+
+      let generatedImageUrls: string[] = [];
       let taskId: string = '';
 
       try {
-        // 先调用 Ace API 生成图片
-        if (mode === 'text-to-image') {
-          const response = await aceClient.createTextToImage({
-            model: 'gpt-image-2',
-            prompt: prompt.trim(),
-            size: size || '1024x1024',
-          });
-          taskId = response.task_id;
-          imageUrls = response.data.map(item => item.url);
-        } else {
-          // 图生图：支持多图片
-          const response = await aceClient.createImageToImage({
-            model: 'gpt-image-2',
-            image: input_urls,
-            prompt: prompt.trim(),
-            size: size || '1024x1024',
-          });
-          taskId = response.task_id;
-          imageUrls = response.data.map(item => item.url);
-        }
+        console.log('[Edit] Calling Ace API with:', { model: 'gpt-image-2', imageCount: imageUrls.length });
 
-        console.log('[Generate] Ace API success, images:', imageUrls.length);
+        // 先调用 Ace API 编辑图片
+        const response = await aceClient.createImageToImage({
+          model: 'gpt-image-2',
+          image: imageUrls,
+          prompt: prompt.trim(),
+          size: size || 'auto',
+        });
+        taskId = response.task_id;
+        generatedImageUrls = response.data.map(item => item.url);
+
+        console.log('[Edit] Ace API success, images:', generatedImageUrls.length);
 
         // 生成成功后，扣减积分
         await convex.mutation(api.users.deductCredits, {
@@ -103,32 +121,40 @@ export async function POST(req: NextRequest) {
           amount: 1,
         });
 
-        // 存储图片到 Convex 并创建生成记录
-        const storageResult = await convex.action(api.storage.storeImagesAndCreateGeneration, {
-          imageUrls,
-          userId: user._id,
-          mode,
-          prompt: prompt.trim(),
-          size: size || '1024x1024',
-          referenceImages: input_urls,
-          taskId,
-        });
+        // 存储生成的图片到 Convex
+        const finalImageUrls: string[] = [];
+        for (const url of generatedImageUrls) {
+          try {
+            const result = await convex.action(api.file.storeImageFromUrl, { url });
+            finalImageUrls.push(result.url);
+          } catch (err) {
+            console.error('Store image error:', err);
+            finalImageUrls.push(url); // 失败就用原 URL
+          }
+        }
 
-        const finalImageUrls = storageResult.success && storageResult.storedUrls.length > 0
-          ? storageResult.storedUrls
-          : imageUrls;
+        // 创建生成历史记录（一步完成）
+        await convex.mutation(api.generations.createGeneration, {
+          userId: user._id,
+          mode: 'image-to-image',
+          prompt: prompt.trim(),
+          size: size || 'auto',
+          referenceImages: imageUrls,
+          outputImages: finalImageUrls,
+          taskId,
+          creditsUsed: 1,
+        });
 
         return NextResponse.json({
           success: true,
           data: {
             taskId,
-            generationId: storageResult.generationId,
             imageUrls: finalImageUrls,
           },
         });
       } catch (apiError) {
         // API 失败，不存储任何记录，直接返回错误
-        console.error('[Generate] Ace API failed:', apiError);
+        console.error('[Edit] Ace API failed:', apiError);
         return handleError(apiError);
       }
     } finally {

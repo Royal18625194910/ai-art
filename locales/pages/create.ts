@@ -39,6 +39,7 @@ export const create = {
       aspectRatio: {
         label: '比例',
         options: {
+          'auto': '自动',
           '1:1': '1:1 头像/商品图',
           '16:9': '16:9 封面/横版',
           '9:16': '9:16 短视频/壁纸',
@@ -111,6 +112,7 @@ export const create = {
       aspectRatio: {
         label: 'Aspect Ratio',
         options: {
+          'auto': 'Auto',
           '1:1': '1:1 Avatar/Product',
           '16:9': '16:9 Cover/Landscape',
           '9:16': '9:16 Shorts/Wallpaper',
@@ -183,6 +185,7 @@ export const create = {
       aspectRatio: {
         label: '比例',
         options: {
+          'auto': '自動',
           '1:1': '1:1 頭像/商品圖',
           '16:9': '16:9 封面/橫版',
           '9:16': '9:16 短視頻/壁紙',

@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { useSyncUserToConvex } from '@/hooks/use-sync-user';
+import { ToastProvider } from '@/components/ui/toast';
 
 /**
  * 全局状态管理组件
@@ -16,8 +17,10 @@ function GlobalStateProvider({ children }: { children: ReactNode }) {
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <GlobalStateProvider>
-      {children}
-    </GlobalStateProvider>
+    <ToastProvider>
+      <GlobalStateProvider>
+        {children}
+      </GlobalStateProvider>
+    </ToastProvider>
   );
 }

@@ -16,18 +16,26 @@ import { HeaderSection } from './_components/header-section';
 import { PackageCard } from './_components/package-card';
 import { CreditInfo } from './_components/credit-info';
 import { RedemptionCard } from './_components/redemption-card';
+import { useToast } from '@/components/ui/toast';
 
-// 内部组件处理 URL 参数清理
+// 内部组件处理 URL 参数清理和成功提示
 function UrlCleanup() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { success } = useToast();
 
   useEffect(() => {
     const hasCallbackParams = searchParams.has('checkout_id') || searchParams.has('status');
+    const status = searchParams.get('status');
+
+    if (status === 'success') {
+      success('充值成功！积分已到账');
+    }
+
     if (hasCallbackParams) {
       router.replace('/buy', { scroll: false });
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, success]);
 
   return null;
 }
@@ -74,6 +82,13 @@ export default function BuyPage() {
         <Container className="max-w-6xl mx-auto">
           <HeaderSection title={t('title')} subtitle={t('subtitle')} />
 
+          {/* 中国大陆用户专享：闲鱼兑换 */}
+          {isChina && (
+            <div className="mb-12">
+              <RedemptionCard t={t} />
+            </div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -84,13 +99,6 @@ export default function BuyPage() {
               <PackageCard key={pkg.id} pkg={pkg} index={index} labels={labels} t={t} />
             ))}
           </motion.div>
-
-          {/* 中国大陆用户专享：闲鱼兑换 */}
-          {isChina && (
-            <div className="mb-12">
-              <RedemptionCard t={t} />
-            </div>
-          )}
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

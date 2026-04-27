@@ -37,11 +37,28 @@ export function useGeneration(options: UseGenerationOptions = {}) {
     setResult(null);
 
     try {
-      // 调用 API（同步等待，最长5分钟）
-      const response = await fetch('/api/generate', {
+      // 根据模式选择不同的 API 端点
+      // 文生图调用 /api/generate，图生图调用 /api/edit
+      const endpoint = params.mode === 'text-to-image' ? '/api/generate' : '/api/edit';
+
+      // 准备请求体
+      const requestBody = params.mode === 'text-to-image'
+        ? {
+            mode: params.mode,
+            prompt: params.prompt,
+            size: params.size || 'auto',
+          }
+        : {
+            // 图生图（编辑）请求体
+            prompt: params.prompt,
+            images: params.input_urls || [],
+            size: params.size || 'auto',
+          };
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();

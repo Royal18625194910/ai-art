@@ -27,7 +27,6 @@ export default defineSchema({
     negativePrompt: v.optional(v.string()),
     referenceImages: v.optional(v.array(v.string())),
     outputImages: v.optional(v.array(v.string())), // 生成的图片数组
-    outputImage: v.string(), // 兼容旧数据，单张图片
     aspectRatio: v.optional(v.string()), // 1:1, 9:16, 16:9, 4:3, 3:4
     resolution: v.optional(v.string()), // 1K, 2K, 4K
     size: v.string(), // 兼容旧数据

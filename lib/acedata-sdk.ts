@@ -37,8 +37,8 @@ export interface TextToImageParams {
 export interface ImageToImageParams {
   /** 模型名称，默认 'gpt-image-2' */
   model?: Model;
-  /** 输入图片 URL，必需 */
-  image: string;
+  /** 输入图片 URL(s)，可以是单个字符串或数组 */
+  image: string | string[];
   /** 提示词，必需 */
   prompt: string;
   /** 图片尺寸，默认 '1024x1024' */
@@ -119,13 +119,25 @@ export class AceDataClient {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-    const headers: HeadersInit = {
-      'Authorization': `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
+    // 使用 Headers 对象来正确合并 headers
+    const headers = new Headers();
+    headers.set('Authorization', `Bearer ${this.apiKey}`);
+
+    // 合并传入的 headers
+    if (options.headers) {
+      const incomingHeaders = new Headers(options.headers);
+      incomingHeaders.forEach((value, key) => {
+        headers.set(key, value);
+      });
+    }
+
+    // 自动添加 Content-Type 如果是 POST 且没有设置
+    if (options.method === 'POST' && options.body && !headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
 
     try {
+      console.log('[AceData SDK] Request:', url, 'headers:', Object.fromEntries(headers.entries()), 'body:', options.body);
       const response = await fetch(url, {
         ...options,
         headers,
@@ -198,17 +210,19 @@ export class AceDataClient {
       throw new AceDataError('prompt is required and cannot be empty', 422);
     }
 
-    if (!params.image?.trim()) {
+    if (!params.image || (Array.isArray(params.image) && params.image.length === 0)) {
       throw new AceDataError('image URL is required', 422);
     }
 
     const body = {
       model: params.model || 'gpt-image-2',
-      image: params.image.trim(),
+      image: params.image,
       prompt: params.prompt.trim(),
       size: params.size || '1024x1024',
       ...(params.user && { user: params.user }),
     };
+
+    console.log('[AceData SDK] createImageToImage body:', JSON.stringify(body));
 
     return this.request<ImageToImageResponse>('/openai/images/edits', {
       method: 'POST',

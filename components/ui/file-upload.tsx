@@ -196,7 +196,7 @@ export function FileUpload({
           <div className="pointer-events-none flex flex-col items-center justify-center p-6">
             <Upload
               className={cn(
-                'w-10 h-10 mb-3 transition-colors',
+                'w-6 h-6 mb-2 transition-colors',
                 isDragging ? 'text-purple-400' : 'text-muted-foreground'
               )}
             />
