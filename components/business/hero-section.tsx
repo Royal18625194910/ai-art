@@ -24,10 +24,10 @@ const STATS = [
 ];
 
 const SAMPLE_IMAGES = [
-  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=futuristic%20cyberpunk%20city%20at%20night%20with%20neon%20lights%20and%20flying%20cars%2C%20cinematic%2C%20highly%20detailed&image_size=square_hd',
-  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beautiful%20anime%20girl%20with%20pink%20hair%20and%20cherry%20blossoms%2C%20soft%20lighting%2C%20art%20station&image_size=square_hd',
-  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=surreal%20abstract%20art%20with%20flowing%20colors%20and%20geometric%20patterns%2C%20modern%20art&image_size=square_hd',
-  'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fantasy%20landscape%20with%20floating%20islands%20and%20crystal%20waterfalls%2C%20epic%20fantasy%20art&image_size=square_hd',
+  '/showcase/portrait-convenience-store.jpg',
+  '/showcase/poster-boston-spring.jpg',
+  '/showcase/ui-gacha-game.jpg',
+  '/showcase/infographic-hanfu.jpg',
 ];
 
 const containerVariants = {
@@ -199,7 +199,7 @@ export function HeroSection({ className }: HeroSectionProps) {
             transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="relative"
           >
-            <div className="relative flex items-center justify-center aspect-square">
+            <div className="relative flex items-center justify-center aspect-square max-w-[500px] mx-auto lg:max-w-none">
               <MagicRings
                 color="#8B5CF6"
                 colorTwo="#A78BFA"
@@ -211,7 +211,7 @@ export function HeroSection({ className }: HeroSectionProps) {
                 className="absolute inset-0"
               />
 
-              <div className="relative z-10 grid grid-cols-2 gap-4 p-8">
+              <div className="relative z-10 grid grid-cols-2 gap-4 md:gap-6 p-4 md:p-8 w-full">
                 {SAMPLE_IMAGES.map((src, index) => (
                   <motion.div
                     key={index}
@@ -223,17 +223,17 @@ export function HeroSection({ className }: HeroSectionProps) {
                     }}
                     className={cn(
                       'relative group rounded-2xl overflow-hidden shadow-xl shadow-purple-500/20 glass-card',
-                      index % 2 === 0 ? 'translate-y-6' : '-translate-y-6'
+                      index % 2 === 0 ? 'translate-y-4 md:translate-y-6' : '-translate-y-4 md:-translate-y-6'
                     )}
                     style={{
-                      transform: `translate(${index === 1 ? '20px' : index === 2 ? '-20px' : '0'}, ${index % 2 === 0 ? '30px' : '-20px'})`,
+                      transform: `translate(${index === 1 ? '10px' : index === 2 ? '-10px' : '0'}, ${index % 2 === 0 ? '20px' : '-15px'})`,
                     }}
                   >
                     <div className="absolute inset-0 bg-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
                     <img
                       src={src}
                       alt={`AI generated sample ${index + 1}`}
-                      className="w-28 h-28 md:w-36 md:h-36 object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="w-full h-auto aspect-square object-cover transition-transform duration-500 group-hover:scale-110"
                       loading="lazy"
                     />
                     <div className="absolute inset-0 border-2 border-purple-500/30 rounded-2xl group-hover:border-purple-500/60 transition-colors pointer-events-none" />

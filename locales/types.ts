@@ -79,11 +79,11 @@ export interface LandingFeaturesTranslations {
 
 export interface LandingGalleryCategories {
   all: string;
-  scifi: string;
-  anime: string;
-  fantasy: string;
-  abstract: string;
   portrait: string;
+  poster: string;
+  ui: string;
+  infographic: string;
+  photo: string;
 }
 
 export interface LandingGalleryTranslations {

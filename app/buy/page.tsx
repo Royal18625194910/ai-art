@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
@@ -15,19 +15,24 @@ import { HeaderSection } from './_components/header-section';
 import { PackageCard } from './_components/package-card';
 import { CreditInfo } from './_components/credit-info';
 
-export default function BuyPage() {
-  const { t, tObject, tArray } = usePageTranslation('buy');
-  const { locale } = useLanguageStore();
+// 内部组件处理 URL 参数清理
+function UrlCleanup() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 清除 URL 中的 Creem 回调参数
   useEffect(() => {
     const hasCallbackParams = searchParams.has('checkout_id') || searchParams.has('status');
     if (hasCallbackParams) {
       router.replace('/buy', { scroll: false });
     }
   }, [searchParams, router]);
+
+  return null;
+}
+
+export default function BuyPage() {
+  const { t, tObject, tArray } = usePageTranslation('buy');
+  const { locale } = useLanguageStore();
 
   const packages = getCreditPackages(locale);
   const labels = getPricingLabels(locale);
@@ -45,6 +50,10 @@ export default function BuyPage() {
 
   return (
     <div className="relative min-h-screen bg-background">
+      <Suspense fallback={null}>
+        <UrlCleanup />
+      </Suspense>
+
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl" />

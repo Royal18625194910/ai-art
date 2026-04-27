@@ -14,9 +14,9 @@ export const create = {
       tips: '提示词越详细，生成效果越好',
       examplesLabel: '示例：',
       examples: [
-        '赛博朋克风格的城市夜景，霓虹灯，雨夜，未来感',
-        '日式庭院，樱花盛开，小桥流水，宁静祥和',
-        '太空飞船在星云中航行，科幻风格，壮丽景观',
+        '便利店夜拍 - 真实城市街拍，年轻人夜间聚会场景',
+        '波士顿春天海报 - 水彩插画风格城市风景',
+        '日本手游抽卡界面 - 日式奇幻RPG游戏UI设计',
       ],
     },
     imageToImage: {
@@ -86,9 +86,9 @@ export const create = {
       tips: 'The more detailed the prompt, the better the result',
       examplesLabel: 'Examples:',
       examples: [
-        'Cyberpunk city at night, neon lights, rainy, futuristic',
-        'Japanese garden, cherry blossoms, small bridge, peaceful',
-        'Spaceship traveling through nebula, sci-fi style, magnificent view',
+        'Convenience store night scene - authentic urban street photography',
+        'Boston Spring poster - watercolor illustration cityscape',
+        'Japanese gacha game UI - fantasy RPG interface design',
       ],
     },
     imageToImage: {
@@ -158,9 +158,9 @@ export const create = {
       tips: '提示詞越詳細，生成效果越好',
       examplesLabel: '示例：',
       examples: [
-        '賽博朋克風格的城市夜景，霓虹燈，雨夜，未來感',
-        '日式庭院，櫻花盛開，小橋流水，寧靜祥和',
-        '太空飛船在星雲中航行，科瑏風格，壯麗景觀',
+        '便利店夜拍 - 真實城市街拍，年輕人夜間聚會場景',
+        '波士頓春天海報 - 水彩插畫風格城市風景',
+        '日本手遊抽卡界面 - 日式奇幻RPG遊戲UI設計',
       ],
     },
     imageToImage: {
