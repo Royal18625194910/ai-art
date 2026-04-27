@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Image as ImageIcon, Layers, Sparkles, Plus, Wand2 } from 'lucide-react';
+import { Clock, Image as ImageIcon, Layers, Sparkles, Plus } from 'lucide-react';
 import { useQuery, useMutation } from 'convex/react';
 import { usePageTranslation, useCommonTranslation } from '@/hooks/use-translation';
 import { Header } from '@/components/layout/header';
@@ -97,7 +97,6 @@ export default function HistoryPage() {
   }, [convexUserId, isUserSynced, generationsData, stats]);
 
   // Convex mutations
-  const clearMockData = useMutation(api.generations.clearMockGenerations);
   const deleteGeneration = useMutation(api.generations.deleteGeneration);
 
   const isLoading = !isUserSynced || generationsData === undefined || stats === undefined;
@@ -164,34 +163,6 @@ export default function HistoryPage() {
     }
   }, [deleteGeneration, selectedItem, t]);
 
-  // 创建测试数据 - 使用 API 路由
-  const handleCreateMockData = async () => {
-    try {
-      const response = await fetch('/api/seed/generations?count=50');
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('Failed to seed data:', error);
-        alert('生成测试数据失败: ' + (error.error || '未知错误'));
-        return;
-      }
-      const result = await response.json();
-      console.log('Created mock data:', result);
-      alert(`成功生成 ${result.data?.created || 0} 条测试数据`);
-    } catch (error) {
-      console.error('Failed to create mock data:', error);
-      alert('生成测试数据失败');
-    }
-  };
-
-  // 清除测试数据
-  const handleClearMockData = async () => {
-    try {
-      await clearMockData();
-    } catch (error) {
-      console.error('Failed to clear mock data:', error);
-    }
-  };
-
   // Reset to page 1 when search/filter changes
   useEffect(() => {
     setCurrentPage(1);
@@ -239,26 +210,6 @@ export default function HistoryPage() {
                 <h1 className="text-3xl md:text-4xl font-bold text-foreground">
                   {t('title')}
                 </h1>
-              </div>
-              {/* 开发工具：创建/清除测试数据 */}
-              <div className="hidden lg:flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCreateMockData}
-                  className="text-muted-foreground hover:text-purple-400"
-                >
-                  <Wand2 className="w-4 h-4 mr-1" />
-                  生成测试数据
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClearMockData}
-                  className="text-muted-foreground hover:text-red-400"
-                >
-                  清除测试数据
-                </Button>
               </div>
             </div>
             <p className="text-muted-foreground text-lg mt-2">{t('subtitle')}</p>
@@ -358,15 +309,6 @@ export default function HistoryPage() {
                   <Plus className="w-5 h-5 mr-2" />
                   {t('gallery.createNow')}
                 </Button>
-                {/* 移动端显示生成测试数据按钮 */}
-                <Button
-                  variant="outline"
-                  onClick={handleCreateMockData}
-                  className="lg:hidden"
-                >
-                  <Wand2 className="w-4 h-4 mr-2" />
-                  生成测试数据
-                </Button>
               </div>
             </motion.div>
           )}
@@ -420,7 +362,6 @@ export default function HistoryPage() {
           creditsUsed: t('detail.parameters.creditsUsed'),
           date: t('card.date'),
           download: t('detail.actions.download'),
-          regenerate: t('card.regenerate'),
           delete: t('card.delete'),
           copyPrompt: t('card.copyPrompt'),
           confirmCopy: tCommon('actions.confirm'),

@@ -61,9 +61,10 @@ export function TextToImageForm({
                 key={index}
                 onClick={() => onExampleClick(example.text)}
                 disabled={isGenerating}
-                className="px-3 py-1.5 text-xs bg-purple-500/10 text-purple-300 rounded-lg hover:bg-purple-500/20 transition-colors border border-purple-500/20 disabled:opacity-50"
+                className="px-2.5 sm:px-3 py-1.5 text-xs bg-purple-500/10 text-purple-300 rounded-lg hover:bg-purple-500/20 transition-colors border border-purple-500/20 disabled:opacity-50 whitespace-nowrap max-w-full truncate"
+                title={example.text}
               >
-                {example.text.slice(0, 20)}...
+                <span className="truncate block max-w-[120px] sm:max-w-[150px]">{example.text.slice(0, 15)}...</span>
               </button>
             ))}
           </div>

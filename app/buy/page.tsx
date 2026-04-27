@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
@@ -10,10 +10,12 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Container } from '@/components/ui/container';
 import { getCreditPackages, getPricingLabels } from '@/config/pricing';
+import { isChinaUser } from '@/lib/common/timezone';
 
 import { HeaderSection } from './_components/header-section';
 import { PackageCard } from './_components/package-card';
 import { CreditInfo } from './_components/credit-info';
+import { RedemptionCard } from './_components/redemption-card';
 
 // 内部组件处理 URL 参数清理
 function UrlCleanup() {
@@ -33,6 +35,7 @@ function UrlCleanup() {
 export default function BuyPage() {
   const { t, tObject, tArray } = usePageTranslation('buy');
   const { locale } = useLanguageStore();
+  const [isChina, setIsChina] = useState(false);
 
   const packages = getCreditPackages(locale);
   const labels = getPricingLabels(locale);
@@ -47,6 +50,11 @@ export default function BuyPage() {
     support: string;
     supportDesc: string;
   };
+
+  // 检测用户是否在中国大陆
+  useEffect(() => {
+    setIsChina(isChinaUser());
+  }, []);
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -76,6 +84,13 @@ export default function BuyPage() {
               <PackageCard key={pkg.id} pkg={pkg} index={index} labels={labels} t={t} />
             ))}
           </motion.div>
+
+          {/* 中国大陆用户专享：闲鱼兑换 */}
+          {isChina && (
+            <div className="mb-12">
+              <RedemptionCard t={t} />
+            </div>
+          )}
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

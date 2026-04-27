@@ -18,6 +18,15 @@ export const contactInfo = {
   supportEmail: '2326182533@qq.com',
 };
 
+// 闲鱼链接配置（中国大陆用户专享）
+export const xianyuConfig = {
+  enabled: true,
+  // 闲鱼商品链接 - 请替换为实际的闲鱼链接
+  link: 'https://www.goofish.com/',
+  // 兑换码说明
+  description: '购买后请复制兑换码，在下方输入框中兑换',
+};
+
 // 未登录时显示的导航（landing page 锚点）
 export const landingNavItems: NavItem[] = [
   {

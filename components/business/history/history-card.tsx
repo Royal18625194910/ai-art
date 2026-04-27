@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Download, Copy, Eye, Check } from 'lucide-react';
 import { HistoryItem } from '@/app/history/page';
+import { downloadImage } from '@/lib/common/download';
 
 interface HistoryCardProps {
   item: HistoryItem;
@@ -29,6 +30,14 @@ export function HistoryCard({
 }: HistoryCardProps) {
   // Use a placeholder if imageUrl is empty
   const imageUrl = item.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM2NjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (item.imageUrl) {
+      const filename = `ai-art-${item.id}-${Date.now()}.png`;
+      await downloadImage(item.imageUrl, filename);
+    }
+  };
 
   return (
     <motion.div
@@ -66,7 +75,7 @@ export function HistoryCard({
               )}
             </button>
             <button
-              onClick={(e) => e.stopPropagation()}
+              onClick={handleDownload}
               className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30 transition-colors backdrop-blur-sm"
               title={downloadLabel}
             >
