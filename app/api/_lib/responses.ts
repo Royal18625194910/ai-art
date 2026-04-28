@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { APIErrorCode, KIEAIError } from '@/lib/kie-ai-sdk';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -21,7 +20,7 @@ export function errorResponse(
   code: number = 500,
   details?: unknown
 ): NextResponse<ApiResponse> {
-  const statusCode = code === APIErrorCode.UNAUTHORIZED ? 401 : 500;
+  const statusCode = code === 401 ? 401 : 500;
 
   return NextResponse.json(
     {
@@ -36,10 +35,6 @@ export function errorResponse(
 
 export function handleApiError(error: unknown): NextResponse<ApiResponse> {
   console.error('API Error:', error);
-
-  if (error instanceof KIEAIError) {
-    return errorResponse(error.message, error.code, error.details);
-  }
 
   if (error instanceof Error) {
     return errorResponse(error.message);
