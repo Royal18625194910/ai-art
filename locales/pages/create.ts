@@ -67,7 +67,7 @@ export const create = {
     tips: {
       title: '创作技巧',
       items: [
-        '描述越详细，生成效果越好',
+        '不要直接用有名的角色或IP名称，可能会失败，建议用"图1中的角色"、"金色头发的女孩"等描述',
         '可以在提示词中包含风格、光线、构图等元素',
         '尝试不同的风格预设获得多样化效果',
         '使用"高清"、"精细"等词可提升画质',
@@ -140,7 +140,7 @@ export const create = {
     tips: {
       title: 'Tips',
       items: [
-        'More detailed descriptions produce better results',
+        'Avoid using famous character or IP names directly, it may fail. Use descriptions like "character in image 1", "girl with golden hair" instead',
         'Include style, lighting, composition in your prompt',
         'Try different style presets for variety',
         'Use words like "HD" or "detailed" for better quality',
@@ -213,7 +213,7 @@ export const create = {
     tips: {
       title: '創作技巧',
       items: [
-        '描述越詳細，生成效果越好',
+        '不要直接用有名的角色或IP名稱，可能會失敗，建議用"圖1中的角色"、"金色頭髮的女孩"等描述',
         '可以在提示詞中包含風格、光線、構圖等元素',
         '嘗試不同的風格預設獲得多樣化效果',
         '使用"高清"、"精細"等詞可提升畫質',

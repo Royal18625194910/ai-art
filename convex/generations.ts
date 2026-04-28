@@ -50,7 +50,6 @@ export const updateGenerationByTaskId = mutation({
     taskId: v.string(),
     status: v.union(v.literal("generating"), v.literal("success"), v.literal("failed")),
     outputImages: v.optional(v.array(v.string())),
-    outputImage: v.optional(v.string()),
     errorMessage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -69,12 +68,6 @@ export const updateGenerationByTaskId = mutation({
 
     if (args.outputImages !== undefined) {
       update.outputImages = args.outputImages;
-      // 兼容旧字段
-      update.outputImage = args.outputImages[0] ?? "";
-    }
-
-    if (args.outputImage !== undefined) {
-      update.outputImage = args.outputImage;
     }
 
     if (args.errorMessage !== undefined) {
@@ -96,7 +89,6 @@ export const updateGenerationStatus = mutation({
     generationId: v.id("generations"),
     status: v.union(v.literal("pending"), v.literal("generating"), v.literal("success"), v.literal("failed")),
     outputImages: v.optional(v.array(v.string())),
-    outputImage: v.optional(v.string()),
     errorMessage: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -106,11 +98,6 @@ export const updateGenerationStatus = mutation({
 
     if (args.outputImages !== undefined) {
       update.outputImages = args.outputImages;
-      update.outputImage = args.outputImages[0] ?? "";
-    }
-
-    if (args.outputImage !== undefined) {
-      update.outputImage = args.outputImage;
     }
 
     if (args.errorMessage !== undefined) {
@@ -457,127 +444,7 @@ export const clearMockGenerations = mutation({
   },
 });
 
-// Admin seed function - 从 Convex Dashboard 运行
-// 为指定用户创建大量测试数据
-export const seedGenerationsForUser = mutation({
-  args: {
-    userId: v.id("users"),
-    count: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const count = args.count ?? 50;
-    const user = await ctx.db.get(args.userId);
-
-    if (!user) {
-      throw new Error(`User not found: ${args.userId}`);
-    }
-
-    // 更丰富的测试数据
-    const textToImagePrompts = [
-      "A serene Japanese zen garden with cherry blossoms falling",
-      "Cyberpunk neon city street at rainy night",
-      "Cute corgi puppy wearing a bowtie, professional photo",
-      "Abstract fluid art with purple and gold swirls",
-      "Medieval castle on a cliff overlooking stormy seas",
-      "Minimalist modern living room with floor-to-ceiling windows",
-      "Astronaut floating in space with Earth reflection in helmet",
-      "Vintage vinyl record player with warm lighting",
-      "Tropical beach paradise with crystal clear turquoise water",
-      "Steampunk mechanical butterfly with intricate gears",
-      "Watercolor painting of lavender fields in Provence",
-      "Dark fantasy forest with bioluminescent plants",
-      "Art deco style portrait of a flapper girl",
-      "Futuristic flying car in a sleek metropolis",
-      "Cozy cottage interior with fireplace and books",
-      "Majestic lion portrait with dramatic lighting",
-      "Colorful hot air balloons over Cappadocia at sunrise",
-      "Retro 80s synthwave landscape with grid floor",
-      "Delicate origami crane made of cherry blossom petals",
-      "Underwater coral reef with tropical fish",
-    ];
-
-    const imageToImagePrompts = [
-      "Transform into Van Gogh style oil painting",
-      "Convert to black and white noir film aesthetic",
-      "Apply anime manga art style",
-      "Transform into watercolor illustration",
-      "Make it look like a 1980s polaroid photo",
-      "Apply impressionist painting style",
-      "Convert to pixel art game style",
-      "Transform into Art Nouveau poster",
-      "Apply cyberpunk neon filter",
-      "Make it look like a Renaissance painting",
-      "Convert to paper cutout art style",
-      "Apply Studio Ghibli animation style",
-      "Transform into low poly 3D render",
-      "Make it look like a 1950s magazine ad",
-      "Apply surrealist dreamlike quality",
-    ];
-
-    const aspectRatios = ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9", "2:3"];
-    const qualities = ["standard", "high", "ultra"];
-    const resolutions = ["1K", "2K", "4K"];
-    const statuses = ["success", "success", "success", "success", "failed"] as const; // 80% success rate
-
-    const now = Date.now();
-    const oneDay = 24 * 60 * 60 * 1000;
-    const createdIds = [];
-
-    for (let i = 0; i < count; i++) {
-      const isTextToImage = Math.random() > 0.3; // 70% text-to-image
-      const mode = isTextToImage ? "text-to-image" : "image-to-image";
-      const prompts = isTextToImage ? textToImagePrompts : imageToImagePrompts;
-      const prompt = prompts[Math.floor(Math.random() * prompts.length)];
-
-      // Random date within last 60 days
-      const daysAgo = Math.floor(Math.random() * 60);
-      const createdAt = now - (daysAgo * oneDay) - Math.floor(Math.random() * oneDay);
-
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
-      const aspectRatio = aspectRatios[Math.floor(Math.random() * aspectRatios.length)];
-      const resolution = resolutions[Math.floor(Math.random() * resolutions.length)];
-      const quality = qualities[Math.floor(Math.random() * qualities.length)];
-      const creditsUsed = resolution === "4K" ? 2 : 1;
-
-      // Generate image URL based on mode and random seed
-      const imageSeed = i + Math.floor(Math.random() * 1000);
-      const outputImage = status === "success"
-        ? `https://picsum.photos/seed/${imageSeed}/400/400`
-        : "";
-
-      const generationId = await ctx.db.insert("generations", {
-        userId: args.userId,
-        mode,
-        prompt,
-        negativePrompt: Math.random() > 0.7 ? "blurry, low quality, distorted" : undefined,
-        size: resolution,
-        resolution,
-        quality,
-        aspectRatio,
-        creditsUsed,
-        status,
-        outputImages: status === "success" ? [outputImage] : [],
-        referenceImages: mode === "image-to-image"
-          ? [`https://picsum.photos/seed/ref${imageSeed}/400/400`]
-          : undefined,
-        createdAt,
-        completedAt: status === "success" ? createdAt + Math.floor(Math.random() * 60000) : undefined,
-        errorMessage: status === "failed" ? "Generation timeout or server error" : undefined,
-      });
-
-      createdIds.push(generationId);
-    }
-
-    return {
-      success: true,
-      created: createdIds.length,
-      userId: args.userId,
-      userName: user.name || user.email,
-    };
-  },
-});
-
-// 获取所有用户列表（用于选择seed目标）
+// 获取所有用户列表
 export const getAllUsers = query({
   args: {},
   handler: async (ctx) => {
