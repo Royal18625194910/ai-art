@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@clerk/localizations": "^4.5.5",
     "@clerk/nextjs": "^7.2.5",
     "@creem_io/nextjs": "^0.6.0",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -20,8 +21,10 @@
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
     "next": "15.5.15",
+    "png-to-ico": "^3.0.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "sharp": "^0.34.5",
     "svix": "^1.92.2",
     "tailwind-merge": "^3.5.0",
     "zustand": "^5.0.12"

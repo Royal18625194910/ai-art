@@ -321,6 +321,10 @@ export interface LandingTranslations {
   faq: LandingFAQTranslations;
   pricing: LandingPricingTranslations;
   footer: {
+    features: string;
+    gallery: string;
+    privacy: string;
+    terms: string;
     copyright: string;
   };
 }

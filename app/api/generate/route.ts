@@ -103,27 +103,35 @@ export async function POST(req: NextRequest) {
           amount: 1,
         });
 
-        // 存储图片到 Convex 并创建生成记录
-        const storageResult = await convex.action(api.storage.storeImagesAndCreateGeneration, {
-          imageUrls,
+        // 下载图片并存储到 Convex Storage
+        const storedUrls: string[] = [];
+        for (const url of imageUrls) {
+          try {
+            const result = await convex.action(api.file.storeImageFromUrl, { url });
+            storedUrls.push(result.url);
+          } catch {
+            storedUrls.push(url);
+          }
+        }
+
+        // 创建生成记录
+        const generationId = await convex.mutation(api.generations.createGeneration, {
           userId: user._id,
           mode,
           prompt: prompt.trim(),
-          size: size || '1024x1024',
-          referenceImages: input_urls,
           taskId,
+          referenceImages: input_urls,
+          outputImages: storedUrls,
+          size: size || '1024x1024',
+          creditsUsed: 1,
         });
-
-        const finalImageUrls = storageResult.success && storageResult.storedUrls.length > 0
-          ? storageResult.storedUrls
-          : imageUrls;
 
         return NextResponse.json({
           success: true,
           data: {
             taskId,
-            generationId: storageResult.generationId,
-            imageUrls: finalImageUrls,
+            generationId,
+            imageUrls: storedUrls,
           },
         });
       } catch (apiError) {

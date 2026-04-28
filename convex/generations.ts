@@ -242,7 +242,7 @@ export const getUserGenerationsById = query({
     return {
       items: paginatedItems.map((g) => ({
         id: g._id,
-        imageUrl: g.outputImages?.[0] || g.outputImage || "",
+        imageUrl: g.outputImages?.[0] || "",
         prompt: g.prompt,
         mode: g.mode,
         size: g.size || g.resolution || "1K",
@@ -251,7 +251,7 @@ export const getUserGenerationsById = query({
         creditsUsed: g.creditsUsed,
         status: g.status,
         createdAt: g.createdAt,
-        outputImages: g.outputImages || (g.outputImage ? [g.outputImage] : []),
+        outputImages: g.outputImages || []
       })),
       nextCursor,
       total: generations.length,
@@ -375,7 +375,7 @@ export const getMyGenerations = query({
     return {
       items: paginatedItems.map((g) => ({
         id: g._id,
-        imageUrl: g.outputImages?.[0] || g.outputImage || "",
+        imageUrl: g.outputImages?.[0] || "",
         prompt: g.prompt,
         mode: g.mode,
         size: g.size || g.resolution || "1K",
@@ -384,7 +384,7 @@ export const getMyGenerations = query({
         creditsUsed: g.creditsUsed,
         status: g.status,
         createdAt: g.createdAt,
-        outputImages: g.outputImages || (g.outputImage ? [g.outputImage] : []),
+        outputImages: g.outputImages || []
       })),
       nextCursor,
       total: generations.length,
@@ -556,7 +556,6 @@ export const seedGenerationsForUser = mutation({
         aspectRatio,
         creditsUsed,
         status,
-        outputImage,
         outputImages: status === "success" ? [outputImage] : [],
         referenceImages: mode === "image-to-image"
           ? [`https://picsum.photos/seed/ref${imageSeed}/400/400`]

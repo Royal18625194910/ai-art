@@ -66,7 +66,7 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
   return (
     <Section
       id="features"
-      variant="alternate"
+      variant="default"
       className={cn('py-24 md:py-32 relative overflow-hidden', className)}
     >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -187,15 +187,15 @@ export function FeaturesSection({ className }: FeaturesSectionProps) {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-400 text-sm font-medium mb-6 border border-purple-500/20">
               <Sparkles className="w-4 h-4" />
-              <span>Try it now</span>
+              <span>{t('features.cta.badge')}</span>
             </div>
             <h3 className="text-2xl md:text-3xl font-bold mb-4">
               <span className="text-gradient-purple">
-                Ready to transform your ideas into art?
+                {t('features.cta.title')}
               </span>
             </h3>
             <p className="text-muted-foreground max-w-xl mx-auto mb-8">
-              Join millions of creators who are already using AI Art to bring their imagination to life.
+              {t('features.cta.description')}
             </p>
           </div>
         </motion.div>

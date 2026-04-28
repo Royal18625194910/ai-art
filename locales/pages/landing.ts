@@ -116,6 +116,10 @@ export const landing = {
       ],
     },
     footer: {
+      features: '功能',
+      gallery: '画廊',
+      privacy: '隐私政策',
+      terms: '使用条款',
       copyright: '© 2024 AI Art. All rights reserved.',
     },
   } as LandingTranslations,
@@ -234,6 +238,10 @@ export const landing = {
       ],
     },
     footer: {
+      features: '功能',
+      gallery: '画廊',
+      privacy: '隐私政策',
+      terms: '使用条款',
       copyright: '© 2024 AI Art. All rights reserved.',
     },
   } as LandingTranslations,

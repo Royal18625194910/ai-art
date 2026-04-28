@@ -102,7 +102,7 @@ export default function HistoryPage() {
   const isLoading = !isUserSynced || generationsData === undefined || stats === undefined;
 
   const items = useMemo(() => {
-    return (generationsData?.items || []).map((item) => ({
+    return (generationsData?.items || []).map((item: HistoryItem) => ({
       ...item,
       createdAt: item.createdAt,
     }));

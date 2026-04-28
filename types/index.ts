@@ -35,3 +35,9 @@ export interface CreditPackage {
 
 // Re-export from locales for backward compatibility
 export type { Locale, LocaleConfig } from '@/locales';
+
+export interface Translation {
+  [key: string]: TranslationValue;
+}
+
+export type TranslationValue = string | string[] | Translation | null | undefined;

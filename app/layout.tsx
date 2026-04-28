@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
-import { ClerkProvider } from "@clerk/nextjs";
+import { LocalizedClerkProvider } from "@/components/providers/clerk-provider";
 import { ConvexClientProvider } from "@/components/providers/convex-provider";
 import { Providers } from "@/components/providers";
 
@@ -55,9 +55,10 @@ export const metadata: Metadata = {
     creator: "@ai_art",
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.svg",
   },
   manifest: `${siteConfig.url}/manifest.json`,
 };
@@ -68,7 +69,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <LocalizedClerkProvider>
       <ConvexClientProvider>
         <Providers>
           <html lang="zh-CN" suppressHydrationWarning>
@@ -86,6 +87,6 @@ export default function RootLayout({
           </html>
         </Providers>
       </ConvexClientProvider>
-    </ClerkProvider>
+    </LocalizedClerkProvider>
   );
 }

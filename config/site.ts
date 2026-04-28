@@ -4,8 +4,8 @@ export const siteConfig: SiteConfig = {
   name: 'AI Art',
   description: '用AI创造无限可能的艺术作品',
   author: 'AI Art Team',
-  url: 'https://ai-art.example.com',
-  ogImage: 'https://ai-art.example.com/og.jpg',
+  url: process.env.NEXT_PUBLIC_CONVEX_SITE_URL || '',
+  ogImage: '',
   links: {
     twitter: 'https://twitter.com/ai_art',
     github: 'https://github.com/ai-art',
