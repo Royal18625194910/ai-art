@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { useLanguageStore } from '@/stores/use-language-store';
 import { Locale, Translation, TranslationValue } from '@/types';
 import { translations } from '@/locales';
+import type { LandingTranslations } from '@/locales';
 
 function getNestedValue(obj: Translation, path: string): TranslationValue | undefined {
   const keys = path.split('.');
@@ -120,11 +121,22 @@ export function useCommonTranslation() {
 
 export function usePageTranslation(page: 'landing' | 'create' | 'buy' | 'history') {
   const { t, tArray, tObject } = useTranslation();
-  
+
   return {
     t: (key: string, params?: Record<string, string | number>) => t(`pages.${page}.${key}`, params),
     tArray: (key: string) => tArray(`pages.${page}.${key}`),
     tObject: (key: string) => tObject(`pages.${page}.${key}`),
     pageTranslations: tObject(`pages.${page}`),
   };
+}
+
+export function useLandingTranslation() {
+  const locale = useLanguageStore((state) => state.locale);
+
+  const landing = useMemo(
+    () => translations[locale].pages.landing as LandingTranslations,
+    [locale]
+  );
+
+  return { landing };
 }

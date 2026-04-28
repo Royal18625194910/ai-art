@@ -24,6 +24,14 @@ export interface CozeRedemptionResponse {
  * ```
  */
 export async function redeemCode(code: string): Promise<CozeRedemptionResponse> {
+  if (!COZE_API_KEY) {
+    return {
+      success: false,
+      message: 'Coze API Key 未配置',
+      error: 'Missing COZE_API_KEY',
+    };
+  }
+
   try {
     const response = await fetch(COZE_API_URL, {
       method: 'POST',
@@ -40,10 +48,12 @@ export async function redeemCode(code: string): Promise<CozeRedemptionResponse> 
     });
 
     if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      console.error('Coze API error:', response.status, text);
       return {
         success: false,
-        message: '网络请求失败',
-        error: `HTTP ${response.status}`,
+        message: `Coze 接口请求失败 (${response.status})`,
+        error: `HTTP ${response.status}: ${text.slice(0, 200)}`,
       };
     }
 
